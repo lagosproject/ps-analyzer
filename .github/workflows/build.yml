@@ -98,8 +98,9 @@ jobs:
           cd ../../..
           # Create sentinel file so Tracy's Makefile skips install.sh
           touch .sdsl
-          # Remove -ldl (not available on Windows) and build tracy
+          # Patch Makefile for Windows: remove -ldl and add Winsock compatibility flags
           sed -i 's/-ldl//g' Makefile
+          sed -i 's/^CXXFLAGS += /CXXFLAGS += -DWIN32_LEAN_AND_MEAN -D_WIN32_WINNT=0x0601 /' Makefile
           make STATIC=1 CXX=x86_64-w64-mingw32-g++
           
           cp src/tracy.exe ../src-tauri/binaries/tracy-x86_64-pc-windows-msvc.exe
