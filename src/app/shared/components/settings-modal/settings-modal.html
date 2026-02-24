@@ -1,0 +1,181 @@
+<div class="modal-backdrop" (click)="close()">
+    <div class="settings-modal wide-modal" (click)="$event.stopPropagation()">
+        <div class="settings-layout">
+            <!-- Settings Sidebar -->
+            <div class="settings-sidebar">
+                <div class="settings-sidebar-header">
+                    <h2>Configuration</h2>
+                </div>
+                <nav class="settings-nav">
+                    <button class="nav-item" [class.active]="activeTab() === 'Generic'"
+                        (click)="setActiveTab('Generic')">
+                        <span class="material-symbols-outlined">tune</span> Generic
+                    </button>
+                    <button class="nav-item" [class.active]="activeTab() === 'Alignment'"
+                        (click)="setActiveTab('Alignment')">
+                        <span class="material-symbols-outlined">align_horizontal_left</span> Alignment
+                    </button>
+                    <button class="nav-item" [class.active]="activeTab() === 'Trimming'"
+                        (click)="setActiveTab('Trimming')">
+                        <span class="material-symbols-outlined">content_cut</span> Trimming
+                    </button>
+                    <div class="nav-divider"></div>
+                    <button class="nav-item" [class.active]="activeTab() === 'HGVS'" (click)="setActiveTab('HGVS')">
+                        <span class="material-symbols-outlined">menu_book</span> HGVS
+                    </button>
+                    <button class="nav-item" [class.active]="activeTab() === 'Annotate'"
+                        (click)="setActiveTab('Annotate')">
+                        <span class="material-symbols-outlined">auto_fix_high</span> Annotate
+                    </button>
+                </nav>
+                @if (!readOnly()) {
+                <div class="settings-sidebar-footer">
+                    <button class="btn-text-action small" (click)="reset.emit()">Results Defaults</button>
+                </div>
+                }
+            </div>
+
+            <!-- Settings Content -->
+            <div class="settings-main">
+                <div class="settings-header">
+                    <h3>{{ activeTab() }} Settings</h3>
+                    <button class="btn-icon-small" (click)="close()">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+
+                <div class="settings-body">
+                    @if (activeTab() === 'Generic') {
+                    <div class="settings-section">
+                        <div class="form-group-small">
+                            <label>Probability Ratio (pratio)</label>
+                            <input type="number" step="0.01" [(ngModel)]="tracyConfig().pratio" [disabled]="readOnly()">
+                            <span class="help-text">Min. ratio of second best to best basecall.</span>
+                        </div>
+                        <div class="form-group-small">
+                            <label>K-mer size</label>
+                            <input type="number" [(ngModel)]="tracyConfig().kmer" [disabled]="readOnly()">
+                        </div>
+                        <div class="form-group-small">
+                            <label>Minimum support</label>
+                            <input type="number" [(ngModel)]="tracyConfig().support" [disabled]="readOnly()">
+                        </div>
+                        <div class="form-group-small">
+                            <label>Max Indel size</label>
+                            <input type="number" [(ngModel)]="tracyConfig().maxindel" [disabled]="readOnly()">
+                        </div>
+                    </div>
+                    }
+
+                    @if (activeTab() === 'Alignment') {
+                    <div class="settings-section">
+                        <div class="form-group-small">
+                            <label>Gap Open Penalty</label>
+                            <input type="number" [(ngModel)]="tracyConfig().gapopen" [disabled]="readOnly()">
+                        </div>
+                        <div class="form-group-small">
+                            <label>Gap Extension Penalty</label>
+                            <input type="number" [(ngModel)]="tracyConfig().gapext" [disabled]="readOnly()">
+                        </div>
+                        <div class="form-group-small">
+                            <label>Match Score</label>
+                            <input type="number" [(ngModel)]="tracyConfig().match" [disabled]="readOnly()">
+                        </div>
+                        <div class="form-group-small">
+                            <label>Mismatch Penalty</label>
+                            <input type="number" [(ngModel)]="tracyConfig().mismatch" [disabled]="readOnly()">
+                        </div>
+                    </div>
+                    }
+
+                    @if (activeTab() === 'Trimming') {
+                    <div class="settings-section">
+                        <div class="form-group-small">
+                            <label>Trim Quality Threshold</label>
+                            <input type="number" [(ngModel)]="tracyConfig().trim" [disabled]="readOnly()">
+                        </div>
+                        <div class="form-group-small">
+                            <label>Global Trim Left (bp)</label>
+                            <input type="number" [(ngModel)]="tracyConfig().trimLeft" [disabled]="readOnly()">
+                        </div>
+                        <div class="form-group-small">
+                            <label>Global Trim Right (bp)</label>
+                            <input type="number" [(ngModel)]="tracyConfig().trimRight" [disabled]="readOnly()">
+                        </div>
+                        <p class="info-box">Note: You can override these trimmings per-read in the patient list.</p>
+                    </div>
+                    }
+
+                    @if (activeTab() === 'HGVS') {
+                    <div class="settings-section">
+                        <div class="form-group">
+                            <label class="form-label">Transcript ID (RefSeq)</label>
+                            <input type="text" [(ngModel)]="hgvsConfig().transcript"
+                                [disabled]="readOnly() || (!!ncbiId() && useLocalRef() === false)"
+                                placeholder="e.g. NM_000059.3">
+                            @if (!!ncbiId() && useLocalRef() === false) {
+                            <span class="help-text">Linked to NCBI Reference ID.</span>
+                            } @else {
+                            <span class="help-text">Manually specify RefSeq transcript for local files.</span>
+                            }
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Genome Assembly</label>
+                            <select [(ngModel)]="hgvsConfig().assembly" class="select-input" [disabled]="readOnly()">
+                                <option value="GRCh38">GRCh38 (hg38)</option>
+                                <option value="GRCh37">GRCh37 (hg19)</option>
+                                <option value="NCBI36">NCBI36 (hg18)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Gene Symbol (Optional)</label>
+                            <input type="text" [(ngModel)]="hgvsConfig().gene" placeholder="e.g. BRCA2"
+                                [disabled]="readOnly()">
+                        </div>
+                    </div>
+                    }
+
+                    @if (activeTab() === 'Annotate') {
+                    <div class="settings-section">
+                        @if (!isHgvsActive()) {
+                        <div class="warning-box">
+                            <span class="material-symbols-outlined">warning</span>
+                            <div>
+                                <strong>HGVS Required</strong>
+                                <p>You must configure a Transcript ID in the HGVS tab to enable annotations.</p>
+                            </div>
+                        </div>
+                        }
+
+                        <div class="info-box">
+                            <span class="material-symbols-outlined">info</span>
+                            <div>
+                                <strong>Network Required</strong>
+                                <p>VEP annotation requires an active internet connection to query Ensembl servers.</p>
+                            </div>
+                        </div>
+
+                        <div class="settings-row">
+                            <div class="setting-info">
+                                <label>Enable VEP Annotation (Beta)</label>
+                                <span class="help-text">Annotates variants with impact and consequence.</span>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" [(ngModel)]="hgvsConfig().auto_vep"
+                                    [disabled]="readOnly() || !isHgvsActive()">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    }
+                </div>
+
+                <div class="settings-footer-actions">
+                    <button class="btn-solid" (click)="close()">{{ readOnly() ? 'Close' : 'Done' }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

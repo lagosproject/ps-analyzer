@@ -1,0 +1,62 @@
+@if (data(); as d) {
+<div class="nucleotide-popover" [style.left.px]="position().x" [style.top.px]="position().y"
+    (click)="$event.stopPropagation()" (contextmenu)="$event.stopPropagation()">
+    <div class="popover-header">
+        <span class="popover-title">Nucleotide Info</span>
+        <span class="popover-pos">{{ d.posLabel || 'Ref Pos' }}: {{ d.refPos }}</span>
+    </div>
+    <div class="popover-content">
+        @for (pos of d.sangerPos; track $index) {
+        <div class="sanger-info-group">
+            <div class="info-row">
+                <span class="info-label">Sanger Pos:</span>
+                <span class="info-value">{{ pos }}</span>
+            </div>
+            <div class="signal-grid">
+                <div class="signal-item a">
+                    <span class="sig-label">A</span>
+                    <span class="sig-val">{{ d.signals[$index].a }}</span>
+                </div>
+                <div class="signal-item c">
+                    <span class="sig-label">C</span>
+                    <span class="sig-val">{{ d.signals[$index].c }}</span>
+                </div>
+                <div class="signal-item g">
+                    <span class="sig-label">G</span>
+                    <span class="sig-val">{{ d.signals[$index].g }}</span>
+                </div>
+                <div class="signal-item t">
+                    <span class="sig-label">T</span>
+                    <span class="sig-val">{{ d.signals[$index].t }}</span>
+                </div>
+            </div>
+        </div>
+        }
+
+        @if (showCopyButtons()) {
+        <div class="popover-divider"></div>
+
+        <div class="copy-section">
+            <span class="section-label">Copy Sequence</span>
+            <div class="copy-buttons">
+                @if (d.readId === 'Reference') {
+                <button class="copy-btn primary" (click)="onCopy('cons')">
+                    <span class="btn-icon">📋</span> Reference
+                </button>
+                } @else {
+                <button class="copy-btn" (click)="onCopy('alt1')">
+                    <span class="btn-icon">📋</span> Allele 1
+                </button>
+                <button class="copy-btn" (click)="onCopy('alt2')">
+                    <span class="btn-icon">📋</span> Allele 2
+                </button>
+                <button class="copy-btn muted" (click)="onCopy('cons')">
+                    <span class="btn-icon">📋</span> Consensus
+                </button>
+                }
+            </div>
+        </div>
+        }
+    </div>
+</div>
+}

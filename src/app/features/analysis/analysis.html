@@ -1,0 +1,119 @@
+<div class="analysis-view">
+
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Top Header -->
+    <header class="top-bar">
+      <div class="header-left">
+        <div class="brand" (click)="goBack()" title="Return to Dashboard" aria-label="Return to Dashboard" role="button"
+          tabindex="0">
+          <img src="assets/logo.svg" class="brand-logo" alt="PS Analyzer Logo" aria-hidden="true">
+          <div class="brand-text">
+            <h1 class="brand-title">PS Analyzer</h1>
+            <div class="brand-subtitle" aria-hidden="true">
+              <span class="material-symbols-outlined" style="font-size: 16px;" aria-hidden="true">arrow_back</span>
+              <span>Back to Dashboard</span>
+            </div>
+          </div>
+        </div>
+        <div class="header-divider"></div>
+        <div class="flex flex-col">
+          @if (isEditingName()) {
+          <div class="inline-edit-container">
+            <input type="text" [(ngModel)]="editingName" (blur)="saveName()" (keyup.enter)="saveName()"
+              (keyup.escape)="cancelEditingName()" class="header-edit-input" aria-label="Edit job name">
+          </div>
+          } @else {
+          <h2 class="page-title editable-title" (dblclick)="startEditingName()" title="Double click to rename"
+            aria-label="Job Name">
+            {{ currentJobName() || 'Sequence Analysis' }}
+            <span class="material-symbols-outlined edit-icon" aria-hidden="true">edit</span>
+          </h2>
+          }
+          <p class="page-meta">{{ patients().length }} Patient(s) • {{ totalReads() }} Read(s)</p>
+        </div>
+      </div>
+      <div class="action-buttons">
+        <button class="btn-outline" (click)="openSettings()" [disabled]="!tracyConfig()"
+          aria-label="View Analysis Settings">
+          <span class="material-symbols-outlined" aria-hidden="true">tune</span>
+          <span>View Settings</span>
+        </button>
+        <button class="btn-solid" [disabled]="!hasMarkedVariants()" (click)="openReportModal()"
+          aria-label="Export Report">
+          <span class="material-symbols-outlined" aria-hidden="true">download</span>
+          <span>Export Report</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Content Area -->
+    <div class="content-area">
+      <!-- Variants Sidebar -->
+      <aside class="variants-sidebar" aria-label="Variant List">
+        <app-variant-list [variants]="allVariants()" [selectedVariant]="selectedVariant()" [comments]="comments()"
+          [jobId]="currentJobId()" [hgvsAlternatives]="hgvsAlternatives()" (variantClick)="zoomToVariant($event)"
+          (commentAdded)="onCommentAdded($event)" (commentDeleted)="onCommentDeleted($event)">
+        </app-variant-list>
+      </aside>
+
+      <!-- Main Visualization Panel -->
+      <main class="visualization-panel">
+        <!-- Visualization Toolbar -->
+        <div class="timeline-view">
+          <div class="minimap-wrapper">
+            <app-analysis-minimap [features]="features()" [coverage]="alignmentReadMap()" [maxCoverage]="maxCoverage()">
+            </app-analysis-minimap>
+          </div>
+        </div>
+        <app-nucleotide-row-controls [referenceTrace]="referenceTrace()">
+        </app-nucleotide-row-controls>
+
+        <!-- Alignment View wrapped in scrollable container-->
+        <div class="alignment-view" (scroll)="updateScroll($event)" role="region" aria-label="Alignment View">
+          <app-group-nucleotide-rows [traces]="traces()" [referenceTrace]="referenceTrace()"
+            [alignmentDepthMap]="alignmentDepthMap()" (rowClick)="handleRowClick($event)"
+            (nucleotideSelected)="onNucleotideSelected($event)"></app-group-nucleotide-rows>
+        </div>
+
+        <!-- Chromatogram Section -->
+        <div class="chromatogram-section">
+          <div class="chromatogram-header">
+            <h4 class="section-title">Chromatogram Trace</h4>
+          </div>
+          <div class="chromatogram-container">
+            <!-- Using existing sanger chart logic-->
+            @for (t of traces(); track t.readId) {
+            <div class="trace-wrapper" style="position: relative;" [id]="'trace-' + t.readId">
+              <app-sanger-chart [trace]="t.result.trace" [readId]="t.readId" [refStart]="t.result.alignment.refStart"
+                [height]="180" [trimLeft]="t.result.alignment.intro_trimmed ?? 0"
+                [trimRight]="t.result.alignment.outro_trimmed ?? 0" [consensusAlign]="t.result.consensusAlign || {}"
+                [readSeqConsensus]="t.result.readSeqConsensus || []"
+                [readSeqConsensusComplementary]="t.result.readSeqConsensusComplementary || []"
+                [readSeqRef]="t.result.readSeqRef || []" [variants]="t.mappedVariants || []"
+                [patientName]="t.patient.name" [refForward]="t.result.alignment.refForward">
+              </app-sanger-chart>
+
+            </div>
+            }
+          </div>
+        </div>
+      </main>
+    </div>
+
+  </div>
+
+  <!-- Settings Modal (Read Only) -->
+  @if (showSettings() && tracyConfig()) {
+  <app-settings-modal [(isVisible)]="showSettings" [tracyConfig]="tracyConfig()!" [hgvsConfig]="hgvsConfig()"
+    [readOnly]="true" [ncbiId]="ncbiId()" [useLocalRef]="useLocalRefState()">
+  </app-settings-modal>
+  }
+
+  <!-- Report Modal -->
+  @if (showReportModal()) {
+  <app-report-modal [(isVisible)]="showReportModal" [jobId]="currentJobId() || ''" [jobName]="currentJobName() || ''"
+    [allVariants]="allVariants()" [patients]="patients()" (generate)="onReportGenerate($event)"></app-report-modal>
+  }
+</div>

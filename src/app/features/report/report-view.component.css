@@ -1,0 +1,203 @@
+/* Report Page Styles */
+.report-container {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    background: white;
+    min-height: 100vh;
+    box-shadow: none;
+}
+
+.report-content {
+    padding: 2rem;
+}
+
+/* Header (Screen Only) */
+.report-header {
+    background: #f8f9fa;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #e9ecef;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.report-title-section {
+    margin-bottom: 2rem;
+    border-bottom: 2px solid #333;
+    padding-bottom: 1rem;
+}
+
+.report-title-section h1 {
+    font-size: 2rem;
+    color: #111;
+    margin-bottom: 1rem;
+}
+
+.meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.meta-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.meta-item .label {
+    font-size: 0.75rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.meta-item .value {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #333;
+}
+
+/* Variant Block */
+.variant-block {
+    margin-bottom: 3rem;
+    page-break-inside: avoid;
+    /* Prevent breaking inside a variant block */
+}
+
+.variant-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid var(--primary, #3b82f6);
+    padding-left: 1rem;
+}
+
+.variant-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.variant-tags {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.tag {
+    background: #f3f4f6;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.tag.type {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+.tag.hgvs {
+    background: #fdf4ff;
+    color: #a21caf;
+    font-family: monospace;
+}
+
+.variant-comments {
+    background: #fffbeb;
+    border: 1px solid #fcd34d;
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
+}
+
+.variant-comments strong {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #92400e;
+}
+
+.variant-comments p {
+    margin: 0;
+    margin-bottom: 0.5rem;
+    color: #78350f;
+    line-height: 1.4;
+}
+
+.variant-comments p:last-child {
+    margin-bottom: 0;
+}
+
+.comment-author {
+    font-weight: 600;
+}
+
+.report-comment {
+    font-style: italic;
+    border-left: 2px solid #fbbf24;
+    padding-left: 0.5rem;
+    margin-top: 0.5rem !important;
+}
+
+/* Charts */
+.charts-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.chart-item {
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 0.5rem;
+    /* Ensure charts don't break across pages if possible, or handle gracefully */
+    page-break-inside: avoid;
+}
+
+.chart-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+    color: #555;
+    padding: 0 0.5rem;
+}
+
+.read-id {
+    font-family: monospace;
+}
+
+.genotype-tag {
+    font-weight: 600;
+    color: #dc2626;
+}
+
+/* Print Specifics */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+
+    .report-container {
+        box-shadow: none;
+        max-width: 100%;
+        margin: 0;
+        min-height: auto;
+    }
+
+    .report-content {
+        padding: 0;
+    }
+
+    /* Force background colors */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .avoid-break {
+        break-inside: avoid;
+    }
+}

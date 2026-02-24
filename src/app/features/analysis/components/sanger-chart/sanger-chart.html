@@ -1,0 +1,160 @@
+<div class="sanger-wrapper">
+
+    <!-- Controls Toolbar -->
+    <!-- Controls Toolbar (Floating Top Right) -->
+    @if (!staticMode()) {
+    <div class="controls">
+        <div class="control-group">
+            <span class="control-label" aria-hidden="true">H</span>
+            <button (click)="zoomInX()" title="Zoom In Horizontal" aria-label="Zoom In Horizontal">
+                <span class="material-symbols-outlined" aria-hidden="true">zoom_in</span>
+            </button>
+            <button (click)="zoomOutX()" title="Zoom Out Horizontal" aria-label="Zoom Out Horizontal">
+                <span class="material-symbols-outlined" aria-hidden="true">zoom_out</span>
+            </button>
+            <button (click)="zoomFullX()" title="Fit Width" aria-label="Fit Horizontal Width">
+                <span class="material-symbols-outlined" aria-hidden="true">fit_screen</span>
+            </button>
+
+        </div>
+        <div class="nav-divider"></div>
+        <div class="control-group">
+            <span class="control-label" aria-hidden="true">V</span>
+            <button (click)="zoomInY()" title="Increase Amplitude" aria-label="Increase Amplitude">
+                <span class="material-symbols-outlined" aria-hidden="true">zoom_in</span>
+            </button>
+            <button (click)="zoomOutY()" title="Decrease Amplitude" aria-label="Decrease Amplitude">
+                <span class="material-symbols-outlined" aria-hidden="true">zoom_out</span>
+            </button>
+            <button (click)="zoomFullY()" title="Reset Amplitude" aria-label="Reset Amplitude">
+                <span class="material-symbols-outlined" aria-hidden="true">fit_screen</span>
+            </button>
+        </div>
+    </div>
+    }
+
+    <!-- Read Overlay (Patient Name + Direction Toggle) -->
+    <div class="read-overlay">
+        <span class="read-patient-name">{{ patientName() }}</span>
+        <button class="read-direction" [class.interactive]="refForward() === 0"
+            [class.reverse-read]="refForward() === 0" [class.view-reversed]="isReverse()" (click)="toggleReverse()"
+            [title]="refForward() === 0 ? 'Toggle View Direction' : 'Forward Read (Fixed)'"
+            [attr.aria-label]="refForward() === 0 ? 'Toggle View Direction' : 'Direction Fixed'">
+            <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+        </button>
+    </div>
+
+    <!-- Scrollable Chart Area -->
+    <div class="chart-container" #scrollContainer (mousedown)="onMouseDown($event)" (mouseleave)="onMouseLeave()"
+        (mouseup)="onMouseUp()" (mousemove)="onMouseMove($event)" (wheel)="onWheel($event)"
+        [class.dragging]="isDragging" [class.static-mode]="staticMode()">
+        <div class="svg-wrapper" [style.height.px]="height()">
+            <svg [attr.height]="height()" [attr.width]="staticMode() ? '100%' : totalWidth()"
+                [attr.viewBox]="staticViewBox()" [attr.preserveAspectRatio]="staticMode() ? 'none' : null">
+
+                <!-- Definitions for Grid -->
+                <defs>
+                    <pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse">
+                        <path d="M 100 0 L 0 0 0 100" fill="none" stroke="gray" stroke-width="0.5" />
+                    </pattern>
+                </defs>
+
+                <!-- Horizontal Grid Lines using % height -->
+                <line x1="0" y1="25%" x2="100%" y2="25%" class="grid-line" stroke-dasharray="4" />
+                <line x1="0" y1="50%" x2="100%" y2="50%" class="grid-line" stroke-dasharray="4" />
+                <line x1="0" y1="75%" x2="100%" y2="75%" class="grid-line" stroke-dasharray="4" />
+
+                <!-- Trim Overlays -->
+                <rect class="trim-overlay" fill="rgba(0,0,0,0.1)" x="0" y="0" [attr.width]="trimOverlay().leftWidth"
+                    height="100%" />
+                <rect class="trim-overlay" fill="rgba(0,0,0,0.1)" [attr.x]="trimOverlay().rightX" y="0"
+                    [attr.width]="trimOverlay().rightWidth" height="100%" />
+
+                <!-- Traces -->
+                <path [attr.d]="tracePaths().a" class="trace-a" fill="none" stroke="green" stroke-width="1.5" />
+                <path [attr.d]="tracePaths().c" class="trace-c" fill="none" stroke="blue" stroke-width="1.5" />
+                <path [attr.d]="tracePaths().g" class="trace-g" fill="none" stroke="black" stroke-width="1.5" />
+                <path [attr.d]="tracePaths().t" class="trace-t" fill="none" stroke="red" stroke-width="1.5" />
+
+                <!-- Ticks/Indicators (Every 5 Nucleotides) -->
+                @for (tick of ticks(); track tick.label) {
+                <g [attr.transform]="'translate(' + tick.x + ', 0)'">
+                    <text [attr.y]="height() - 4" x="0" text-anchor="middle" font-size="10"
+                        fill="#666">{{tick.label}}</text>
+                </g>
+                }
+
+                <!-- Consensus Bases Row -->
+                @for (b of consensusBases(); track $index) {
+                <text [attr.x]="b.x" [attr.y]="height() - 36" text-anchor="middle" font-size="11" font-weight="600"
+                    [attr.fill]="b.base === 'A' ? 'green' : b.base === 'C' ? 'blue' : b.base === 'G' ? 'black' : b.base === 'T' ? 'red' : '#666'"
+                    style="pointer-events: auto; user-select: none; cursor: pointer;"
+                    [attr.transform]="isReverse() ? 'matrix(-1, 0, 0, 1, ' + (2 * b.x) + ', 0)' : null"
+                    (click)="onBaseClick($event, b.index)">
+                    {{b.base}}
+                </text>
+                }
+
+                <!-- Reference Bases Row -->
+                @for (b of referenceBases(); track $index) {
+                <text [attr.x]="b.x" [attr.y]="height() - 20" text-anchor="middle" font-size="11" font-weight="600"
+                    [attr.fill]="b.base === 'A' ? 'green' : b.base === 'C' ? 'blue' : b.base === 'G' ? 'black' : b.base === 'T' ? 'red' : '#666'"
+                    style="pointer-events: auto; user-select: none; cursor: pointer;"
+                    (click)="onBaseClick($event, b.index)">
+                    {{b.base}}
+                </text>
+                }
+                <!-- Highlights -->
+                @for (h of highlights(); track h.x) {
+                <g [attr.transform]="'translate(' + h.x + ', 0)'">
+                    <line x1="0" x2="0" y1="0" [attr.y2]="height() - 50" [attr.stroke]="h.color" stroke-width="2"
+                        stroke-opacity="0.7" />
+
+                    <polygon points="-5,0 5,0 0,10" [attr.fill]="h.color" transform="translate(0, 10)" />
+
+                    @if (h.label) {
+                    <text x="0" y="8" text-anchor="middle" font-size="10" stroke="white" stroke-width="3"
+                        font-weight="bold">{{h.label}}</text>
+
+                    <text x="0" y="8" text-anchor="middle" font-size="10" [attr.fill]="h.color"
+                        font-weight="bold">{{h.label}}</text>
+                    }
+                </g>
+                }
+
+                <!-- Deletion Markers -->
+                @for (delMarker of deletionMarkers(); track delMarker.x) {
+                <g [attr.transform]="'translate(' + delMarker.x + ', 0)'">
+                    <title>{{delMarker.tooltip}}</title>
+                    <polygon points="-5,0 5,0 0,10" fill="orange" transform="translate(0, 10)" />
+                    <line y1="0" [attr.y2]="height()" stroke="orange" stroke-width="1" stroke-dasharray="2,2" />
+                    <text y="8" x="0" text-anchor="middle" font-size="9" fill="orange"
+                        font-weight="bold">{{delMarker.label}}</text>
+                </g>
+                }
+
+                <!-- SNV Markers -->
+                @for (snvMarker of snvMarkers(); track snvMarker.x) {
+                <g [attr.transform]="'translate(' + snvMarker.x + ', 0)'">
+                    <title>{{snvMarker.tooltip}}</title>
+                    <polygon points="-5,0 5,0 0,10" fill="#20B2AA" transform="translate(0, 10)" />
+                    <line y1="0" [attr.y2]="height()" stroke="#20B2AA" stroke-width="1" stroke-dasharray="2,2" />
+                    <text y="8" x="0" text-anchor="middle" font-size="9" fill="#20B2AA"
+                        font-weight="bold">{{snvMarker.label}}</text>
+                </g>
+                }
+
+            </svg>
+        </div>
+    </div>
+
+    @if (popupVisible() && popupData()) {
+    <app-signal-popup [data]="popupData()!" [position]="popupPosition()" [showCopyButtons]="false">
+    </app-signal-popup>
+    }
+</div>
+
+@if (popupVisible()) {
+<div class="backdrop" (click)="closePopup()" style="position: fixed; inset: 0; z-index: 999; background: transparent;">
+</div>
+}

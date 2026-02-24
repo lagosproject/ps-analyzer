@@ -1,0 +1,60 @@
+<div class="toolbar">
+    <div class="toolbar-group">
+        <div class="cursor-display">
+            <span>Cursor:</span>
+            <input type="number" [ngModel]="timelineService.position() + 1" (change)="updateCursor($event)"
+                class="cursor-input" min="1" [max]="timelineService.maxPosition() + 1">
+        </div>
+        <div class="toolbar-divider"></div>
+
+        <!-- Search Controls -->
+        <div class="search-controls">
+            <div class="search-input-wrapper">
+                <span class="material-symbols-outlined search-icon">search</span>
+                <input type="text" [(ngModel)]="searchQuery" placeholder="Search..." class="search-input">
+            </div>
+            <button class="zoom-btn" (click)="prevMatch()" [disabled]="searchResults().length === 0"
+                title="Previous Match">
+                <span class="material-symbols-outlined">chevron_left</span>
+            </button>
+            @if (searchResults().length > 0) {
+            <span class="search-counter">
+                {{ currentMatchIndex() + 1 }} / {{ searchResults().length }}
+            </span>
+            }
+            <button class="zoom-btn" (click)="nextMatch()" [disabled]="searchResults().length === 0" title="Next Match">
+                <span class="material-symbols-outlined">chevron_right</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="zoom-controls">
+        <div class="nav-controls">
+            <button class="zoom-btn" [disabled]="timelineService.position() === 0" (click)="scrollToBoundary(false)"
+                title="First Page">
+                <span class="material-symbols-outlined">first_page</span>
+            </button>
+            <button class="zoom-btn" [disabled]="timelineService.position() === 0" (click)="moveTimeline(-1)"
+                title="Go Left">
+                <span class="material-symbols-outlined">chevron_left</span>
+            </button>
+            <button class="zoom-btn"
+                [disabled]="timelineService.position() >= timelineService.maxPosition() - timelineService.zoom()"
+                (click)="moveTimeline(1)" title="Go Right">
+                <span class="material-symbols-outlined">chevron_right</span>
+            </button>
+            <button class="zoom-btn"
+                [disabled]="timelineService.position() >= timelineService.maxPosition() - timelineService.zoom()"
+                (click)="scrollToBoundary(true)" title="Last Page">
+                <span class="material-symbols-outlined">last_page</span>
+            </button>
+        </div>
+        <div class="toolbar-divider"></div>
+        <button class="zoom-btn" (click)="updateZoom(-1)" title="Zoom In">
+            <span class="material-symbols-outlined">zoom_in</span>
+        </button>
+        <button class="zoom-btn" (click)="updateZoom(1)" title="Zoom Out">
+            <span class="material-symbols-outlined">zoom_out</span>
+        </button>
+    </div>
+</div>

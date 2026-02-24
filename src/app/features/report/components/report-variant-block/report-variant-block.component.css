@@ -1,0 +1,125 @@
+.variant-block {
+    margin-bottom: 3rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+}
+
+.variant-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid var(--primary, #38A89D);
+    padding-left: 1rem;
+}
+
+.variant-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.variant-tags {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.tag {
+    background: #f3f4f6;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.tag.type {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+.tag.hgvs {
+    background: #fdf4ff;
+    color: #a21caf;
+    font-family: monospace;
+}
+
+/* Visualization Panel matching Analysis View (Minimap/Controls removed) */
+.visualization-panel {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    background-color: white;
+    position: relative;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    overflow: hidden;
+}
+
+.alignment-view {
+    display: flex;
+    flex-direction: column;
+    overflow-x: auto;
+}
+
+.variant-comments {
+    background: #fffbeb;
+    border: 1px solid #fcd34d;
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
+}
+
+.variant-comments strong {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #92400e;
+}
+
+.variant-comments p {
+    margin: 0;
+    margin-bottom: 0.5rem;
+    color: #78350f;
+    line-height: 1.4;
+}
+
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+    gap: 1.5rem;
+}
+
+.chart-item {
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 0.5rem;
+}
+
+.chart-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+    color: #555;
+    padding: 0 0.5rem;
+}
+
+.read-id {
+    font-family: monospace;
+}
+
+.genotype-tag {
+    font-weight: 600;
+    color: #dc2626;
+}
+
+@media print {
+    .no-print {
+        display: none !important;
+    }
+
+    .variant-block {
+        box-shadow: none;
+        padding: 0;
+    }
+}

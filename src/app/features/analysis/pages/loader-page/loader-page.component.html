@@ -1,0 +1,14 @@
+<div class="loader-page">
+    @if (analysisError(); as err) {
+    <div class="error-container" role="alert" aria-live="assertive">
+        <h3>Analysis Failed: {{ err.type }}</h3>
+        <p>{{ err.message }}</p>
+        <button class="btn-solid" (click)="goBack()">Return to Dashboard</button>
+    </div>
+    } @else {
+    <div class="loader-container">
+        <app-sanger-loader [message]="statusMessage()" [progress]="progress()"></app-sanger-loader>
+        <button class="btn-outline cancel-btn" (click)="goBack()">Cancel</button>
+    </div>
+    }
+</div>

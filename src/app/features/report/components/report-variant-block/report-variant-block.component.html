@@ -1,0 +1,62 @@
+<div class="variant-block avoid-break">
+    <div class="variant-header">
+        @if (item().hgvs) {
+        <h2>{{ item().hgvs }}</h2>
+        } @else {
+        <h2>Variant at Position {{ item().config.variantPosition }}</h2>
+        }
+        <div class="variant-tags">
+            <span class="tag">{{ item().variant.ref }} <span class="arrow">→</span> {{ item().variant.alt }}</span>
+            @if (item().variant.type) {
+            <span class="tag type">{{ item().variant.type }}</span>
+            }
+        </div>
+    </div>
+
+    @if (item().config.comments || item().jobComments.length > 0) {
+    <div class="variant-comments">
+        <strong>Comments:</strong>
+        @for (comment of item().jobComments; track comment.id) {
+        <p class="job-comment"><span class="comment-author">{{ comment.author }}:</span> {{ comment.text }}</p>
+        }
+        @if (item().config.comments) {
+        <p class="report-comment">{{ item().config.comments }}</p>
+        }
+    </div>
+    }
+
+    <!-- Visualisation Panel matching Analysis View (Minimap/Controls removed per request) -->
+    <div class="visualization-panel">
+        <div class="alignment-view">
+            <app-group-nucleotide-rows [traces]="traces()"
+                [referenceTrace]="item().config.includeReference ? referenceTrace() : undefined"
+                [alignmentDepthMap]="alignmentDepthMap()"
+                (nucleotideSelected)="onNucleotideSelected($event)"></app-group-nucleotide-rows>
+        </div>
+    </div>
+
+    <div class="charts-grid">
+        @for (read of item().reads; track read.readId) {
+        <div class="chart-item">
+            <div class="chart-meta">
+                <span class="read-id">{{ read.readId }}</span>
+                @if (read.variant && read.variant['genotype']) {
+                <span class="genotype-tag">{{ read.variant['genotype'] }}</span>
+                }
+            </div>
+            <app-sanger-chart [trace]="read.trace.result.trace" [readId]="read.readId"
+                [patientName]="read.trace.patient.name"
+                [variants]="read.trace.result.variants ? analysisService.mapVariantData(read.trace.result.variants) : []"
+                [consensusAlign]="read.trace.result.consensusAlign || {}"
+                [readSeqConsensus]="read.trace.result.readSeqConsensus || []"
+                [readSeqConsensusComplementary]="read.trace.result.readSeqConsensusComplementary || []"
+                [readSeqRef]="read.trace.result.readSeqRef || []" [refStart]="read.trace.result.alignment.refStart || 0"
+                [trimLeft]="read.trace.result.alignment.intro_trimmed || 0"
+                [trimRight]="read.trace.result.alignment.outro_trimmed || 0"
+                [refForward]="read.trace.result.alignment.refForward !== undefined ? read.trace.result.alignment.refForward : 1"
+                [height]="120" [staticMode]="true" [viewRange]="timelineService.viewRange()">
+            </app-sanger-chart>
+        </div>
+        }
+    </div>
+</div>

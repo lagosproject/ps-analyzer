@@ -1,0 +1,340 @@
+.group-container {
+    --row-height: 30px;
+    position: relative;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border: 1px solid #eee;
+    background: white;
+}
+
+.row-container {
+    display: flex;
+    flex-direction: row;
+    border-bottom: 1px solid #f0f0f0;
+    min-height: var(--row-height);
+    position: relative;
+}
+
+.row-container:hover {
+    z-index: 100;
+}
+
+.row-container:last-child {
+    border-bottom: none;
+}
+
+.row-label {
+    width: 200px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 0 12px;
+    background-color: #fcfcfc;
+    border-right: 1px solid #eee;
+    font-size: 12px;
+    font-weight: 500;
+    color: #555;
+    white-space: nowrap;
+    overflow: visible;
+}
+
+.label-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: var(--row-height);
+}
+
+.label-left {
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    flex: 1;
+}
+
+.patient-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-left: 4px;
+}
+
+.row-expand-btn {
+    background: #eee;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 8px;
+    padding: 0;
+    flex-shrink: 0;
+    color: #666;
+}
+
+.row-expand-btn:hover {
+    background: #e0e0e0;
+    color: #333;
+}
+
+.read-direction {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    background-color: var(--primary);
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 4px;
+    margin-left: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.read-direction.reverse {
+    background-color: #f59e0b;
+}
+
+.info-icon-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    margin-left: 6px;
+    cursor: help;
+}
+
+.info-icon {
+    font-size: 13px;
+    color: #888;
+    background: #f0f0f0;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    border: 1px solid #ddd;
+}
+
+.info-icon-wrapper:hover .info-icon {
+    background: #38A89D;
+    color: white;
+    border-color: #38A89D;
+}
+
+
+.fixed-tooltip {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(-50%);
+    background: white;
+    color: var(--text-dark);
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 11px;
+    z-index: 10000;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border-muted);
+    min-width: 200px;
+    pointer-events: none;
+    animation: tooltip-fade-in 0.15s ease-out;
+}
+
+@keyframes tooltip-fade-in {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+.fixed-tooltip::after {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px;
+    border-style: solid;
+    border-color: transparent transparent white transparent;
+}
+
+.tooltip-header {
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 8px;
+    border-bottom: 1px solid var(--border-muted);
+    padding-bottom: 4px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.tooltip-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.tooltip-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+}
+
+.tooltip-label {
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 10px;
+}
+
+.tooltip-value {
+    color: var(--text-dark);
+    font-weight: 500;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.reference-container .row-label {
+    background-color: #f0f4f8;
+    color: #2c3e50;
+    font-weight: bold;
+}
+
+.labels-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.labels-spacer {
+    height: 0;
+}
+
+.allele-side-label {
+    height: var(--row-height);
+    display: flex;
+    align-items: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.allele-side-label.allele-1 {
+    color: #38A89D;
+}
+
+.allele-side-label.allele-2 {
+    color: #f59e0b;
+}
+
+.row-wrapper {
+    position: relative;
+    min-height: var(--row-height);
+    flex: 1;
+    overflow: hidden;
+}
+
+
+/* Selection Pop-up Styles */
+.selection-copy-popup {
+    position: fixed;
+    z-index: 1001;
+    /* Above the info popover */
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(56, 168, 157, 0.3);
+    /* Using #38A89D */
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    padding: 6px;
+    animation: selection-pop-in 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    pointer-events: auto;
+}
+
+@keyframes selection-pop-in {
+    from {
+        opacity: 0;
+        transform: scale(0.5) translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.popup-btn-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.selection-copy-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    background: white;
+    color: var(--text-main);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.selection-copy-btn:hover {
+    background: #f8f9fa;
+    border-color: #38A89D;
+    color: #38A89D;
+    transform: scale(1.02);
+}
+
+.selection-copy-btn.primary {
+    background: #38A89D;
+    color: white;
+    border: none;
+    box-shadow: 0 2px 4px rgba(56, 168, 157, 0.2);
+}
+
+.selection-copy-btn.primary:hover {
+    background: #2c8a81;
+    transform: scale(1.05);
+}
+
+.selection-copy-btn.muted {
+    background: #fafafa;
+    color: #888;
+    font-weight: 500;
+}
+
+.selection-copy-btn.muted:hover {
+    background: #f0f0f0;
+    color: #555;
+}
+
+.selection-copy-btn:active {
+    transform: scale(0.98);
+}

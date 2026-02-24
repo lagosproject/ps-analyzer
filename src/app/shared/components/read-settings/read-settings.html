@@ -1,0 +1,69 @@
+<div class="modal-backdrop" (click)="onClose()">
+    <div class="settings-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h2>Read Settings: {{ filePath().split('/').pop() }}</h2>
+            <button class="btn-icon-small" (click)="onClose()">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <div class="settings-content">
+            @if (loading()) {
+            <div class="loading">Loading preview...</div>
+            } @else if (error()) {
+            <div class="error">{{ error() }}</div>
+            } @else {
+            <div class="preview-container">
+                <div class="settings-section">
+                    <h4>Trim Settings</h4>
+                    <div class="grid-2">
+                        <div class="form-group-small">
+                            <label>Trim Left (bases):</label>
+                            <input type="number" [ngModel]="trimLeft()" (ngModelChange)="trimLeft.set($event)" min="0"
+                                [max]="previewSequenceLength()">
+                        </div>
+                        <div class="form-group-small">
+                            <label>Trim Right (bases):</label>
+                            <input type="number" [ngModel]="trimRight()" (ngModelChange)="trimRight.set($event)" min="0"
+                                [max]="previewSequenceLength()">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="settings-section">
+                    <h4>Preview</h4>
+                    <div class="chart-preview">
+                        <div class="chart-header">
+                            <h4>Start Region</h4>
+                        </div>
+                        <div class="chart-wrapper">
+                            <app-sanger-chart [trace]="previewTrace()" [readId]="'preview'" [height]="150"
+                                [viewRange]="startViewRange()" [trimLeft]="trimLeft()"
+                                [trimRight]="trimRight()"></app-sanger-chart>
+                        </div>
+
+                        <div class="chart-header">
+                            <h4>End Region</h4>
+                        </div>
+                        <div class="chart-wrapper">
+                            <app-sanger-chart [trace]="previewTrace()" [readId]="'preview'" [height]="150"
+                                [viewRange]="endViewRange()" [trimLeft]="trimLeft()"
+                                [trimRight]="trimRight()"></app-sanger-chart>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            }
+        </div>
+
+        <div class="modal-footer">
+            <button (click)="onClose()" class="btn-text-action">Cancel</button>
+            <button (click)="onSave()" class="btn-solid">
+                <span class="material-symbols-outlined">check</span>
+                Save Changes
+            </button>
+        </div>
+    </div>
+</div>

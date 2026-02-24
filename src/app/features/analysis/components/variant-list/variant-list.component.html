@@ -1,0 +1,250 @@
+<div class="variants-sidebar">
+    <div class="variants-header">
+        <h3 class="variants-title">Detected Variants</h3>
+        <div class="search-box">
+            <span class="material-symbols-outlined search-icon" aria-hidden="true">search</span>
+            <input class="search-input" type="text" placeholder="Search pos or mutation..." [ngModel]="searchTerm()"
+                (ngModelChange)="updateSearchTerm($event)" aria-label="Search variants by position or mutation">
+        </div>
+        <div class="filter-section">
+            <div class="filter-row">
+                <span class="filter-label">Type:</span>
+                <div class="filter-chips">
+                    <button class="chip" [class.active]="filterType() === 'All'" (click)="setFilter('All')">All</button>
+                    @for (type of availableTypes(); track type) {
+                    <button class="chip" [class.active]="filterType() === type" [attr.data-type]="type"
+                        (click)="setFilter(type)">
+                        {{ type }}
+                    </button>
+                    }
+                </div>
+            </div>
+            <div class="filter-row">
+                <span class="filter-label">Quality:</span>
+                <div class="filter-chips">
+                    <button class="chip" [class.active]="filterQuality() === 'All'"
+                        (click)="setQualityFilter('All')">All</button>
+                    @for (q of availableQualities(); track q) {
+                    <button class="chip" [class.active]="filterQuality() === q" (click)="setQualityFilter(q)">
+                        {{ q }}
+                    </button>
+                    }
+                </div>
+            </div>
+            <div class="filter-row">
+                <span class="filter-label">Patient:</span>
+                <div class="filter-chips">
+                    <button class="chip" [class.active]="filterPatient() === 'All'"
+                        (click)="setPatientFilter('All')">All</button>
+                    @for (patient of availablePatients(); track patient) {
+                    <button class="chip" [class.active]="filterPatient() === patient"
+                        (click)="setPatientFilter(patient)">
+                        {{ patient }}
+                    </button>
+                    }
+                </div>
+            </div>
+            @if(availableConsequences().length > 0){
+            <div class="filter-row">
+                <span class="filter-label">Consequence:</span>
+                <div class="filter-chips">
+                    <button class="chip" [class.active]="filterConsequence() === 'All'"
+                        (click)="setConsequenceFilter('All')">All</button>
+                    @for (consequence of availableConsequences(); track consequence) {
+                    <button class="chip" [class.active]="filterConsequence() === consequence"
+                        (click)="setConsequenceFilter(consequence)">
+                        {{ consequence }}
+                    </button>
+                    }
+                </div>
+            </div>
+            }
+        </div>
+    </div>
+
+    <div class="variants-list">
+        @for (v of filteredVariants(); track $index) {
+        <div class="variant-card" [class.selected]="selectedVariant() === v" (click)="onVariantClick(v)">
+            <div class="variant-card-header">
+                <div class="variant-name-row">
+                    <div class="variant-name-container" [class.has-hgvs-interaction]="getHgvs(v).length > 0">
+                        <span class="variant-name">{{ getVariantName(v) }}</span>
+                        @if (getHgvs(v).length > 0) {
+                        <div class="hgvs-tooltip">
+                            <div class="hgvs-tooltip-header">
+                                <span>HGVS Variants</span>
+                                @if (getHgvs(v).length > 1) {
+                                <button class="copy-all-btn" (click)="copyToClipboard(getHgvs(v).join('\n'), $event)"
+                                    title="Copy all" aria-label="Copy all HGVS variants">
+                                    <span class="material-symbols-outlined" aria-hidden="true">content_copy</span>
+                                </button>
+                                }
+                            </div>
+
+                            @if (getHgvsState(v)?.loading) {
+                            <div class="hgvs-status">Loading alternatives...</div>
+                            }
+
+                            @if (getHgvsState(v)?.error) {
+                            <div class="hgvs-status error">
+                                Failed to load.
+                                <button class="retry-btn" (click)="fetchHgvsAlternatives(v, $event)">Retry</button>
+                            </div>
+                            }
+
+                            <div class="hgvs-list">
+                                @for (h of getHgvs(v); track h) {
+                                <div class="hgvs-item" (click)="copyToClipboard(h, $event)">
+                                    <span>{{ h }}</span>
+                                    <span class="material-symbols-outlined mini-copy">content_copy</span>
+                                </div>
+                                }
+                            </div>
+
+                            @if (getHgvs(v).length === 1 && !getHgvsState(v)?.loading &&
+                            !getHgvsState(v)?.alternatives?.length) {
+                            <div class="hgvs-actions-row">
+                                <button class="action-btn" (click)="fetchHgvsAlternatives(v, $event)">
+                                    Retrieve alternatives
+                                </button>
+                                <button class="action-btn secondary" (click)="openEnsembl(v, $event)">
+                                    Ensembl
+                                </button>
+                            </div>
+                            } @else if (getHgvs(v).length > 1 || getHgvsState(v)?.alternatives?.length) {
+                            <div class="hgvs-actions-row">
+                                <button class="action-btn secondary" (click)="openEnsembl(v, $event)">
+                                    View on Ensembl
+                                </button>
+                            </div>
+                            }
+                        </div>
+                        }
+                    </div>
+                    <button class="comment-toggle-btn"
+                        [class.has-comments]="(comments()[getCommentKey(v)]?.length ?? 0) > 0"
+                        (click)="toggleComments(getCommentKey(v), $event)"
+                        [attr.aria-expanded]="expandedComments().has(getCommentKey(v))" aria-label="Toggle comments">
+                        <span class="material-symbols-outlined" aria-hidden="true">{{
+                            expandedComments().has(getCommentKey(v)) ?
+                            'chat_bubble' : 'chat_bubble_outline' }}</span>
+                        @if ((comments()[getCommentKey(v)]?.length ?? 0) > 0) {
+                        <span class="comment-count" aria-label="Number of comments">{{
+                            comments()[getCommentKey(v)].length }}</span>
+                        }
+                    </button>
+                    <button class="report-toggle-btn" [class.is-marked]="isMarkedForReport(v)"
+                        (click)="toggleReport(v, $event)"
+                        [title]="isMarkedForReport(v) ? 'Remove from report' : 'Add to report'"
+                        [attr.aria-label]="isMarkedForReport(v) ? 'Remove variant from report' : 'Add variant to report'">
+                        <span class="material-symbols-outlined" aria-hidden="true">
+                            {{ isMarkedForReport(v) ? 'bookmark' : 'bookmark_add' }}
+                        </span>
+                    </button>
+                </div>
+
+                <div class="variant-meta-row">
+                    <div class="variant-patients">
+                        @for (patient of getInvolvedPatients(v); track patient) {
+                        <span class="patient-pill" (click)="onPatientClick(patient, $event)">
+                            {{ patient }}
+                        </span>
+                        }
+                    </div>
+                    <div class="variant-filters">
+                        <span class="type-pill" [attr.data-type]="v.type" (click)="onPillClick(v.type, $event)">
+                            {{ v.type }}
+                        </span>
+                        @if (v['consequence']) {
+                        <div class="consequence-pill-container">
+                            <span class="consequence-pill" (click)="onConsequenceClick(v['consequence'], $event)">
+                                {{ v['consequence'] }}
+                            </span>
+                            <div class="vep-tooltip">
+                                <div class="vep-tooltip-header">VEP Annotations</div>
+                                <div class="vep-info-grid">
+                                    <div class="vep-info-item">
+                                        <span class="vep-info-label">Gene:</span>
+                                        <span class="vep-info-value">{{ v['gene_symbol'] || 'N/A' }}</span>
+                                    </div>
+                                    <div class="vep-info-item">
+                                        <span class="vep-info-label">Impact:</span>
+                                        <span class="vep-info-value" [attr.data-impact]="v['impact']">{{ v['impact'] ||
+                                            'N/A' }}</span>
+                                    </div>
+                                    <div class="vep-info-item">
+                                        <span class="vep-info-label">HGVS.c:</span>
+                                        <span class="vep-info-value">{{ v['hgvs_c'] || 'N/A' }}</span>
+                                    </div>
+                                    <div class="vep-info-item">
+                                        <span class="vep-info-label">HGVS.p:</span>
+                                        <span class="vep-info-value">{{ v['hgvs_p'] || 'N/A' }}</span>
+                                    </div>
+                                    @if (v['sift']) {
+                                    <div class="vep-info-item">
+                                        <span class="vep-info-label">SIFT:</span>
+                                        <span class="vep-info-value">{{ v['sift'] }}</span>
+                                    </div>
+                                    }
+                                    @if (v['polyphen']) {
+                                    <div class="vep-info-item">
+                                        <span class="vep-info-label">PolyPhen:</span>
+                                        <span class="vep-info-value">{{ v['polyphen'] }}</span>
+                                    </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        }
+                        <span class="quality-pill" [style.background-color]="getQualityColor(v.qual)"
+                            (click)="onQualityClick(v.filter, $event)">
+                            {{ v.filter || 'N/A' }}: {{ v.qual }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            @if (expandedComments().has(getCommentKey(v))) {
+            <div class="comments-section" (click)="$event.stopPropagation()">
+                <div class="comments-list">
+                    @for (comment of comments()[getCommentKey(v)]; track comment.id) {
+                    <div class="comment-item">
+                        <div class="comment-author-row">
+                            <span class="comment-author">{{ comment.author }}</span>
+                            <span class="comment-date">{{ comment.created_at | date:'short' }}</span>
+                        </div>
+                        <div class="comment-text">{{ comment.text }}</div>
+                        <button class="delete-comment-btn"
+                            (click)="onDeleteComment(getCommentKey(v), comment.id, $event)" title="Delete comment"
+                            aria-label="Delete comment">
+                            <span class="material-symbols-outlined" aria-hidden="true">delete</span>
+                        </button>
+                    </div>
+                    } @empty {
+                    <div class="no-comments">No comments yet.</div>
+                    }
+                </div>
+                <div class="add-comment-box">
+                    <textarea class="comment-input" placeholder="Add a comment..."
+                        [ngModel]="newCommentText()[getCommentKey(v)] || ''"
+                        (ngModelChange)="updateNewCommentText(getCommentKey(v), $event)"
+                        (keydown.enter)="submitComment(getCommentKey(v), $event); $event.preventDefault()"
+                        aria-label="New comment text">
+                        </textarea>
+                    <button class="add-comment-btn" (click)="submitComment(getCommentKey(v), $event)"
+                        [disabled]="!(newCommentText()[getCommentKey(v)]?.trim())" aria-label="Submit comment">
+                        Add
+                    </button>
+                </div>
+            </div>
+            }
+        </div>
+        } @empty {
+        <div class="empty-state">
+            No variants match your criteria.
+        </div>
+        }
+    </div>
+
+
+</div>

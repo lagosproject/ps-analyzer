@@ -1,0 +1,247 @@
+<div class="dashboard-container">
+    <!-- Sidebar (Left Column) remains similar but stylized -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <img src="assets/logo.svg" class="header-logo" alt="PS Analyzer Logo">
+            <h2 class="header-title">PS Analyzer</h2>
+        </div>
+
+        <div class="sidebar-actions">
+            <button class="btn-sidebar-primary" (click)="onImportJob()" aria-label="Import existing project">
+                <span class="material-symbols-outlined" aria-hidden="true">cloud_download</span>
+                Import Project
+            </button>
+        </div>
+
+        <div class="search-container">
+            <span class="material-symbols-outlined search-icon" aria-hidden="true">search</span>
+            <input type="text" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)"
+                placeholder="Search projects..." class="search-input" aria-label="Search saved projects">
+        </div>
+
+        <div class="recent-projects">
+            <h3>Recent Projects</h3>
+            <ul>
+                @for (job of filteredJobs(); track job.id) {
+                <li class="project-item" (click)="loadJob(job)">
+                    <div class="project-info">
+                        <span class="project-name">{{ job.name }}</span>
+                        <span class="project-date">{{ job.created_at | date:'short' }}</span>
+                    </div>
+                    <div class="project-actions">
+                        <button class="btn-icon-small hover-scale" (click)="onRenameJob($event, job)" title="Rename"
+                            aria-label="Rename project">
+                            <span class="material-symbols-outlined" aria-hidden="true">edit</span>
+                        </button>
+                        <button class="btn-icon-small hover-scale" (click)="onShareJob($event, job)"
+                            title="Share / Export" aria-label="Export project">
+                            <span class="material-symbols-outlined" aria-hidden="true">share</span>
+                        </button>
+                        <button class="btn-icon-small btn-icon-danger hover-scale" (click)="onDeleteJob($event, job)"
+                            title="Delete" aria-label="Delete project">
+                            <span class="material-symbols-outlined" aria-hidden="true">delete</span>
+                        </button>
+                    </div>
+                </li>
+                }
+            </ul>
+        </div>
+    </aside>
+
+    <!-- Main Content (Right Column) -->
+    <main class="main-content">
+        <!-- Header -->
+        <div class="modal-header">
+            <div class="header-title-group">
+                @if (currentJobId()) {
+                @if (isEditingName()) {
+                <div class="inline-edit-container">
+                    <input type="text" [(ngModel)]="editingName" (blur)="saveName()" (keyup.enter)="saveName()"
+                        (keyup.escape)="cancelEditingName()" class="header-edit-input">
+                </div>
+                } @else {
+                <h1 (dblclick)="startEditingName()" title="Double click to rename" class="editable-title">
+                    Edit Project: {{ currentJobName() }}
+                    <span class="material-symbols-outlined edit-icon">edit</span>
+                </h1>
+                }
+                <p>Modify reference or patient data and re-run analysis.</p>
+                } @else {
+                <h1>Create New Project</h1>
+                <p>Start by importing reference sequences and patient data for alignment.</p>
+                }
+            </div>
+            @if (currentJobId()) {
+            <button class="btn-outline" (click)="resetProject()" aria-label="Create new project">
+                <span class="material-symbols-outlined" aria-hidden="true">add</span> New Project
+            </button>
+            }
+        </div>
+
+        <!-- Scrollable Content -->
+        <div class="modal-content">
+            <!-- Reference Genome Section -->
+            <section class="content-section">
+                <h3 class="section-title">Reference Genome</h3>
+                <div class="grid-2">
+                    <!-- Accession Code Input -->
+                    <div class="form-group">
+                        <label class="form-label">NCBI Accession Code</label>
+                        <div class="input-with-action">
+                            <input type="text" [ngModel]="ncbiId()" (ngModelChange)="onNcbiIdChange($event)"
+                                placeholder="e.g., NM_000546.6" aria-label="NCBI Accession ID">
+                            <button class="btn-inline-action" (click)="fetchRefSeq()"
+                                aria-label="Fetch from NCBI">Fetch</button>
+                        </div>
+                        @if (fetchError()) {
+                        <p class="form-error" style="color: #ef4444; font-size: 12px; margin-top: 4px;">{{ fetchError()
+                            }}</p>
+                        }
+                        @if (fetchSuccess()) {
+                        <p class="form-success" style="color: #22c55e; font-size: 12px; margin-top: 4px;">{{
+                            fetchSuccess() }}</p>
+                        }
+                        <p class="form-hint">Enter a valid RefSeq code to auto-populate metadata.</p>
+                    </div>
+
+                    <!-- File Upload Area -->
+                    <div class="form-group">
+                        <label class="form-label">Upload Local FASTA</label>
+                        @if (!useLocalRef()) {
+                        <div class="upload-area" (click)="selectRefFasta()">
+                            <span class="material-symbols-outlined upload-icon">upload_file</span>
+                            <p class="upload-title">Upload Reference Genome</p>
+                            <p class="upload-subtitle">Click to browse .fasta or .fna files</p>
+                        </div>
+                        } @else {
+                        <div class="upload-area" (click)="clearLocalRef()">
+                            <span class="material-symbols-outlined upload-icon"
+                                style="color: var(--primary)">check_circle</span>
+                            <p class="upload-title">{{ refFastaPath()?.split('/')?.pop() }}</p>
+                            <p class="upload-subtitle">Click to change reference</p>
+                        </div>
+                        }
+                    </div>
+                </div>
+            </section>
+
+            <div class="divider"></div>
+
+            <!-- Patients Section -->
+            <section class="content-section">
+                <div class="patient-section-header">
+                    <h3 class="section-title">Patient Samples</h3>
+                    <button class="btn-text-action" (click)="addPatient()">
+                        <span class="material-symbols-outlined">add_circle</span>
+                        Add Another Patient
+                    </button>
+                </div>
+
+                <!-- Patient Cards -->
+                @for (patient of patients(); track patient.id) {
+                <div class="patient-card">
+                    <div class="patient-grid-layout">
+                        <!-- Patient ID -->
+                        <div class="form-group">
+                            <label class="form-label">Patient ID / Sample Name</label>
+                            <div class="input-with-action">
+                                <input type="text" [(ngModel)]="patient.name" placeholder="Enter ID (e.g. PT-104)"
+                                    aria-label="Patient Name">
+                                <button class="btn-inline-action btn-icon-danger" (click)="removePatient(patient.id)"
+                                    title="Remove Patient" aria-label="Remove patient">
+                                    <span class="material-symbols-outlined" aria-hidden="true">delete</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Reads Upload -->
+                        <div class="form-group">
+                            <label class="form-label">Sequencing Reads</label>
+                            <div class="reads-upload-container">
+                                <div class="reads-icon-wrapper">
+                                    <span class="material-symbols-outlined">biotech</span>
+                                </div>
+                                <div class="reads-info">
+                                    <p class="title">Upload .ab1 or .scf files</p>
+                                    <p class="subtitle">Supports multi-file selection</p>
+                                </div>
+                                <button class="btn-small-action" (click)="addRead(patient)">Browse</button>
+                            </div>
+
+                            <!-- Uploaded Files List -->
+                            <div class="file-tags">
+                                @for (read of patient.reads; track $index) {
+                                <div class="file-tag">
+                                    <span class="material-symbols-outlined" style="font-size: 16px">description</span>
+                                    <span>{{ read.file.split('/').pop() }}</span>
+                                    <button class="btn-tag-action hover-rotate"
+                                        (click)="openReadSettings(patient.id, read)" title="Settings"
+                                        aria-label="Read settings">
+                                        <span class="material-symbols-outlined" aria-hidden="true">settings</span>
+                                    </button>
+                                    <button class="btn-tag-remove" (click)="removeRead(patient.id, read.file)"
+                                        title="Remove" aria-label="Remove read">
+                                        <span class="material-symbols-outlined" aria-hidden="true">delete</span>
+                                    </button>
+                                </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                } @empty {
+                <!-- Empty Patient Placeholder -->
+                <div class="empty-placeholder" (click)="addPatient()">
+                    <div class="placeholder-content">
+                        <span class="material-symbols-outlined">add</span>
+                        <span>Add New Patient</span>
+                    </div>
+                </div>
+                }
+            </section>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+            <div class="footer-actions">
+                <button class="btn-outline-icon" (click)="openSettings()" title="Tracy Configuration"
+                    aria-label="Tracy Configuration">
+                    <span class="material-symbols-outlined" aria-hidden="true">settings</span>
+                </button>
+                <div style="flex: 1"></div>
+                @if (currentJobId()) {
+                <button class="btn-outline" (click)="showCurrentResults()" aria-label="View current job results">
+                    <span class="material-symbols-outlined" aria-hidden="true">visibility</span>
+                    See Results
+                </button>
+                }
+                <button class="btn-solid" (click)="runAnalysis()" [disabled]="!canRunAnalysis()"
+                    aria-label="Run analysis">
+                    @if (currentJobId()) {
+                    <span class="material-symbols-outlined" aria-hidden="true">save</span>
+                    Update & Run
+                    } @else {
+                    <span class="material-symbols-outlined" aria-hidden="true">play_arrow</span>
+                    Run Analysis
+                    }
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Settings Modal -->
+    @if (showSettings()) {
+    <app-settings-modal [(isVisible)]="showSettings" [tracyConfig]="tracyConfig()" [hgvsConfig]="hgvsConfig()"
+        [ncbiId]="ncbiId()" [useLocalRef]="useLocalRef()" (reset)="resetTracyConfig()">
+    </app-settings-modal>
+    }
+
+    <!-- Read Settings Modal -->
+    @if (editingRead(); as current) {
+    <app-read-settings [filePath]="current.read.file" [initialTrimLeft]="current.read.trimLeft ?? 50"
+        [initialTrimRight]="current.read.trimRight ?? 50" (save)="saveReadSettings($event)"
+        (close)="closeReadSettings()"></app-read-settings>
+    }
+
+</div>

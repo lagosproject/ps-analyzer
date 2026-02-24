@@ -1,0 +1,109 @@
+<div class="group-container" [class.selection-mode]="selectionActive()">
+    @if (referenceTrace(); as ref) {
+    <div class="row-container reference-container">
+        <div class="row-label">
+            <div class="label-top">
+                Reference
+            </div>
+        </div>
+        <div class="row-wrapper">
+            <app-nucleotide-row [trace]="referenceTrace()" [alignmentDepthMap]="alignmentDepthMap()"
+                [isSelectedRow]="selectingRowId() === 'Reference'"
+                (nucleotideClicked)="handleNucleotideClick($event, 'Reference')"
+                (nucleotideRightClicked)="handleContextMenu($event, 'Reference')"
+                (nucleotideMouseDown)="handleMouseDown($event, 'Reference')"
+                (nucleotideMouseEnter)="handleMouseEnter($event, 'Reference')"></app-nucleotide-row>
+        </div>
+    </div>
+    }
+
+    @for (trace of traces(); track trace.readId) {
+    <div class="row-container trace-container" (click)="rowClick.emit(trace.readId)"
+        style="cursor: pointer; transition: background-color 0.2s;">
+        <div class="row-label">
+            <div class="label-top">
+                <div class="label-left">
+                    @if (consensusLength() > 0) {
+                    <button class="row-expand-btn" (click)="toggleRow(trace.readId)"
+                        [class.expanded]="isExpanded(trace.readId)" [attr.aria-expanded]="isExpanded(trace.readId)"
+                        [attr.aria-label]="isExpanded(trace.readId) ? 'Collapse Alleles' : 'Expand Alleles'">
+                        {{ isExpanded(trace.readId) ? '▼' : '▶' }}
+                    </button>
+                    }
+                    <span class="patient-name">{{ trace.patient.name }}</span>
+                </div>
+                <span class="read-direction" [class.reverse]="trace.result.alignment.refForward === 0"
+                    [title]="trace.result.alignment.refForward === 1 ? 'Forward' : 'Reverse'"
+                    [attr.aria-label]="trace.result.alignment.refForward === 1 ? 'Forward direction' : 'Reverse direction'">
+                    {{ trace.result.alignment.refForward === 1 ? '→' : '←' }}
+                </span>
+                <div class="info-icon-wrapper" (mouseenter)="showInfoTooltip($event, trace)"
+                    (mouseleave)="hideInfoTooltip()" role="button" tabindex="0" aria-label="Show read information">
+                    <span class="info-icon" aria-hidden="true">ⓘ</span>
+                </div>
+            </div>
+            @if (isExpanded(trace.readId)) {
+            <div class="labels-column">
+                <div class="allele-side-label allele-1">Allele 1</div>
+                <div class="allele-side-label allele-2">Allele 2</div>
+            </div>
+            }
+        </div>
+        <div class="row-wrapper">
+            <app-nucleotide-row [trace]="trace" [expanded]="isExpanded(trace.readId)"
+                [alignmentDepthMap]="alignmentDepthMap()" [isSelectedRow]="selectingRowId() === trace.readId"
+                (nucleotideClicked)="handleNucleotideClick($event, trace.readId)"
+                (nucleotideRightClicked)="handleContextMenu($event, trace.readId)"
+                (nucleotideMouseDown)="handleMouseDown($event, trace.readId)"
+                (nucleotideMouseEnter)="handleMouseEnter($event, trace.readId)"></app-nucleotide-row>
+        </div>
+    </div>
+    }
+
+    <!-- Signal-based global Tooltip to avoid clipping -->
+    @if (hoveredTrace(); as trace) {
+    <div class="info-tooltip fixed-tooltip" [style.left.px]="infoTooltipPosition().x"
+        [style.top.px]="infoTooltipPosition().y">
+        <div class="tooltip-header">Read Information</div>
+        <div class="tooltip-grid">
+            <div class="tooltip-row">
+                <span class="tooltip-label">File:</span>
+                <span class="tooltip-value">{{ trace.readName }}</span>
+            </div>
+            <div class="tooltip-row">
+                <span class="tooltip-label">Length:</span>
+                <span class="tooltip-value">{{ trace.result.baseCount }} bp</span>
+            </div>
+        </div>
+    </div>
+    }
+
+    @if (contextMenuData(); as data) {
+    <app-signal-popup [data]="data" [position]="contextMenuPosition()" (copy)="copySequence($event)"></app-signal-popup>
+    }
+
+    @if (selectionPopUpVisible(); as visible) {
+    <div class="selection-copy-popup" [style.left.px]="selectionPopUpPosition().x"
+        [style.top.px]="selectionPopUpPosition().y" (click)="$event.stopPropagation()">
+        <div class="popup-btn-group">
+            @if (selectingRowId() === 'Reference') {
+            <button class="selection-copy-btn primary" (click)="copySequence('cons')"
+                aria-label="Copy Reference Sequence">
+                <span class="btn-icon" aria-hidden="true">📋</span> Copy Reference
+            </button>
+            } @else {
+            <button class="selection-copy-btn" (click)="copySequence('alt1')" aria-label="Copy Allele 1 Sequence">
+                <span class="btn-icon" aria-hidden="true">📋</span> Copy Allele 1
+            </button>
+            <button class="selection-copy-btn" (click)="copySequence('alt2')" aria-label="Copy Allele 2 Sequence">
+                <span class="btn-icon" aria-hidden="true">📋</span> Copy Allele 2
+            </button>
+            <button class="selection-copy-btn muted" (click)="copySequence('cons')"
+                aria-label="Copy Consensus Sequence">
+                <span class="btn-icon" aria-hidden="true">📋</span> Copy Consensus
+            </button>
+            }
+        </div>
+    </div>
+    }
+</div>

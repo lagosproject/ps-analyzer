@@ -1,0 +1,66 @@
+.alleles-wrapper {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+}
+
+.alleles-list {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    flex: 1;
+}
+
+.nucleotide-row {
+    display: flex;
+    flex-direction: row;
+    height: var(--row-height, 30px);
+    white-space: nowrap;
+    will-change: left;
+}
+
+.nucleotide-row.consensus-row {
+    /* background-color: rgba(255, 255, 0, 0.05); */
+    /* Very light yellow */
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.nucleotide-btn {
+    height: 100%;
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: monospace;
+    font-weight: bold;
+    font-size: 14px;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.nucleotide-btn.alt-bg {
+    background-color: rgba(0, 0, 0, 0.03);
+}
+
+.nucleotide-btn:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+}
+
+.nucleotide-btn:active {
+    transform: scale(0.95);
+}
+
+.nucleotide-btn.highlighted-cell {
+    background-color: rgba(56, 168, 157, 0.2);
+    z-index: 10;
+    position: relative;
+}
+
+.sequence-selection-highlight {
+    background-color: rgba(255, 165, 0, 0.4) !important;
+}

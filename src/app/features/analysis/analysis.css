@@ -1,0 +1,364 @@
+.analysis-view {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--bg-light);
+  /* mapped from --background-light */
+  font-family: var(--font-body);
+  color: var(--text-dark);
+}
+
+/* Main Content Wrapper */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background-color: var(--bg-light);
+}
+
+/* Top Header */
+.top-bar {
+  background-color: var(--bg-light);
+  border-bottom: 1px solid var(--border-muted);
+  padding: 0.5rem 1rem;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 1.5rem;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s;
+}
+
+.brand:hover {
+  background-color: var(--surface-light);
+}
+
+.brand .brand-logo {
+  width: 32px;
+  height: 32px;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand .brand-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin: 0;
+  color: var(--text-dark);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.brand-subtitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.header-divider {
+  width: 1px;
+  height: 2.5rem;
+  background-color: var(--border-muted);
+}
+
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.page-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  line-height: 1;
+}
+
+.editable-title {
+  cursor: pointer;
+  transition: color 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.editable-title:hover {
+  color: var(--primary);
+}
+
+.edit-icon {
+  font-size: 1.25rem !important;
+  opacity: 0;
+  transition: opacity 0.2s, color 0.2s;
+  color: var(--text-muted);
+  user-select: none;
+  pointer-events: none;
+}
+
+.editable-title:hover .edit-icon {
+  opacity: 1;
+}
+
+.inline-edit-container {
+  display: flex;
+  align-items: center;
+}
+
+.header-edit-input {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  background-color: white;
+  border: 1px solid var(--primary);
+  border-radius: 4px;
+  padding: 2px 8px;
+  outline: none;
+  width: 100%;
+  max-width: 400px;
+  font-family: inherit;
+}
+
+.page-meta {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+/* Removed local .btn-secondary and .btn-primary as they are replaced by global btn-outline and btn-solid */
+
+/* Removed local .btn-secondary and .btn-primary as they are replaced by global btn-outline and btn-solid */
+
+/* Content Area (Split View) */
+.content-area {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Variants Sidebar (Middle) */
+.variants-sidebar {
+  width: 20rem;
+  /* w-80 */
+  background-color: var(--bg-light);
+  border-right: 1px solid var(--border-muted);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  z-index: 10;
+  overflow: hidden;
+}
+
+.variants-sidebar app-variant-list {
+  display: block;
+  height: 100%;
+  width: 100%;
+  min-height: 0;
+}
+
+
+/* Visualization Panel (Right/Main) */
+.visualization-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background-color: white;
+  position: relative;
+}
+
+
+.alignment-view {
+  display: flex;
+  flex: 0 0 auto;
+  overflow-y: auto;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+/* Chromatogram Section (Bottom) */
+.chromatogram-section {
+  display: flex;
+  flex: 1;
+  overflow: auto;
+  border-top: 1px solid var(--border-muted);
+  background-color: var(--bg-light);
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.chromatogram-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 3rem;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid rgba(209, 217, 212, 0.5);
+}
+
+.section-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.chromatogram-container {
+  flex: 1;
+  position: relative;
+  overflow-y: auto;
+  width: 100%;
+  background-color: white;
+}
+
+.read-overlay {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 20;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  pointer-events: none;
+}
+
+.read-patient-name {
+  background-color: rgba(255, 255, 255, 0.8);
+  color: var(--text-dark);
+  padding: 0.25rem 0.625rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  backdrop-filter: blur(4px);
+  border: 1px solid var(--border-muted);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.read-direction {
+  background-color: var(--primary);
+  color: white;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  box-shadow: 0 2px 4px rgba(56, 168, 157, 0.3);
+  line-height: 1;
+}
+
+.read-direction.reverse {
+  background-color: #f59e0b;
+  /* Amber for reverse */
+  box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+}
+
+.timeline-view {
+  height: 80px;
+  /* Increased from 2.5rem (~40px) to accommodate minimap */
+  background-color: var(--bg-light);
+  border-bottom: 1px solid var(--border-muted);
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+  gap: 0.75rem;
+  /* border-radius: 0 0 1rem 1rem; removed as it might look weird if not floating */
+}
+
+/* .nav-icon styles removed as they are replaced by .zoom-btn in toolbar */
+
+.minimap-wrapper {
+  flex: 1;
+  height: 60px;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+/* Removed .scroll-slider as it is replaced by minimap component */
+
+.scroll-slider::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background-color: var(--primary);
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Error States */
+.error-container {
+  padding: 2rem;
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fee2e2;
+  margin: 1rem;
+  border-radius: 0.75rem;
+}
+
+.loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-muted);
+}
+
+@keyframes flash-highlight {
+  0% {
+    box-shadow: 0 0 20px rgba(56, 168, 157, 0.5);
+    background-color: rgba(56, 168, 157, 0.1);
+  }
+
+  50% {
+    box-shadow: 0 0 30px rgba(56, 168, 157, 0.7);
+    background-color: rgba(56, 168, 157, 0.2);
+  }
+
+  100% {
+    box-shadow: 0 0 20px rgba(56, 168, 157, 0.5);
+    background-color: rgba(56, 168, 157, 0.1);
+  }
+}
+
+.highlighted {
+  position: relative;
+  z-index: 50;
+  animation: flash-highlight 2s ease-out forwards;
+}
+
+/* Settings Modal Styles - Removed many as they are in global */
+
+/* Used in read-settings too, can check if these are needed here or global */

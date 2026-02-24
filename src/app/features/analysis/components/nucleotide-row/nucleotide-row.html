@@ -1,0 +1,27 @@
+@if (trace()) {
+<div class="alleles-wrapper">
+    <div class="alleles-list" [class.expanded]="expanded()">
+        @for (allele of visibleAlleles(); track $index) {
+        <div class="nucleotide-row" [class.consensus-row]="$index === 0">
+            @for (item of allele; track item.index + '-' + item.subIndex) {
+            @if (item.type === 'nucleotide') {
+            <button class="nucleotide-btn" [class.alt-bg]="item.globalIndex % 2 === 0"
+                [class.highlighted-cell]="item.isHighlighted && !item.isSequenceSelection"
+                [class.sequence-selection-highlight]="item.isSequenceSelection" [attr.title]="'Position: ' + item.index"
+                [style.color]="getColorForNucleotide(item.char)"
+                [style.visibility]="(item.isMatch && !item.showAlways) ? 'hidden' : 'visible'"
+                (click)="onNucleotideClick(item.char, item.index, item.globalIndex, item.isInsertion)"
+                (contextmenu)="onContextMenu($event, item.char, item.index, item.globalIndex, item.isInsertion, item.sangerPos1, item.sangerPos2)"
+                (mousedown)="onMouseDown(item.index, item.globalIndex, $index)"
+                (mouseenter)="onMouseEnter(item.index, item.globalIndex, $index)">
+                {{ item.char }}
+            </button>
+            } @else {
+            <div class="spacer-item"></div>
+            }
+            }
+        </div>
+        }
+    </div>
+</div>
+}

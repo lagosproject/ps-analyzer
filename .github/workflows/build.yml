@@ -1,0 +1,98 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [ubuntu-latest, windows-latest]
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: install dependencies (ubuntu only)
+        if: matrix.platform == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev
+
+      - name: install frontend dependencies
+        run: npm install
+
+      # --- SIDECAR BINARY PREPARATION ---
+      
+      - name: Get Sidecar Binaries (Linux)
+        if: matrix.platform == 'ubuntu-latest'
+        run: |
+          mkdir -p src-tauri/binaries
+          # Tracy
+          curl -L https://github.com/gear-genomics/tracy/releases/download/v0.8.1/tracy_v0.8.1_linux_x86_64bit -o src-tauri/binaries/tracy-x86_64-unknown-linux-gnu
+          chmod +x src-tauri/binaries/tracy-x86_64-unknown-linux-gnu
+          # Bio-Engine
+          curl -L https://github.com/pabloferlagosidipaz/bio-engine/releases/latest/download/bio-engine -o src-tauri/binaries/bio-engine-x86_64-unknown-linux-gnu
+          chmod +x src-tauri/binaries/bio-engine-x86_64-unknown-linux-gnu
+
+      - name: Get Sidecar Binaries (Windows)
+        if: matrix.platform == 'windows-latest'
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            mingw-w64-x86_64-toolchain
+            mingw-w64-x86_64-boost
+            mingw-w64-x86_64-xz
+            mingw-w64-x86_64-curl
+            mingw-w64-x86_64-zlib
+            mingw-w64-x86_64-bzip2
+            make
+            git
+
+      - name: Build Sidecar Binaries (Windows)
+        if: matrix.platform == 'windows-latest'
+        shell: msys2 {0}
+        run: |
+          mkdir -p src-tauri/binaries
+          # Bio-Engine (downloaded via curl but msys2 env)
+          curl -L https://github.com/pabloferlagosidipaz/bio-engine/releases/latest/download/bio-engine.exe -o src-tauri/binaries/bio-engine-x86_64-pc-windows-msvc.exe
+          
+          # Build Tracy
+          git clone --recursive https://github.com/gear-genomics/tracy.git tracy-build
+          cd tracy-build
+          sed -i 's/-ldl//g' Makefile
+          make STATIC=1 CXX=x86_64-w64-mingw32-g++
+          
+          cp src/tracy.exe ../src-tauri/binaries/tracy-x86_64-pc-windows-msvc.exe
+
+      # --- TAURI BUILD ---
+
+      - name: build tauri app
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: app-v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version
+          releaseName: "PS Analyzer v__VERSION__"
+          releaseBody: "Automated release from GitHub Actions"
+          releaseDraft: true
+          prerelease: false

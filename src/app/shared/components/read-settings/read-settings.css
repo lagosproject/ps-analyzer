@@ -1,0 +1,79 @@
+/* Component specific styles */
+.chart-wrapper {
+    border: 1px solid var(--border-color);
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    background: var(--input-bg);
+    /* was #fafafa which is close to input-bg */
+    border-radius: 4px;
+}
+
+.preview-container h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: var(--primary);
+    font-size: 1.1em;
+}
+
+.chart-preview h4 {
+    color: var(--text-muted);
+    font-size: 0.9em;
+    margin-bottom: 0.5rem;
+}
+
+.loading,
+.error {
+    padding: 2rem;
+    text-align: center;
+    color: var(--text-muted);
+}
+
+.error {
+    color: #ef4444;
+    /* Keep error color or move to global if frequent */
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.chart-header h4 {
+    margin: 0;
+}
+
+.chart-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.pan-slider {
+    width: 150px;
+    height: 4px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: var(--border-color);
+    border-radius: 2px;
+    outline: none;
+}
+
+.pan-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    background: var(--primary);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.pan-slider::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    background: var(--primary);
+    border-radius: 50%;
+    cursor: pointer;
+}
