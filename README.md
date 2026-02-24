@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="src/assets/logo.svg" alt="PS Analyzer Logo" width="200">
+</p>
+
 # PS Analyzer
 
 PS Analyzer is a modern Sanger sequence analysis tool designed for clinical and research use. It provides a comprehensive suite of features for variant detection, visualization, and report generation, built with performance and security in mind using Angular and Tauri.
