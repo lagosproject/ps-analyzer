@@ -67,6 +67,7 @@ jobs:
             automake
             libtool
             pkg-config
+            mingw-w64-x86_64-cmake
             make
             git
 
