@@ -96,6 +96,8 @@ jobs:
           find . -name "libdivsufsort.a" -exec cp {} ../../sdslLite/lib/ \;
           find . -name "libdivsufsort64.a" -exec cp {} ../../sdslLite/lib/ \;
           cd ../../..
+          # Create sentinel file so Tracy's Makefile skips install.sh
+          touch .sdsl
           # Remove -ldl (not available on Windows) and build tracy
           sed -i 's/-ldl//g' Makefile
           make STATIC=1 CXX=x86_64-w64-mingw32-g++
