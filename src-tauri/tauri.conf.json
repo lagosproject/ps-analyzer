@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "PS Analyzer",
-  "version": "0.1.10",
-  "identifier": "com.ingemm.ps-analyzer",
+  "version": "0.1.11",
+  "identifier": "com.lagosproject.ps-analyzer",
   "build": {
     "beforeDevCommand": "npm run start",
     "devUrl": "http://localhost:1420",
