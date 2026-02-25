@@ -145,7 +145,7 @@
                         <div class="form-group">
                             <label class="form-label">Patient ID / Sample Name</label>
                             <div class="input-with-action">
-                                <input type="text" [(ngModel)]="patient.name" placeholder="Enter ID (e.g. PT-104)"
+                                <input type="text" [ngModel]="patient.name" (ngModelChange)="updatePatientName(patient.id, $event)" placeholder="Enter ID (e.g. PT-104)"
                                     aria-label="Patient Name">
                                 <button class="btn-inline-action btn-icon-danger" (click)="removePatient(patient.id)"
                                     title="Remove Patient" aria-label="Remove patient">

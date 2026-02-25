@@ -59,6 +59,19 @@ export class AppStateService {
     }
 
     /**
+     * Updates a patient's name.
+     */
+    updatePatientName(patientId: string, name: string) {
+        this.patients.update(patients => {
+            const patient = patients.find(p => p.id === patientId);
+            if (patient) {
+                patient.name = name;
+            }
+            return [...patients];
+        });
+    }
+
+    /**
      * Adds a Sanger read sequence to a patient's record.
      * @param patientId - ID of the target patient
      * @param filePath - Local path to the .ab1 or .scf file

@@ -50,9 +50,11 @@ export class DashboardComponent implements OnInit {
 
     /** Computed signal checking if analysis parameters are sufficient to run */
     readonly canRunAnalysis = computed(() => {
-        const hasReads = this.patients().some(p => p.reads.length > 0);
+        const patientsList = this.patients();
+        const hasReads = patientsList.some(p => p.reads.length > 0);
         const hasValidRef = this.useLocalRef() ? !!this.refFastaPath() : !!this.fetchSuccess();
-        return hasValidRef && hasReads;
+        const hasValidNames = patientsList.length > 0 && patientsList.every(p => p.name && p.name.trim() !== '');
+        return hasValidRef && hasReads && hasValidNames;
     });
 
     /** Error message from reference fetching */
@@ -200,13 +202,28 @@ export class DashboardComponent implements OnInit {
     }
 
     /**
-     * Prompts for a new patient name and adds it to the project.
+     * Adds a new patient to the project and focuses their name input field.
      */
-    async addPatient() {
-        const name = prompt("Enter Patient ID/Name:");
-        if (name) {
-            this.appState.addPatient(name);
-        }
+    addPatient() {
+        this.appState.addPatient('');
+        setTimeout(() => {
+            const container = document.querySelector('.modal-content');
+            if (container) {
+                container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+            }
+            const inputs = document.querySelectorAll('.patient-card input[type="text"]');
+            if (inputs.length > 0) {
+                const lastInput = inputs[inputs.length - 1] as HTMLInputElement;
+                lastInput.focus();
+            }
+        }, 50);
+    }
+
+    /**
+     * Updates the name of a patient reactively.
+     */
+    updatePatientName(id: string, name: string) {
+        this.appState.updatePatientName(id, name);
     }
 
     /**
