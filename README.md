@@ -30,7 +30,7 @@ This repository contains the frontend and desktop application logic. It expects 
 
 1.  Clone the repository:
     ```bash
-    git clone https://github.com/pabloferlagosidipaz/ps-analyzer.git
+    git clone https://github.com/lagosproject/ps-analyzer.git
     cd ps-analyzer
     ```
 2.  Install dependencies:
@@ -40,7 +40,7 @@ This repository contains the frontend and desktop application logic. It expects 
 3.  Ensure `bio-engine` is present in the sibling directory. You can clone it and build it, or download the latest release:
     ```bash
     cd ..
-    git clone https://github.com/pabloferlagosidipaz/bio-engine.git
+    git clone https://github.com/lagosproject/bio-engine.git
     cd bio-engine
     # Follow bio-engine README for environment setup and build
     cd ../ps-analyzer
