@@ -1,6 +1,21 @@
 use tauri::Manager;
 use tauri_plugin_shell::ShellExt;
 use tauri_plugin_shell::process::CommandEvent;
+use std::net::TcpListener;
+
+struct AppState {
+    port: u16,
+}
+
+#[tauri::command]
+fn get_backend_port(state: tauri::State<AppState>) -> u16 {
+    state.port
+}
+
+fn get_available_port() -> u16 {
+    let listener = TcpListener::bind("127.0.0.1:0").expect("Failed to bind to random port");
+    listener.local_addr().expect("Failed to get local address").port()
+}
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -14,10 +29,14 @@ pub fn run() {
             let app_handle = app.handle().clone();
             
             tauri::async_runtime::spawn(async move {
+                let port = get_available_port();
+                app_handle.manage(AppState { port });
+
                 let mut sidecar_command = app_handle
                     .shell()
                     .sidecar("bio-engine")
-                    .expect("failed to create sidecar");
+                    .expect("failed to create sidecar")
+                    .env("BIO_PORT", port.to_string());
 
                 // Resolve tracy sidecar path to pass it to the bio-engine
                 let target_triple = if cfg!(target_os = "linux") {
@@ -76,6 +95,7 @@ pub fn run() {
 
             Ok(())
         })
+        .invoke_handler(tauri::generate_handler![get_backend_port])
         .build(tauri::generate_context!()) // Use .build() instead of .run() to get access to events
         .expect("error while building tauri application")
         .run(|_app_handle, event| {
