@@ -24,10 +24,10 @@
      inkscape:deskcolor="#d1d1d1"
      showgrid="false"
      inkscape:zoom="1.4980469"
-     inkscape:cx="365.80965"
-     inkscape:cy="256.66754"
+     inkscape:cx="253.32985"
+     inkscape:cy="256.66753"
      inkscape:window-width="1920"
-     inkscape:window-height="1003"
+     inkscape:window-height="1043"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
@@ -40,55 +40,60 @@
      id="rect2"
      x="0"
      y="0" />
-  <text
-     x="256"
-     y="150"
-     font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
-     font-size="64"
-     font-weight="800"
-     fill="#0A9396"
-     text-anchor="middle"
-     letter-spacing="2"
-     id="text4">PS SANGER</text>
-  <path
-     d="M 90 240 q 32 -30 64 0 t 64 0 t 64 0 t 64 0 t 64 0"
-     fill="none"
-     stroke="#0A9396"
-     stroke-width="12"
-     stroke-linecap="round"
-     stroke-linejoin="round"
-     id="path6" />
-  <path
-     d="M 90 315 q 40 35 80 0 t 80 0 t 80 0 t 80 0"
-     fill="none"
-     stroke="#0A9396"
-     stroke-width="12"
-     stroke-linecap="round"
-     stroke-linejoin="round"
-     id="path8" />
-  <path
-     d="M 90 390 q 32 -20 64 0 t 64 0 t 64 0 t 64 0 t 64 0"
-     fill="none"
-     stroke="#0A9396"
-     stroke-width="12"
-     stroke-linecap="round"
-     stroke-linejoin="round"
-     id="path10" />
-  <line
-     x1="314"
-     y1="195"
-     x2="314"
-     y2="420"
-     stroke="#0A9396"
-     stroke-width="10"
-     stroke-linecap="round"
-     id="line12" />
-  <circle
-     cx="314"
-     cy="195"
-     r="14"
-     fill="#FAFCFC"
-     stroke="#0A9396"
-     stroke-width="10"
-     id="circle14" />
+  <g
+     id="g862"
+     transform="matrix(1.086244,0,0,1.086244,-30.242995,-31.476632)">
+    <path
+       d="m 76.104852,190.68304 q 37.482288,-35.13964 74.964578,0 37.48229,35.13965 74.96457,0 37.48229,-35.13964 74.96458,0 37.48229,35.13965 74.96458,0 37.48229,-35.13964 74.96458,0"
+       fill="none"
+       stroke="#0a9396"
+       stroke-width="14.0559"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       id="path6" />
+    <path
+       d="m 76.104852,278.53216 q 46.852858,40.99625 93.705718,0 46.85286,-40.99626 93.70572,0 46.85286,40.99625 93.70573,0 46.85286,-40.99626 93.70572,0"
+       fill="none"
+       stroke="#0a9396"
+       stroke-width="14.0559"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       id="path8" />
+    <path
+       d="m 76.104852,366.38127 q 37.482288,-23.42643 74.964578,0 37.48229,23.42643 74.96457,0 37.48229,-23.42643 74.96458,0 37.48229,23.42643 74.96458,0 37.48229,-23.42643 74.96458,0"
+       fill="none"
+       stroke="#0a9396"
+       stroke-width="14.0559"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       id="path10" />
+    <line
+       x1="262.5878"
+       y1="137.97357"
+       x2="262.5878"
+       y2="401.5209"
+       stroke="#0a9396"
+       stroke-width="10"
+       stroke-linecap="round"
+       id="line854"
+       style="stroke:#ffffff;stroke-width:24.1292;stroke-dasharray:none;stroke-opacity:1" />
+    <line
+       x1="262.5878"
+       y1="137.97357"
+       x2="262.5878"
+       y2="401.5209"
+       stroke="#0a9396"
+       stroke-width="11.7132"
+       stroke-linecap="round"
+       id="line12"
+       style="stroke:#0a9396;stroke-opacity:1" />
+    <circle
+       cx="262.5878"
+       cy="137.97357"
+       r="16.398502"
+       fill="#fafcfc"
+       stroke="#0a9396"
+       stroke-width="11.7132"
+       id="circle14" />
+  </g>
 </svg>
