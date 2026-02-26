@@ -1,0 +1,135 @@
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.settings-modal {
+    background-color: var(--card-bg, #fff);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+}
+
+.modal-small {
+    width: 450px;
+    max-width: 90vw;
+}
+
+.settings-layout {
+    display: flex;
+    flex: 1;
+    height: 100%;
+    overflow: hidden;
+}
+
+.settings-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    background-color: var(--card-bg, #fff);
+}
+
+.settings-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border-color, #e2e8f0);
+}
+
+.settings-header h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.settings-body {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+}
+
+.settings-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.info-box {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 13px;
+    margin-top: 16px;
+    margin-bottom: 16px;
+    background-color: rgba(15, 118, 110, 0.05);
+    border: 1px solid rgba(15, 118, 110, 0.2);
+    color: var(--text-muted, #64748b);
+}
+
+.info-box .material-symbols-outlined {
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.info-box strong {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+
+.info-box p {
+    margin: 0;
+    line-height: 1.4;
+}
+
+.form-group-small {
+    margin-bottom: 12px;
+}
+
+.form-group-small label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.form-group-small input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 4px;
+    background-color: var(--input-bg, #fff);
+}
+
+.btn-icon-small {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+}
+
+.btn-icon-small:hover {
+    color: var(--text-main);
+}
+
+.settings-footer-actions {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border-color, #e2e8f0);
+    display: flex;
+    justify-content: flex-end;
+}

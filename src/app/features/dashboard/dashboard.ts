@@ -11,6 +11,7 @@ import { Patient, SangerRead } from '../../core/models/patient.model';
 import { TracyConfig, HGVSConfig, AnalysisJob } from '../../core/models/analysis.model';
 import { ReadSettingsComponent } from '../../shared/components/read-settings/read-settings';
 import { SettingsModalComponent } from '../../shared/components/settings-modal/settings-modal';
+import { AppConfigModalComponent } from '../../shared/components/app-config-modal/app-config-modal';
 
 /**
  * DashboardComponent handles the main orchestration of analysis projects.
@@ -20,7 +21,7 @@ import { SettingsModalComponent } from '../../shared/components/settings-modal/s
 @Component({
     selector: 'app-dashboard',
     standalone: true,
-    imports: [CommonModule, FormsModule, ReadSettingsComponent, SettingsModalComponent],
+    imports: [CommonModule, FormsModule, ReadSettingsComponent, SettingsModalComponent, AppConfigModalComponent],
     templateUrl: './dashboard.html',
     styleUrl: './dashboard.css',
     changeDetection: ChangeDetectionStrategy.OnPush
@@ -84,6 +85,9 @@ export class DashboardComponent implements OnInit {
 
     /** UI state for showing/hiding settings modal */
     readonly showSettings = signal<boolean>(false);
+
+    /** UI state for showing/hiding app config modal */
+    readonly showAppConfig = signal<boolean>(false);
 
     tracyConfig = signal<TracyConfig>({
         pratio: 0.33,
@@ -568,6 +572,13 @@ export class DashboardComponent implements OnInit {
      */
     closeSettings() {
         this.showSettings.set(false);
+    }
+
+    /**
+     * Opens the app config modal.
+     */
+    openAppConfig() {
+        this.showAppConfig.set(true);
     }
 
     /**

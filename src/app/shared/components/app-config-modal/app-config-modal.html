@@ -1,0 +1,40 @@
+<div class="modal-backdrop" (click)="close()">
+    <div class="settings-modal modal-small" (click)="$event.stopPropagation()">
+        <div class="settings-layout">
+            <div class="settings-main" style="width: 100%; border-radius: 8px;">
+                <div class="settings-header">
+                    <h3>Application Settings</h3>
+                    <button class="btn-icon-small" (click)="close()">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+
+                <div class="settings-body">
+                    <div class="settings-section">
+                        <div class="info-box">
+                            <span class="material-symbols-outlined">info</span>
+                            <div>
+                                <strong>Proxy Configuration</strong>
+                                <p>Set a custom proxy. Leave empty to use system defaults. To disable an existing proxy,
+                                    leave it blank and close.</p>
+                            </div>
+                        </div>
+                        <div class="form-group-small">
+                            <label>HTTP Proxy</label>
+                            <input type="text" [(ngModel)]="proxyConfig.http_proxy" placeholder="http://127.0.0.1:8080">
+                        </div>
+                        <div class="form-group-small">
+                            <label>HTTPS Proxy</label>
+                            <input type="text" [(ngModel)]="proxyConfig.https_proxy"
+                                placeholder="http://127.0.0.1:8080">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-footer-actions">
+                    <button class="btn-solid" (click)="close()">Save & Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

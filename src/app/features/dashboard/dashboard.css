@@ -45,17 +45,17 @@
 }
 
 .sidebar-actions {
-    display: flex;
-    gap: 8px;
     margin-bottom: 24px;
+    display: flex;
+    gap: 12px;
 }
 
 .btn-sidebar-primary {
-    flex: 2;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
+    flex: 2;
     padding: 12px;
     background-color: var(--primary);
     color: white;
@@ -64,6 +64,7 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
+    white-space: nowrap;
 }
 
 .btn-sidebar-primary:hover {
@@ -91,6 +92,7 @@
     font-size: 14px;
     cursor: pointer;
     transition: all 0.2s ease;
+    white-space: nowrap;
 }
 
 .btn-sidebar-secondary:hover {

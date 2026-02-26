@@ -4,6 +4,10 @@
         <div class="sidebar-header">
             <img src="assets/logo.svg" class="header-logo" alt="PS Analyzer Logo">
             <h2 class="header-title">PS Analyzer</h2>
+            <button class="btn-icon-small" (click)="openAppConfig()" title="App Settings" aria-label="App Settings"
+                style="margin-left: auto">
+                <span class="material-symbols-outlined" aria-hidden="true">settings</span>
+            </button>
         </div>
 
         <div class="sidebar-actions">
@@ -76,9 +80,6 @@
                 <p>Start by importing reference sequences and patient data for alignment.</p>
                 }
             </div>
-            @if (currentJobId()) {
-
-            }
         </div>
 
         <!-- Scrollable Content -->
@@ -228,9 +229,9 @@
         <!-- Footer -->
         <div class="modal-footer">
             <div class="footer-actions">
-                <button class="btn-outline-icon" (click)="openSettings()" title="Tracy Configuration"
-                    aria-label="Tracy Configuration">
-                    <span class="material-symbols-outlined" aria-hidden="true">settings</span>
+                <button class="btn-outline-icon" (click)="openSettings()" title="Run Configuration"
+                    aria-label="Run Configuration">
+                    <span class="material-symbols-outlined" aria-hidden="true">tune</span>
                 </button>
                 <div style="flex: 1"></div>
                 @if (currentJobId()) {
@@ -259,6 +260,11 @@
     <app-settings-modal [(isVisible)]="showSettings" [tracyConfig]="tracyConfig()" [hgvsConfig]="hgvsConfig()"
         [ncbiId]="ncbiId()" [useLocalRef]="useLocalRef()" (reset)="resetTracyConfig()">
     </app-settings-modal>
+    }
+
+    <!-- App Config Modal -->
+    @if (showAppConfig()) {
+    <app-config-modal [(isVisible)]="showAppConfig"></app-config-modal>
     }
 
     <!-- Read Settings Modal -->
