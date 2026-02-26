@@ -112,6 +112,24 @@ export class AnalysisService {
   }
 
   /**
+   * Searches the backend storage for a given reference query (NCBI code or Gene).
+   * @param query - The reference search query
+   * @returns Promise resolving to a list of matching references
+   */
+  async searchReference(query: string): Promise<any[]> {
+    try {
+      const res = await firstValueFrom(
+        this.http.get<{ results: any[] }>(`${this.apiUrl}/search-reference`, {
+          params: { query }
+        })
+      );
+      return res.results;
+    } catch (error: any) {
+      throw this.handleApiError(error);
+    }
+  }
+
+  /**
    * Helper to map tabular variant data to an array of Variant objects.
    * @param data - The raw tabular data from the API
    * @returns Array of structured Variant objects

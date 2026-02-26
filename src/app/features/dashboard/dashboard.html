@@ -89,13 +89,18 @@
                 <div class="grid-2">
                     <!-- Accession Code Input -->
                     <div class="form-group">
-                        <label class="form-label">NCBI Accession Code</label>
+                        <label class="form-label">NCBI Code or Gene Name</label>
                         <div class="input-with-action">
                             <input type="text" [ngModel]="ncbiId()" (ngModelChange)="onNcbiIdChange($event)"
-                                placeholder="e.g., NM_000546.6" aria-label="NCBI Accession ID">
+                                placeholder="e.g., NM_000546.6 or TP53" aria-label="NCBI Accession ID or Gene Name"
+                                (keyup.enter)="fetchRefSeq()">
                             <button class="btn-inline-action" (click)="fetchRefSeq()"
-                                aria-label="Fetch from NCBI">Fetch</button>
+                                aria-label="Search NCBI">Search</button>
                         </div>
+                        @if (isSearching()) {
+                        <p class="form-hint" style="color: var(--primary); font-size: 12px; margin-top: 4px;">Searching
+                            NCBI...</p>
+                        }
                         @if (fetchError()) {
                         <p class="form-error" style="color: #ef4444; font-size: 12px; margin-top: 4px;">{{ fetchError()
                             }}</p>
@@ -104,7 +109,22 @@
                         <p class="form-success" style="color: #22c55e; font-size: 12px; margin-top: 4px;">{{
                             fetchSuccess() }}</p>
                         }
-                        <p class="form-hint">Enter a valid RefSeq code to auto-populate metadata.</p>
+
+                        @if (searchResults().length > 0) {
+                        <div class="search-results-dropdown">
+                            <ul class="results-list">
+                                @for (res of searchResults(); track res.accession) {
+                                <li class="result-item" (click)="selectSearchResult(res)" tabindex="0"
+                                    (keyup.enter)="selectSearchResult(res)">
+                                    <span class="result-acc">{{ res.accession }}</span>
+                                    <span class="result-title">{{ res.title }}</span>
+                                </li>
+                                }
+                            </ul>
+                        </div>
+                        }
+
+                        <p class="form-hint">Enter a code or gene name to search NCBI.</p>
                     </div>
 
                     <!-- File Upload Area -->

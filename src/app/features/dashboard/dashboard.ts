@@ -62,6 +62,11 @@ export class DashboardComponent implements OnInit {
     /** Success message from reference validation */
     readonly fetchSuccess = signal<string | null>(null);
 
+    /** List of search results from NCBI */
+    readonly searchResults = signal<any[]>([]);
+    /** Whether search is currently running */
+    readonly isSearching = signal<boolean>(false);
+
     /** List of all saved analysis jobs */
     readonly jobs = signal<AnalysisJob[]>([]);
     /** Search query for filtering jobs */
@@ -153,6 +158,7 @@ export class DashboardComponent implements OnInit {
         this.ncbiId.set(newId);
         this.fetchError.set(null);
         this.fetchSuccess.set(null);
+        this.searchResults.set([]);
 
         // Auto-update HGVS transcript if using NCBI ID
         this.hgvsConfig.update(cfg => ({ ...cfg, transcript: newId }));
@@ -164,20 +170,46 @@ export class DashboardComponent implements OnInit {
     async fetchRefSeq() {
         this.fetchError.set(null);
         this.fetchSuccess.set(null);
-        const id = this.ncbiId();
-        if (!id) return;
+        this.searchResults.set([]);
+        const query = this.ncbiId();
+        if (!query) return;
 
+        this.isSearching.set(true);
         try {
-            const exists = await this.analysisService.checkReferenceExists(id);
-            if (exists) {
-                this.appState.clearLocalRef();
-                this.fetchSuccess.set(`Validated reference: ${id}`);
+            const results = await this.analysisService.searchReference(query);
+            this.isSearching.set(false);
+            if (results && results.length > 0) {
+                if (results.length === 1 || query.toUpperCase().startsWith('NM_') || query.toUpperCase().startsWith('NC_') || query.toUpperCase().startsWith('NG_') || query.toUpperCase().startsWith('NR_')) {
+                    // Exact match or single result
+                    const id = results[0].accession;
+                    this.appState.clearLocalRef();
+                    this.ncbiId.set(id);
+                    // Update HGVS transcript
+                    this.hgvsConfig.update(cfg => ({ ...cfg, transcript: id }));
+                    this.fetchSuccess.set(`Validated reference: ${id} (${results[0].title})`);
+                } else {
+                    // Multiple results, show them to the user
+                    this.searchResults.set(results);
+                    this.fetchSuccess.set(`Found ${results.length} possible references. Please select one.`);
+                }
             } else {
-                this.fetchError.set("Reference not found in NCBI.");
+                this.fetchError.set(`No references found for "${query}".`);
             }
         } catch (error: any) {
+            this.isSearching.set(false);
             this.fetchError.set("Error checking reference. Please try again.");
         }
+    }
+
+    /**
+     * Selects a specific search result from NCBI.
+     */
+    selectSearchResult(result: any) {
+        this.appState.clearLocalRef();
+        this.ncbiId.set(result.accession);
+        this.hgvsConfig.update(cfg => ({ ...cfg, transcript: result.accession }));
+        this.searchResults.set([]);
+        this.fetchSuccess.set(`Selected reference: ${result.accession} (${result.title})`);
     }
 
     /**

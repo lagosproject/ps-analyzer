@@ -247,6 +247,50 @@
     color: var(--text-muted);
 }
 
+/* Search Results Dropdown */
+.search-results-dropdown {
+    margin-top: 8px;
+    background-color: var(--input-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.results-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.result-item {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+}
+
+.result-item:last-child {
+    border-bottom: none;
+}
+
+.result-item:hover {
+    background-color: var(--primary);
+    color: white;
+}
+
+.result-acc {
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.result-title {
+    font-size: 11px;
+    color: inherit;
+    opacity: 0.8;
+}
+
 /* Upload Area */
 .upload-area {
     display: flex;
