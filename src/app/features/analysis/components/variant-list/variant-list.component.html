@@ -159,13 +159,6 @@
                 </div>
 
                 <div class="variant-meta-row">
-                    <div class="variant-patients">
-                        @for (patient of getInvolvedPatients(v); track patient) {
-                        <span class="patient-pill" (click)="onPatientClick(patient, $event)">
-                            {{ patient }}
-                        </span>
-                        }
-                    </div>
                     <div class="variant-filters">
                         <span class="type-pill" [attr.data-type]="v.type" (click)="onPillClick(v.type, $event)">
                             {{ v.type }}
@@ -215,6 +208,13 @@
                             (click)="onQualityClick(v.filter, $event)">
                             {{ v.filter || 'N/A' }}: {{ v.qual }}
                         </span>
+                    </div>
+                    <div class="variant-patients">
+                        @for (patient of getInvolvedPatients(v); track patient) {
+                        <span class="patient-pill" (click)="onPatientClick(patient, $event)">
+                            {{ patient }}
+                        </span>
+                        }
                     </div>
                 </div>
             </div>
