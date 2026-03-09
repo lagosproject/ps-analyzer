@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, output, viewChild, ElementRef, signal, effect } from '@angular/core';
 
 /**
  * Data structure for the signal popup displaying nucleotide details.
@@ -35,13 +35,54 @@ export class SignalPopupComponent {
     readonly showCopyButtons = input<boolean>(true);
 
     /** Event emitted when a user requests to copy a specific allele sequence. */
-    readonly copy = output<'cons' | 'alt1' | 'alt2'>();
+    readonly copyAllele = output<'cons' | 'alt1' | 'alt2'>();
+
+    /** View child for the popover element to measure its dimensions. */
+    popover = viewChild<ElementRef<HTMLDivElement>>('popover');
+
+    /** The adjusted position ensuring the popup stays within the viewport. */
+    adjustedPosition = signal<{ x: number, y: number } | null>(null);
+
+    constructor() {
+        effect(() => {
+            const pos = this.position();
+            const el = this.popover()?.nativeElement;
+
+            if (el) {
+                // Use a short timeout to ensure the DOM has rendered and dimensions are available
+                setTimeout(() => {
+                    const width = el.offsetWidth;
+                    const height = el.offsetHeight;
+                    const padding = 16;
+
+                    let newX = pos.x;
+                    let newY = pos.y;
+
+                    // Horizontal check
+                    if (newX + width + padding > window.innerWidth) {
+                        newX = window.innerWidth - width - padding;
+                    }
+
+                    // Vertical check
+                    if (newY + height + padding > window.innerHeight) {
+                        newY = window.innerHeight - height - padding;
+                    }
+
+                    // Ensure it doesn't go off the left/top edges either
+                    newX = Math.max(padding, newX);
+                    newY = Math.max(padding, newY);
+
+                    this.adjustedPosition.set({ x: newX, y: newY });
+                }, 0);
+            }
+        });
+    }
 
     /**
      * Emits the copy event for the given allele.
      * @param allele The allele type to copy.
      */
     onCopy(allele: 'cons' | 'alt1' | 'alt2') {
-        this.copy.emit(allele);
+        this.copyAllele.emit(allele);
     }
 }

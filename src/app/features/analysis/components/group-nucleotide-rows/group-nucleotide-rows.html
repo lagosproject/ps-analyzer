@@ -79,7 +79,8 @@
     }
 
     @if (contextMenuData(); as data) {
-    <app-signal-popup [data]="data" [position]="contextMenuPosition()" (copy)="copySequence($event)"></app-signal-popup>
+    <app-signal-popup [data]="data" [position]="contextMenuPosition()"
+        (copyAllele)="copySequence($event)"></app-signal-popup>
     }
 
     @if (selectionPopUpVisible(); as visible) {

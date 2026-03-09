@@ -1,5 +1,6 @@
 @if (data(); as d) {
-<div class="nucleotide-popover" [style.left.px]="position().x" [style.top.px]="position().y"
+<div #popover class="nucleotide-popover" [style.left.px]="adjustedPosition()?.x ?? position().x"
+    [style.top.px]="adjustedPosition()?.y ?? position().y" [style.opacity]="adjustedPosition() ? 1 : 0"
     (click)="$event.stopPropagation()" (contextmenu)="$event.stopPropagation()">
     <div class="popover-header">
         <span class="popover-title">Nucleotide Info</span>
