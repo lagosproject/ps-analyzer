@@ -47,6 +47,7 @@
             <app-sanger-chart [trace]="read.trace.result.trace" [readId]="read.readId"
                 [patientName]="read.trace.patient.name"
                 [variants]="read.trace.result.variants ? analysisService.mapVariantData(read.trace.result.variants) : []"
+                [activeVariant]="read.variant || item().variant"
                 [consensusAlign]="read.trace.result.consensusAlign || {}"
                 [readSeqConsensus]="read.trace.result.readSeqConsensus || []"
                 [readSeqConsensusComplementary]="read.trace.result.readSeqConsensusComplementary || []"

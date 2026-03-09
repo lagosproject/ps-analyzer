@@ -1,4 +1,4 @@
-import { Component, ElementRef, input, ChangeDetectionStrategy, signal, computed, effect, viewChild, OnDestroy } from '@angular/core';
+import { Component, ElementRef, input, ChangeDetectionStrategy, signal, computed, effect, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AnalysisResult, ConsensusAlignItem, Variant } from '../../../../core/models/analysis.model';
 import { SignalPopupComponent, SignalPopupData } from "../../../../shared/components/signal-popup/signal-popup";
@@ -23,6 +23,8 @@ export class SangerChartComponent {
     patientName = input<string>('');
     /** Alignment direction: 1 for Forward, 0 for Reverse */
     refForward = input<number>(1);
+    /** Specifically highlighted variant for reports or focus */
+    activeVariant = input<Variant | undefined>();
 
     /** Current visible range in reference coordinates */
     viewRange = input<{ start: number, end: number }>();
@@ -154,6 +156,13 @@ export class SangerChartComponent {
                         }, 0);
                     }
                 }
+            }
+        });
+
+        effect(() => {
+            const v = this.activeVariant();
+            if (v) {
+                this.highlightRefPos(v.position, v['genotype']);
             }
         });
     }
