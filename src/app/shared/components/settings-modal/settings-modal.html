@@ -149,14 +149,6 @@
                         </div>
                         }
 
-                        <div class="info-box">
-                            <span class="material-symbols-outlined">info</span>
-                            <div>
-                                <strong>Network Required</strong>
-                                <p>VEP annotation requires an active internet connection to query Ensembl servers.</p>
-                            </div>
-                        </div>
-
                         <div class="settings-row">
                             <div class="setting-info">
                                 <label>Enable VEP Annotation (Beta)</label>
@@ -168,6 +160,46 @@
                                 <span class="slider"></span>
                             </label>
                         </div>
+
+                        @if (hgvsConfig().auto_vep) {
+                        <div class="form-group mt-3">
+                            <label class="form-label">VEP Execution Mode</label>
+                            <select [(ngModel)]="hgvsConfig().vep_mode" class="select-input" [disabled]="readOnly()">
+                                <option value="online">Online REST API (Default)</option>
+                                <option value="local">Local Installation</option>
+                                <option value="docker">Docker Container</option>
+                            </select>
+                        </div>
+
+                        @if (hgvsConfig().vep_mode === 'local' || hgvsConfig().vep_mode === 'docker') {
+                        <div class="form-group">
+                            <label class="form-label">
+                                {{ hgvsConfig().vep_mode === 'local' ? 'VEP Executable Path' : 'Docker Image Name' }}
+                            </label>
+                            <input type="text" [(ngModel)]="hgvsConfig().vep_path" 
+                                [placeholder]="hgvsConfig().vep_mode === 'local' ? 'e.g. /usr/local/bin/vep' : 'e.g. ensemblorg/ensembl-vep'"
+                                [disabled]="readOnly()">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">VEP Data/Cache Directory (Optional)</label>
+                            <input type="text" [(ngModel)]="hgvsConfig().vep_data" 
+                                placeholder="e.g. /home/user/.vep"
+                                [disabled]="readOnly()">
+                            <span class="help-text">Path to folder containing VEP caches and plugins.</span>
+                        </div>
+                        }
+
+                        @if (hgvsConfig().vep_mode === 'online') {
+                        <div class="info-box mt-2">
+                            <span class="material-symbols-outlined">info</span>
+                            <div>
+                                <strong>Network Required</strong>
+                                <p>VEP annotation requires an active internet connection to query Ensembl servers.</p>
+                            </div>
+                        </div>
+                        }
+                        }
                     </div>
                     }
 

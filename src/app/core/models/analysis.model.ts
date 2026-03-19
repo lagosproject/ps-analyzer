@@ -200,6 +200,12 @@ export interface HGVSConfig {
   auto_hgvs?: boolean;
   /** Whether to automatically fetch VEP annotations */
   auto_vep?: boolean;
+  /** VEP execution mode (online, local, docker) */
+  vep_mode?: 'online' | 'local' | 'docker';
+  /** Path to VEP executable or docker image */
+  vep_path?: string;
+  /** Path to VEP cache/data directory */
+  vep_data?: string;
 }
 
 /**
