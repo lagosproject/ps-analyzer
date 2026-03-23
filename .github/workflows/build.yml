@@ -51,15 +51,37 @@ jobs:
           # Tracy
           curl -L https://github.com/gear-genomics/tracy/releases/download/v0.8.9/tracy-v0.8.9-linux-amd64 -o src-tauri/binaries/tracy-x86_64-unknown-linux-gnu
           chmod +x src-tauri/binaries/tracy-x86_64-unknown-linux-gnu
+          
+          # Samtools & Bgzip
+          sudo apt-get update
+          sudo apt-get install -y samtools tabix
+          cp $(which samtools) src-tauri/binaries/samtools-x86_64-unknown-linux-gnu
+          cp $(which bgzip) src-tauri/binaries/bgzip-x86_64-unknown-linux-gnu
+          
           # Bio-Engine
           curl -L https://github.com/lagosproject/bio-engine/releases/latest/download/bio-engine-${{ matrix.platform }} -o src-tauri/binaries/bio-engine-x86_64-unknown-linux-gnu
           chmod +x src-tauri/binaries/bio-engine-x86_64-unknown-linux-gnu
+
+      - name: setup msys2 (Windows)
+        uses: msys2/setup-msys2@v2
+        if: matrix.platform == 'windows-latest'
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            mingw-w64-x86_64-samtools
+            mingw-w64-x86_64-htslib
 
       - name: Get Sidecar Binaries (Windows)
         if: matrix.platform == 'windows-latest'
         shell: bash
         run: |
           mkdir -p src-tauri/binaries
+          
+          # Copy from MSYS2
+          cp /mingw64/bin/samtools.exe src-tauri/binaries/samtools-x86_64-pc-windows-msvc.exe
+          cp /mingw64/bin/bgzip.exe src-tauri/binaries/bgzip-x86_64-pc-windows-msvc.exe
+          
           # Bio-Engine
           curl -L https://github.com/lagosproject/bio-engine/releases/latest/download/bio-engine.exe -o src-tauri/binaries/bio-engine-x86_64-pc-windows-msvc.exe
           

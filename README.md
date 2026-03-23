@@ -12,6 +12,7 @@ PS Analyzer is a modern Sanger sequence analysis tool designed for clinical and 
 - **Automated Variant Detection**: Integration with `bio-engine` for precise SNV and Indel identification.
 - **VEP Integration**: Automatic annotation of variants using the Ensembl Variant Effect Predictor.
 - **Clinical Reporting**: Professional PDF and HTML report generation with customizable variant and read selection.
+- **Self-Contained**: `tracy`, `samtools`, and `bgzip` are bundled with the application, no manual installation required.
 - **Secure by Design**: Local-first architecture powered by Tauri, ensuring sensitive genetic data stays on your machine.
 - **Modern Tech Stack**: Built with Angular 20, utilizing Signals and modern control flow for a reactive and efficient UI.
 

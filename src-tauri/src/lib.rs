@@ -47,22 +47,30 @@ pub fn run() {
                     "unknown"
                 };
                 if let Ok(path_resolver) = app_handle.path().resource_dir() {
-                    let tracy_path = path_resolver.join(format!("binaries/tracy-{}", target_triple));
-                    if tracy_path.exists() {
-                        println!("Redirecting bio-engine to use tracy at: {:?}", tracy_path);
-                        sidecar_command = sidecar_command
-                            .env("TRACY_PATH", tracy_path.to_string_lossy().to_string())
-                            .args(["--tracy-path", &tracy_path.to_string_lossy()]);
-                    } else {
-                        // Fallback for development where binaries might be in src-tauri/binaries
-                        let dev_tracy_path = std::env::current_dir()
-                            .unwrap_or_default()
-                            .join(format!("src-tauri/binaries/tracy-{}", target_triple));
-                        if dev_tracy_path.exists() {
-                           println!("Development: Redirecting bio-engine to use tracy at: {:?}", dev_tracy_path);
-                           sidecar_command = sidecar_command
-                               .env("TRACY_PATH", dev_tracy_path.to_string_lossy().to_string())
-                               .args(["--tracy-path", &dev_tracy_path.to_string_lossy()]);
+                    let tools = [
+                        ("tracy", "TRACY_PATH", "--tracy-path"),
+                        ("samtools", "BIO_SAMTOOLS_PATH", "--samtools-path"),
+                        ("bgzip", "BIO_BGZIP_PATH", "--bgzip-path"),
+                    ];
+
+                    for (name, env_var, arg) in tools {
+                        let sidecar_path = path_resolver.join(format!("binaries/{}-{}", name, target_triple));
+                        if sidecar_path.exists() {
+                            println!("Redirecting bio-engine to use {} at: {:?}", name, sidecar_path);
+                            sidecar_command = sidecar_command
+                                .env(env_var, sidecar_path.to_string_lossy().to_string())
+                                .args([arg, &sidecar_path.to_string_lossy()]);
+                        } else {
+                            // Fallback for development where binaries might be in src-tauri/binaries
+                            let dev_path = std::env::current_dir()
+                                .unwrap_or_default()
+                                .join(format!("src-tauri/binaries/{}-{}", name, target_triple));
+                            if dev_path.exists() {
+                                println!("Development: Redirecting bio-engine to use {} at: {:?}", name, dev_path);
+                                sidecar_command = sidecar_command
+                                    .env(env_var, dev_path.to_string_lossy().to_string())
+                                    .args([arg, &dev_path.to_string_lossy()]);
+                            }
                         }
                     }
                 }
