@@ -91,6 +91,9 @@ pub fn run() {
                                 sidecar_command = sidecar_command
                                     .env(env_var, dev_path.to_string_lossy().to_string())
                                     .args([arg, &dev_path.to_string_lossy()]);
+                            } else {
+                                // 5. Final fallback: Don't pass the path, let bio-engine use system PATH
+                                println!("⚠️  {} not found in sidecars or development. Bio-engine will use system '{}' from PATH.", name, name);
                             }
                         }
                     }

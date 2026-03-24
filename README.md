@@ -29,23 +29,27 @@ This repository contains the frontend and desktop application logic. It expects 
 
 ### Installation
 
-1.  Clone the repository:
-    ```bash
-    git clone https://github.com/lagosproject/ps-analyzer.git
-    cd ps-analyzer
-    ```
-2.  Install dependencies:
-    ```bash
-    npm install
-    ```
-3.  Ensure `bio-engine` is present in the sibling directory. You can clone it and build it, or download the latest release:
-    ```bash
-    cd ..
-    git clone https://github.com/lagosproject/bio-engine.git
-    cd bio-engine
-    # Follow bio-engine README for environment setup and build
-    cd ../ps-analyzer
-    ```
+We provide two versions of the Linux application:
+
+#### 1. Bundled Version (Recommended)
+This version includes all necessary bioinformatics tools (`samtools`, `bgzip`, `tracy`) bundled as sidecars. No additional system installation is required.
+
+- Download the `PS.Analyzer_X.Y.Z_amd64.deb` package.
+- Install using: `sudo apt install ./PS.Analyzer_X.Y.Z_amd64.deb`
+
+#### 2. Minimal Version
+This version is smaller but requires you to have `samtools` and `htslib` (for `bgzip`) already installed on your system.
+
+- Download the `PS.Analyzer.Minimal_X.Y.Z_amd64.deb` package.
+- Install system dependencies:
+  ```bash
+  sudo apt update
+  sudo apt install samtools tabix
+  ```
+- Install the package: `sudo apt install ./PS.Analyzer.Minimal_X.Y.Z_amd64.deb`
+
+### Ensuring bio-engine is present
+The application expects a sibling directory `bio-engine` containing the backend analysis services if you are running from source. For packaged releases, the `bio-engine` is bundled automatically.
 
 ### Running the Application
 
