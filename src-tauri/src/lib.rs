@@ -56,45 +56,53 @@ pub fn run() {
 
                     for (name, env_var, arg) in tools {
                         let sidecar_id = format!("ps-analyzer-{}", name);
-                        // 1. Try to find it as a sidecar in resources (standard triple-suffixed name)
-                        let sidecar_path = path_resolver.join(format!("binaries/{}-{}", sidecar_id, target_triple));
-                        
-                        // 2. Fallback to flattened name in resources
-                        let mut final_path = if sidecar_path.exists() {
-                            sidecar_path
-                        } else {
-                            path_resolver.join(format!("binaries/{}", sidecar_id))
-                        };
+                        let mut final_path = None;
 
-                        // 3. Fallback to executable directory (common for Linux packages)
-                        if !final_path.exists() {
-                            if let Ok(exe_dir) = app_handle.path().executable_dir() {
-                                let exe_sidecar = exe_dir.join(&sidecar_id);
-                                if exe_sidecar.exists() {
-                                    final_path = exe_sidecar;
-                                }
+                        // List of potential paths to check, in order of priority
+                        let mut paths_to_check = Vec::new();
+
+                        // 1. Standard sidecar location (Resource dir / binaries / {id}-{triple})
+                        paths_to_check.push(path_resolver.join(format!("binaries/{}-{}", sidecar_id, target_triple)));
+                        
+                        // 2. Flattened resource location (Resource dir / binaries / {id})
+                        paths_to_check.push(path_resolver.join(format!("binaries/{}", sidecar_id)));
+
+                        // 3. Executable directory (common for Linux packages)
+                        if let Ok(exe_dir) = app_handle.path().executable_dir() {
+                            // Check with and without triple in exe_dir
+                            paths_to_check.push(exe_dir.join(format!("{}-{}", sidecar_id, target_triple)));
+                            paths_to_check.push(exe_dir.join(&sidecar_id));
+                        }
+
+                        // 4. Development fallback (Project root / src-tauri / binaries / {id}-{triple})
+                        if let Ok(cwd) = std::env::current_dir() {
+                            paths_to_check.push(cwd.join(format!("src-tauri/binaries/{}-{}", sidecar_id, target_triple)));
+                            paths_to_check.push(cwd.join(format!("src-tauri/binaries/{}", sidecar_id)));
+                        }
+
+                        // 5. Explicit system paths (Final fallback for Linux)
+                        if cfg!(target_os = "linux") {
+                            paths_to_check.push(std::path::PathBuf::from(format!("/usr/bin/{}", sidecar_id)));
+                            paths_to_check.push(std::path::PathBuf::from(format!("/bin/{}", sidecar_id)));
+                            paths_to_check.push(std::path::PathBuf::from(format!("/usr/local/bin/{}", sidecar_id)));
+                        }
+
+                        // Find the first path that exists
+                        for path in paths_to_check {
+                            if path.exists() {
+                                final_path = Some(path);
+                                break;
                             }
                         }
 
-                        if final_path.exists() {
-                            println!("Redirecting bio-engine to use {} at: {:?}", name, final_path);
+                        if let Some(path) = final_path {
+                            println!("Redirecting bio-engine to use {} at: {:?}", name, path);
                             sidecar_command = sidecar_command
-                                .env(env_var, final_path.to_string_lossy().to_string())
-                                .args([arg, &final_path.to_string_lossy()]);
+                                .env(env_var, path.to_string_lossy().to_string())
+                                .args([arg, &path.to_string_lossy()]);
                         } else {
-                            // 4. Fallback for development where binaries might be in src-tauri/binaries
-                            let dev_path = std::env::current_dir()
-                                .unwrap_or_default()
-                                .join(format!("src-tauri/binaries/{}-{}", sidecar_id, target_triple));
-                            if dev_path.exists() {
-                                println!("Development: Redirecting bio-engine to use {} at: {:?}", name, dev_path);
-                                sidecar_command = sidecar_command
-                                    .env(env_var, dev_path.to_string_lossy().to_string())
-                                    .args([arg, &dev_path.to_string_lossy()]);
-                            } else {
-                                // 5. Final fallback: Don't pass the path, let bio-engine use system PATH
-                                println!("⚠️  {} not found in sidecars or development. Bio-engine will use system '{}' from PATH.", name, name);
-                            }
+                            // Final fallback: Don't pass the path, let bio-engine use system PATH
+                            println!("Sidecar for {} not found. Bio-engine will attempt to use system '{}' from PATH.", name, name);
                         }
                     }
                 }
