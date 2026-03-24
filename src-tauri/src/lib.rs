@@ -34,11 +34,11 @@ pub fn run() {
 
                 let mut sidecar_command = app_handle
                     .shell()
-                    .sidecar("bio-engine")
+                    .sidecar("ps-analyzer-bio-engine")
                     .expect("failed to create sidecar")
                     .env("BIO_PORT", port.to_string());
 
-                // Resolve tracy sidecar path to pass it to the bio-engine
+                // Resolve sidecar paths to pass them to the bio-engine
                 let target_triple = if cfg!(target_os = "linux") {
                     "x86_64-unknown-linux-gnu"
                 } else if cfg!(target_os = "windows") {
@@ -46,6 +46,7 @@ pub fn run() {
                 } else {
                     "unknown"
                 };
+
                 if let Ok(path_resolver) = app_handle.path().resource_dir() {
                     let tools = [
                         ("tracy", "TRACY_PATH", "--tracy-path"),
@@ -54,17 +55,37 @@ pub fn run() {
                     ];
 
                     for (name, env_var, arg) in tools {
-                        let sidecar_path = path_resolver.join(format!("binaries/{}-{}", name, target_triple));
-                        if sidecar_path.exists() {
-                            println!("Redirecting bio-engine to use {} at: {:?}", name, sidecar_path);
-                            sidecar_command = sidecar_command
-                                .env(env_var, sidecar_path.to_string_lossy().to_string())
-                                .args([arg, &sidecar_path.to_string_lossy()]);
+                        let sidecar_id = format!("ps-analyzer-{}", name);
+                        // 1. Try to find it as a sidecar in resources (standard triple-suffixed name)
+                        let sidecar_path = path_resolver.join(format!("binaries/{}-{}", sidecar_id, target_triple));
+                        
+                        // 2. Fallback to flattened name in resources
+                        let mut final_path = if sidecar_path.exists() {
+                            sidecar_path
                         } else {
-                            // Fallback for development where binaries might be in src-tauri/binaries
+                            path_resolver.join(format!("binaries/{}", sidecar_id))
+                        };
+
+                        // 3. Fallback to executable directory (common for Linux packages)
+                        if !final_path.exists() {
+                            if let Ok(exe_dir) = app_handle.path().executable_dir() {
+                                let exe_sidecar = exe_dir.join(&sidecar_id);
+                                if exe_sidecar.exists() {
+                                    final_path = exe_sidecar;
+                                }
+                            }
+                        }
+
+                        if final_path.exists() {
+                            println!("Redirecting bio-engine to use {} at: {:?}", name, final_path);
+                            sidecar_command = sidecar_command
+                                .env(env_var, final_path.to_string_lossy().to_string())
+                                .args([arg, &final_path.to_string_lossy()]);
+                        } else {
+                            // 4. Fallback for development where binaries might be in src-tauri/binaries
                             let dev_path = std::env::current_dir()
                                 .unwrap_or_default()
-                                .join(format!("src-tauri/binaries/{}-{}", name, target_triple));
+                                .join(format!("src-tauri/binaries/{}-{}", sidecar_id, target_triple));
                             if dev_path.exists() {
                                 println!("Development: Redirecting bio-engine to use {} at: {:?}", name, dev_path);
                                 sidecar_command = sidecar_command
