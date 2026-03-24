@@ -74,11 +74,11 @@ jobs:
 
       - name: Get Sidecar Binaries (Windows)
         if: matrix.platform == 'windows-latest'
-        shell: bash
+        shell: msys2 {0}
         run: |
           mkdir -p src-tauri/binaries
           
-          # Copy from MSYS2
+          # Copy from MSYS2 (using local paths relative to MSYS2 root)
           cp /mingw64/bin/samtools.exe src-tauri/binaries/samtools-x86_64-pc-windows-msvc.exe
           cp /mingw64/bin/bgzip.exe src-tauri/binaries/bgzip-x86_64-pc-windows-msvc.exe
           
