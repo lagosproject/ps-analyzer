@@ -50,7 +50,6 @@ pub fn run() {
                 if let Ok(path_resolver) = app_handle.path().resource_dir() {
                     let tools = [
                         ("tracy", "TRACY_PATH", "--tracy-path"),
-                        ("samtools", "BIO_SAMTOOLS_PATH", "--samtools-path"),
                         ("bgzip", "BIO_BGZIP_PATH", "--bgzip-path"),
                     ];
 
