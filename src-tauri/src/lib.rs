@@ -65,18 +65,32 @@ pub fn run() {
                         
                         // 2. Flattened resource location (Resource dir / binaries / {id})
                         paths_to_check.push(path_resolver.join(format!("binaries/{}", sidecar_id)));
+                        
+                        // Windows-specific: Add .exe variants
+                        if cfg!(target_os = "windows") {
+                            paths_to_check.push(path_resolver.join(format!("binaries/{}-{}.exe", sidecar_id, target_triple)));
+                            paths_to_check.push(path_resolver.join(format!("binaries/{}.exe", sidecar_id)));
+                        }
 
                         // 3. Executable directory (common for Linux packages)
                         if let Ok(exe_dir) = app_handle.path().executable_dir() {
                             // Check with and without triple in exe_dir
                             paths_to_check.push(exe_dir.join(format!("{}-{}", sidecar_id, target_triple)));
                             paths_to_check.push(exe_dir.join(&sidecar_id));
+                            if cfg!(target_os = "windows") {
+                                paths_to_check.push(exe_dir.join(format!("{}-{}.exe", sidecar_id, target_triple)));
+                                paths_to_check.push(exe_dir.join(format!("{}.exe", sidecar_id)));
+                            }
                         }
 
                         // 4. Development fallback (Project root / src-tauri / binaries / {id}-{triple})
                         if let Ok(cwd) = std::env::current_dir() {
                             paths_to_check.push(cwd.join(format!("src-tauri/binaries/{}-{}", sidecar_id, target_triple)));
                             paths_to_check.push(cwd.join(format!("src-tauri/binaries/{}", sidecar_id)));
+                            if cfg!(target_os = "windows") {
+                                paths_to_check.push(cwd.join(format!("src-tauri/binaries/{}-{}.exe", sidecar_id, target_triple)));
+                                paths_to_check.push(cwd.join(format!("src-tauri/binaries/{}.exe", sidecar_id)));
+                            }
                         }
 
                         // 5. Explicit system paths (Final fallback for Linux)
