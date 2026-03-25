@@ -101,9 +101,11 @@ pub fn run() {
                         }
 
                         // Find the first path that exists
-                        for path in paths_to_check {
+                        for path in &paths_to_check {
+                            println!("Checking path for {}: {:?}", name, path);
                             if path.exists() {
-                                final_path = Some(path);
+                                final_path = Some(path.clone());
+                                println!("Found {} at: {:?}", name, path);
                                 break;
                             }
                         }
