@@ -1,6 +1,6 @@
 {
   "name": "ps-analyzer",
-  "version": "0.1.31",
+  "version": "0.1.32",
   "author": "Pablo Fernández Lagos <pablo.fernandez.lago@idipaz.es>",
   "scripts": {
     "ng": "ng",

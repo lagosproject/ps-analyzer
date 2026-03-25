@@ -157,7 +157,6 @@ jobs:
           # Tracy
           curl -L https://github.com/gear-genomics/tracy/releases/download/v0.8.9/tracy-v0.8.9-linux-amd64 -o src-tauri/binaries/ps-analyzer-tracy-x86_64-unknown-linux-gnu
           chmod +x src-tauri/binaries/ps-analyzer-tracy-x86_64-unknown-linux-gnu
- pieces of information.
       - name: build tauri app
         uses: tauri-apps/tauri-action@v0
         env:
