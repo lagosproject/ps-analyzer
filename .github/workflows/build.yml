@@ -84,7 +84,9 @@ jobs:
           cp /mingw64/bin/libwinpthread-1.dll src-tauri/binaries/
           cp /mingw64/bin/libbz2-1.dll src-tauri/binaries/
           cp /mingw64/bin/liblzma-5.dll src-tauri/binaries/
-          # Optional but recommended for samtools
+          cp /mingw64/bin/libgcc_s_seh-1.dll src-tauri/binaries/ || true
+          cp /mingw64/bin/libstdc++-6.dll src-tauri/binaries/ || true
+          # Optional but recommended for samtools/htslib
           cp /mingw64/bin/libcurl-4.dll src-tauri/binaries/ || true
           cp /mingw64/bin/libcrypto-3-x64.dll src-tauri/binaries/ || true
           cp /mingw64/bin/libssl-3-x64.dll src-tauri/binaries/ || true

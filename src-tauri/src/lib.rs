@@ -120,6 +120,11 @@ pub fn run() {
                             println!("Sidecar for {} not found. Bio-engine will attempt to use system '{}' from PATH.", name, name);
                         }
                     }
+
+                    // Pass the resource directory itself for DLL discovery
+                    let resource_path = path_resolver.to_string_lossy().to_string();
+                    println!("Passing resource path to bio-engine: {}", resource_path);
+                    sidecar_command = sidecar_command.args(["--resource-path", &resource_path]);
                 }
 
                 let (mut rx, _child) = sidecar_command
