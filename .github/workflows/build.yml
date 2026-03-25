@@ -70,6 +70,8 @@ jobs:
           msystem: MINGW64
           update: true
           install: >-
+            mingw-w64-x86_64-htslib
+
       - name: Prepare Binary Directory (Windows)
         if: matrix.platform == 'windows-latest'
         run: |
@@ -77,12 +79,10 @@ jobs:
           echo "dummy" > src-tauri/binaries/dummy.txt
           echo "dummy" > src-tauri/binaries/dummy.dll
 
-      - name: setup msys2 (Windows)
+      - name: Get Sidecar Binaries (Windows)
         if: matrix.platform == 'windows-latest'
         shell: msys2 {0}
         run: |
-          mkdir -p src-tauri/binaries
-          
           # Copy from MSYS2 (using local paths relative to MSYS2 root)
           cp /mingw64/bin/bgzip.exe src-tauri/binaries/ps-analyzer-bgzip-x86_64-pc-windows-msvc.exe
           
