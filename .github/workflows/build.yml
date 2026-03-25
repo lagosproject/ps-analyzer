@@ -135,10 +135,11 @@ jobs:
       - name: install frontend dependencies
         run: npm install
 
-      - name: Prepare Minimal Config (Label as Minimal)
+      - name: Prepare Minimal Config (Remove Bgzip sidecar)
         run: |
-          # Change the product name to distinguish the bundle
-          jq '.productName = "PS Analyzer Minimal"' src-tauri/tauri.conf.json > src-tauri/tauri.conf.json.tmp && mv src-tauri/tauri.conf.json.tmp src-tauri/tauri.conf.json
+          # Use jq to remove bgzip from externalBin
+          # Also change the product name to distinguish the bundle
+          jq '.bundle.externalBin |= map(select(contains("bgzip") == false)) | .productName = "PS Analyzer Minimal"' src-tauri/tauri.conf.json > src-tauri/tauri.conf.json.tmp && mv src-tauri/tauri.conf.json.tmp src-tauri/tauri.conf.json
 
       - name: Get Core Sidecar Binaries (Bio-Engine)
         run: |
