@@ -25,7 +25,8 @@
     "active": true,
     "targets": "all",
     "resources": [
-      "binaries/*.dll"
+      "binaries/*.dll",
+      "binaries/.keep"
     ],
     "icon": [
       "icons/32x32.png",

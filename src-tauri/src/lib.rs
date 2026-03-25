@@ -121,10 +121,11 @@ pub fn run() {
                         }
                     }
 
-                    // Pass the resource directory itself for DLL discovery
-                    let resource_path = path_resolver.to_string_lossy().to_string();
-                    println!("Passing resource path to bio-engine: {}", resource_path);
-                    sidecar_command = sidecar_command.args(["--resource-path", &resource_path]);
+                    // Pass the resource directory itself (with binaries subfolder) for DLL discovery
+                    let resource_path = path_resolver.join("binaries");
+                    let resource_path_str = resource_path.to_string_lossy().to_string();
+                    println!("Passing resource path to bio-engine: {}", resource_path_str);
+                    sidecar_command = sidecar_command.args(["--resource-path", &resource_path_str]);
                 }
 
                 let (mut rx, _child) = sidecar_command
