@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "PS Analyzer",
-  "version": "0.1.24",
+  "version": "0.1.25",
   "identifier": "com.lagosproject.ps-analyzer",
   "build": {
     "beforeDevCommand": "npm run start",
@@ -32,11 +32,10 @@
       "icons/icon.ico",
       "icons/icon.icns"
     ],
-    "externalBin": [
-      "binaries/ps-analyzer-bio-engine",
-      "binaries/ps-analyzer-tracy",
-      "binaries/ps-analyzer-samtools",
-      "binaries/ps-analyzer-bgzip"
-    ]
+      "externalBin": [
+        "binaries/ps-analyzer-bio-engine",
+        "binaries/ps-analyzer-tracy",
+        "binaries/ps-analyzer-bgzip"
+      ]
   }
 }
