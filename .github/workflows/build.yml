@@ -48,7 +48,7 @@ jobs:
         if: startsWith(matrix.platform, 'ubuntu-')
         run: |
           mkdir -p src-tauri/binaries
-          touch src-tauri/binaries/.keep
+          touch src-tauri/binaries/dummy.txt
           touch src-tauri/binaries/dummy.dll
           # Tracy
           curl -L https://github.com/gear-genomics/tracy/releases/download/v0.8.9/tracy-v0.8.9-linux-amd64 -o src-tauri/binaries/ps-analyzer-tracy-x86_64-unknown-linux-gnu
@@ -148,7 +148,7 @@ jobs:
       - name: Get Core Sidecar Binaries (Bio-Engine)
         run: |
           mkdir -p src-tauri/binaries
-          touch src-tauri/binaries/.keep
+          touch src-tauri/binaries/dummy.txt
           touch src-tauri/binaries/dummy.dll
           # Bio-Engine
           curl -L https://github.com/lagosproject/bio-engine/releases/latest/download/bio-engine-ubuntu-22.04 -o src-tauri/binaries/ps-analyzer-bio-engine-x86_64-unknown-linux-gnu
