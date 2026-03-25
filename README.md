@@ -12,7 +12,7 @@ PS Analyzer is a modern Sanger sequence analysis tool designed for clinical and 
 - **Automated Variant Detection**: Integration with `bio-engine` for precise SNV and Indel identification.
 - **VEP Integration**: Automatic annotation of variants using the Ensembl Variant Effect Predictor.
 - **Clinical Reporting**: Professional PDF and HTML report generation with customizable variant and read selection.
-- **Self-Contained**: `tracy`, `samtools`, and `bgzip` are bundled with the application, no manual installation required.
+- **Self-Contained**: `tracy` and `bgzip` are bundled with the application. FASTA indexing is handled internally by the `bio-engine` via `pysam`, eliminating the need for an external `samtools` binary.
 - **Secure by Design**: Local-first architecture powered by Tauri, ensuring sensitive genetic data stays on your machine.
 - **Modern Tech Stack**: Built with Angular 20, utilizing Signals and modern control flow for a reactive and efficient UI.
 
@@ -32,19 +32,19 @@ This repository contains the frontend and desktop application logic. It expects 
 We provide two versions of the Linux application:
 
 #### 1. Bundled Version (Recommended)
-This version includes all necessary bioinformatics tools (`samtools`, `bgzip`, `tracy`) bundled as sidecars. No additional system installation is required.
+This version includes all necessary bioinformatics tools (`bgzip`, `tracy`) bundled as sidecars. FASTA indexing is handled internally by the bundled `bio-engine`. No additional system installation is required.
 
 - Download the `PS.Analyzer_X.Y.Z_amd64.deb` package.
 - Install using: `sudo apt install ./PS.Analyzer_X.Y.Z_amd64.deb`
 
 #### 2. Minimal Version
-This version is smaller but requires you to have `samtools` and `htslib` (for `bgzip`) already installed on your system.
+This version is smaller and requires you to have `htslib` (for `bgzip`) already installed on your system.
 
 - Download the `PS.Analyzer.Minimal_X.Y.Z_amd64.deb` package.
 - Install system dependencies:
   ```bash
   sudo apt update
-  sudo apt install samtools tabix
+  sudo apt install tabix
   ```
 - Install the package: `sudo apt install ./PS.Analyzer.Minimal_X.Y.Z_amd64.deb`
 
