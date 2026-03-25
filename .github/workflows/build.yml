@@ -105,6 +105,18 @@ jobs:
           LATEST_TRACY_URL=$(curl -s https://api.github.com/repos/gear-genomics/tracy/releases/latest | grep "browser_download_url.*windows-amd64" | cut -d '"' -f 4)
           curl -L "$LATEST_TRACY_URL" -o src-tauri/binaries/ps-analyzer-tracy-x86_64-pc-windows-msvc.exe
 
+      - name: Smoke Test Sidecars (Windows)
+        if: matrix.platform == 'windows-latest'
+        run: |
+          echo "Verifying bgzip sidecar..."
+          ./src-tauri/binaries/ps-analyzer-bgzip-x86_64-pc-windows-msvc.exe --version
+          
+          echo "Verifying tracy sidecar..."
+          ./src-tauri/binaries/ps-analyzer-tracy-x86_64-pc-windows-msvc.exe --version
+          
+          echo "Verifying bio-engine sidecar..."
+          ./src-tauri/binaries/ps-analyzer-bio-engine-x86_64-pc-windows-msvc.exe --help
+
       # --- TAURI BUILD ---
 
       - name: build tauri app

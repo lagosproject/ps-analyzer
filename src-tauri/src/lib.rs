@@ -60,16 +60,16 @@ pub fn run() {
                         // List of potential paths to check, in order of priority
                         let mut paths_to_check = Vec::new();
 
-                        // 1. Standard sidecar location (Resource dir / binaries / {id}-{triple})
-                        paths_to_check.push(path_resolver.join(format!("binaries/{}-{}", sidecar_id, target_triple)));
+                        // 1. Standard sidecar location (Resource dir / {id}-{triple})
+                        paths_to_check.push(path_resolver.join(format!("{}-{}", sidecar_id, target_triple)));
                         
-                        // 2. Flattened resource location (Resource dir / binaries / {id})
-                        paths_to_check.push(path_resolver.join(format!("binaries/{}", sidecar_id)));
+                        // 2. Flattened resource location (Resource dir / {id})
+                        paths_to_check.push(path_resolver.join(&sidecar_id));
                         
                         // Windows-specific: Add .exe variants
                         if cfg!(target_os = "windows") {
-                            paths_to_check.push(path_resolver.join(format!("binaries/{}-{}.exe", sidecar_id, target_triple)));
-                            paths_to_check.push(path_resolver.join(format!("binaries/{}.exe", sidecar_id)));
+                            paths_to_check.push(path_resolver.join(format!("{}-{}.exe", sidecar_id, target_triple)));
+                            paths_to_check.push(path_resolver.join(format!("{}.exe", sidecar_id)));
                         }
 
                         // 3. Executable directory (common for Linux packages)
@@ -121,8 +121,8 @@ pub fn run() {
                         }
                     }
 
-                    // Pass the resource directory itself (with binaries subfolder) for DLL discovery
-                    let resource_path = path_resolver.join("binaries");
+                    // Pass the resource directory itself (flat structure) for DLL discovery
+                    let resource_path = path_resolver;
                     let resource_path_str = resource_path.to_string_lossy().to_string();
                     println!("Passing resource path to bio-engine: {}", resource_path_str);
                     sidecar_command = sidecar_command.args(["--resource-path", &resource_path_str]);
