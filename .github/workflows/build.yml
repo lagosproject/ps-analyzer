@@ -70,9 +70,14 @@ jobs:
           msystem: MINGW64
           update: true
           install: >-
-            mingw-w64-x86_64-htslib
+      - name: Prepare Binary Directory (Windows)
+        if: matrix.platform == 'windows-latest'
+        run: |
+          mkdir -p src-tauri/binaries
+          echo "dummy" > src-tauri/binaries/dummy.txt
+          echo "dummy" > src-tauri/binaries/dummy.dll
 
-      - name: Get Sidecar Binaries (Windows)
+      - name: setup msys2 (Windows)
         if: matrix.platform == 'windows-latest'
         shell: msys2 {0}
         run: |
