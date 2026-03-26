@@ -128,61 +128,6 @@ jobs:
           tagName: v__VERSION__ # Matches standard vX.Y.Z format
           releaseId: ${{ github.event.release.id }}
           releaseName: "PS Analyzer v__VERSION__"
-          releaseBody: "Automated release from GitHub Actions. Includes Bundled and Minimal versions (Linux)."
-          releaseDraft: false
-          prerelease: false
-
-  build-minimal:
-    permissions:
-      contents: write
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      - name: setup node
-        uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-
-      - name: install Rust stable
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev jq
-
-      - name: install frontend dependencies
-        run: npm install
-
-      - name: Prepare Minimal Config (Remove Bgzip sidecar)
-        run: |
-          # Use jq to remove bgzip from externalBin
-          # Also change the product name to distinguish the bundle
-          jq '.bundle.externalBin |= map(select(contains("bgzip") == false)) | .productName = "PS Analyzer Minimal"' src-tauri/tauri.conf.json > src-tauri/tauri.conf.json.tmp && mv src-tauri/tauri.conf.json.tmp src-tauri/tauri.conf.json
-
-      - name: Get Core Sidecar Binaries (Bio-Engine)
-        run: |
-          mkdir -p src-tauri/binaries
-          touch src-tauri/binaries/dummy.txt
-          touch src-tauri/binaries/dummy.dll
-          # Bio-Engine
-          curl -L https://github.com/lagosproject/bio-engine/releases/latest/download/bio-engine-ubuntu-22.04 -o src-tauri/binaries/ps-analyzer-bio-engine-x86_64-unknown-linux-gnu
-          chmod +x src-tauri/binaries/ps-analyzer-bio-engine-x86_64-unknown-linux-gnu
-          
-          # Tracy
-          curl -L https://github.com/gear-genomics/tracy/releases/download/v0.8.9/tracy-v0.8.9-linux-amd64 -o src-tauri/binaries/ps-analyzer-tracy-x86_64-unknown-linux-gnu
-          chmod +x src-tauri/binaries/ps-analyzer-tracy-x86_64-unknown-linux-gnu
-      - name: build tauri app
-        uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tagName: v__VERSION__
-          releaseId: ${{ github.event.release.id }}
-          releaseName: "PS Analyzer v__VERSION__"
-          releaseBody: "Automated release from GitHub Actions. Includes Bundled and Minimal versions (Linux)."
+          releaseBody: "Automated release from GitHub Actions. Optimized Linux bundle (no bgzip sidecar)."
           releaseDraft: false
           prerelease: false
