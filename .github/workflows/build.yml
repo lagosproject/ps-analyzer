@@ -42,6 +42,12 @@ jobs:
       - name: install frontend dependencies
         run: npm install
 
+      - name: Prepare Config (Remove Bgzip on Linux)
+        if: startsWith(matrix.platform, 'ubuntu-')
+        run: |
+           sudo apt-get update && sudo apt-get install -y jq
+           jq '.bundle.externalBin |= map(select(contains("bgzip") == false))' src-tauri/tauri.conf.json > src-tauri/tauri.conf.json.tmp && mv src-tauri/tauri.conf.json.tmp src-tauri/tauri.conf.json
+
       # --- SIDECAR BINARY PREPARATION ---
       
       - name: Get Sidecar Binaries (Linux)
@@ -53,11 +59,6 @@ jobs:
           # Tracy
           curl -L https://github.com/gear-genomics/tracy/releases/download/v0.8.9/tracy-v0.8.9-linux-amd64 -o src-tauri/binaries/ps-analyzer-tracy-x86_64-unknown-linux-gnu
           chmod +x src-tauri/binaries/ps-analyzer-tracy-x86_64-unknown-linux-gnu
-          
-          # Bgzip (Still needed for compression)
-          sudo apt-get update
-          sudo apt-get install -y tabix
-          cp $(which bgzip) src-tauri/binaries/ps-analyzer-bgzip-x86_64-unknown-linux-gnu
           
           # Bio-Engine
           curl -L https://github.com/lagosproject/bio-engine/releases/latest/download/bio-engine-${{ matrix.platform }} -o src-tauri/binaries/ps-analyzer-bio-engine-x86_64-unknown-linux-gnu
