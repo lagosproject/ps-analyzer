@@ -42,11 +42,11 @@ jobs:
       - name: install frontend dependencies
         run: npm install
 
-      - name: Prepare Config (Remove Bgzip on Linux)
+      - name: Prepare Config (Remove Bgzip and Samtools on Linux)
         if: startsWith(matrix.platform, 'ubuntu-')
         run: |
            sudo apt-get update && sudo apt-get install -y jq
-           jq '.bundle.externalBin |= map(select(contains("bgzip") == false))' src-tauri/tauri.conf.json > src-tauri/tauri.conf.json.tmp && mv src-tauri/tauri.conf.json.tmp src-tauri/tauri.conf.json
+           jq '.bundle.externalBin |= map(select(contains("bgzip") == false and contains("samtools") == false))' src-tauri/tauri.conf.json > src-tauri/tauri.conf.json.tmp && mv src-tauri/tauri.conf.json.tmp src-tauri/tauri.conf.json
 
       # --- SIDECAR BINARY PREPARATION ---
       
