@@ -51,6 +51,7 @@ pub fn run() {
                     let tools = [
                         ("tracy", "TRACY_PATH", "--tracy-path"),
                         ("bgzip", "BIO_BGZIP_PATH", "--bgzip-path"),
+                        ("samtools", "BIO_SAMTOOLS_PATH", "--samtools-path"),
                     ];
 
                     for (name, env_var, arg) in tools {
@@ -98,6 +99,13 @@ pub fn run() {
                             paths_to_check.push(std::path::PathBuf::from(format!("/usr/bin/{}", sidecar_id)));
                             paths_to_check.push(std::path::PathBuf::from(format!("/bin/{}", sidecar_id)));
                             paths_to_check.push(std::path::PathBuf::from(format!("/usr/local/bin/{}", sidecar_id)));
+                            
+                            // Conda fallbacks (for dev environment)
+                            if let Ok(home) = std::env::var("HOME") {
+                                paths_to_check.push(std::path::PathBuf::from(format!("{}/miniforge3/envs/bio-engine/bin/{}", home, name)));
+                                paths_to_check.push(std::path::PathBuf::from(format!("{}/anaconda3/envs/bio-engine/bin/{}", home, name)));
+                                paths_to_check.push(std::path::PathBuf::from(format!("{}/miniconda3/envs/bio-engine/bin/{}", home, name)));
+                            }
                         }
 
                         // Find the first path that exists

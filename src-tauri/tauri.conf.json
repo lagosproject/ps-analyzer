@@ -37,6 +37,7 @@
       "externalBin": [
         "binaries/ps-analyzer-bio-engine",
         "binaries/ps-analyzer-tracy",
+        "binaries/ps-analyzer-samtools",
         "binaries/ps-analyzer-bgzip"
       ]
   }
