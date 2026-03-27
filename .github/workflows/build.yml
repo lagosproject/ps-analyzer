@@ -72,6 +72,7 @@ jobs:
           update: true
           install: >-
             mingw-w64-x86_64-htslib
+            mingw-w64-x86_64-samtools
 
       - name: Prepare Binary Directory (Windows)
         if: matrix.platform == 'windows-latest'
@@ -86,6 +87,7 @@ jobs:
         run: |
           # Copy from MSYS2 (using local paths relative to MSYS2 root)
           cp /mingw64/bin/bgzip.exe src-tauri/binaries/ps-analyzer-bgzip-x86_64-pc-windows-msvc.exe
+          cp /mingw64/bin/samtools.exe src-tauri/binaries/ps-analyzer-samtools-x86_64-pc-windows-msvc.exe
           
           # Include necessary DLLs for MSYS2 binaries
           cp /mingw64/bin/zlib1.dll src-tauri/binaries/
