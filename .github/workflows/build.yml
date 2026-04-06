@@ -89,24 +89,22 @@ jobs:
           cp /mingw64/bin/bgzip.exe src-tauri/binaries/ps-analyzer-bgzip-x86_64-pc-windows-msvc.exe
           cp /mingw64/bin/samtools.exe src-tauri/binaries/ps-analyzer-samtools-x86_64-pc-windows-msvc.exe
           
-          # Include necessary DLLs for MSYS2 binaries
-          cp /mingw64/bin/zlib1.dll src-tauri/binaries/
-          cp /mingw64/bin/libwinpthread-1.dll src-tauri/binaries/
-          cp /mingw64/bin/libbz2-1.dll src-tauri/binaries/
-          cp /mingw64/bin/liblzma-5.dll src-tauri/binaries/
-          cp /mingw64/bin/libgcc_s_seh-1.dll src-tauri/binaries/ || true
-          cp /mingw64/bin/libstdc++-6.dll src-tauri/binaries/ || true
-          # Optional but recommended for samtools/htslib
-          cp /mingw64/bin/libcurl-4.dll src-tauri/binaries/ || true
-          cp /mingw64/bin/libcrypto-3-x64.dll src-tauri/binaries/ || true
-          cp /mingw64/bin/libssl-3-x64.dll src-tauri/binaries/ || true
-          
-          # Bio-Engine
-          curl -L https://github.com/lagosproject/bio-engine/releases/latest/download/bio-engine.exe -o src-tauri/binaries/ps-analyzer-bio-engine-x86_64-pc-windows-msvc.exe
+          # Automated discovery of all MinGW DLL dependencies
+          # We check both bgzip and samtools to capture all transient requirements
+          for bin in src-tauri/binaries/*.exe; do
+            echo "Identifying dependencies for $bin..."
+            ldd "$bin" | grep /mingw64/bin/ | awk '{print $3}' | xargs -I {} cp -v {} src-tauri/binaries/
+          done
           
           # Tracy (Dynamic latest version)
           LATEST_TRACY_URL=$(curl -s https://api.github.com/repos/gear-genomics/tracy/releases/latest | grep "browser_download_url.*windows-amd64" | cut -d '"' -f 4)
           curl -L "$LATEST_TRACY_URL" -o src-tauri/binaries/ps-analyzer-tracy-x86_64-pc-windows-msvc.exe
+          
+          # Bio-Engine
+          curl -L https://github.com/lagosproject/bio-engine/releases/latest/download/bio-engine.exe -o src-tauri/binaries/ps-analyzer-bio-engine-x86_64-pc-windows-msvc.exe
+          
+          echo "Final contents of binaries folder:"
+          ls -F src-tauri/binaries/
 
       - name: Smoke Test Sidecars (Windows)
         if: matrix.platform == 'windows-latest'
