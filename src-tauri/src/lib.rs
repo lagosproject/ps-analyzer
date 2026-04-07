@@ -134,6 +134,27 @@ pub fn run() {
                     let resource_path_str = resource_path.to_string_lossy().to_string();
                     println!("Passing resource path to bio-engine: {}", resource_path_str);
                     sidecar_command = sidecar_command.args(["--resource-path", &resource_path_str]);
+
+                    // BEST PRACTICE: Add resource and binaries folders to the sidecar's PATH directly
+                    // This helps Windows find DLLs even if the sidecar is launched from elsewhere
+                    if let Ok(current_path) = std::env::var("PATH") {
+                        let mut new_path = vec![resource_path_str.clone()];
+                        
+                        // Also add standard subfolders where DLLs might be
+                        let binaries_sub = resource_path.join("binaries");
+                        if binaries_sub.exists() {
+                            new_path.push(binaries_sub.to_string_lossy().to_string());
+                        }
+                        
+                        let resources_sub = resource_path.join("resources/binaries");
+                        if resources_sub.exists() {
+                            new_path.push(resources_sub.to_string_lossy().to_string());
+                        }
+
+                        new_path.push(current_path);
+                        let final_path_env = new_path.join(if cfg!(target_os = "windows") { ";" } else { ":" });
+                        sidecar_command = sidecar_command.env("PATH", final_path_env);
+                    }
                 }
 
                 let (mut rx, _child) = sidecar_command
