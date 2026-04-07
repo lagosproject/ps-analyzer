@@ -29,24 +29,10 @@ This repository contains the frontend and desktop application logic. It expects 
 
 ### Installation
 
-We provide two versions of the Linux application:
-
-#### 1. Bundled Version (Recommended)
-This version includes all necessary bioinformatics tools (`bgzip`, `tracy`) bundled as sidecars. FASTA indexing is handled internally by the bundled `bio-engine`. No additional system installation is required.
-
 - Download the `PS.Analyzer_X.Y.Z_amd64.deb` package.
 - Install using: `sudo apt install ./PS.Analyzer_X.Y.Z_amd64.deb`
 
-#### 2. Minimal Version
-This version is smaller and requires you to have `htslib` (for `bgzip`) already installed on your system.
-
-- Download the `PS.Analyzer.Minimal_X.Y.Z_amd64.deb` package.
-- Install system dependencies:
-  ```bash
-  sudo apt update
-  sudo apt install tabix
-  ```
-- Install the package: `sudo apt install ./PS.Analyzer.Minimal_X.Y.Z_amd64.deb`
+This version includes all necessary bioinformatics tools (`bgzip`, `tracy`) bundled as sidecars. FASTA indexing is handled internally by the bundled `bio-engine`. No additional system installation is required.
 
 ### Ensuring bio-engine is present
 The application expects a sibling directory `bio-engine` containing the backend analysis services if you are running from source. For packaged releases, the `bio-engine` is bundled automatically.
