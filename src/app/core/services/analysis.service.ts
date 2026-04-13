@@ -448,6 +448,9 @@ export class AnalysisService {
       }
     }
 
+    // Sort by genomic position
+    result.sort((a, b) => (a.position || 0) - (b.position || 0));
+
     return result;
   }
 

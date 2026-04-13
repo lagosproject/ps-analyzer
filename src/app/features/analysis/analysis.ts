@@ -421,6 +421,17 @@ export class AnalysisComponent implements OnInit {
         return;
       }
 
+      // Create a map to maintain the original submission order of reads
+      const readOrderMap = new Map<string, number>();
+      let globalIdx = 0;
+      for (const p of job.patients) {
+        for (const r of p.reads) {
+          readOrderMap.set(r.file, globalIdx);
+          if (r.id) readOrderMap.set(r.id, globalIdx);
+          globalIdx++;
+        }
+      }
+
       for (const res of results) {
         if (res.error) {
           console.error(`Error in result for patient ${res.patientId}: `, res.error);
@@ -464,13 +475,20 @@ export class AnalysisComponent implements OnInit {
 
           this.traces.update(current => {
             const index = current.findIndex(t => t.readId === readPath);
+            let updated: AnalysisEntry[];
             if (index !== -1) {
-              const updated = [...current];
+              updated = [...current];
               updated[index] = newTrace;
-              return updated;
             } else {
-              return [...current, newTrace];
+              updated = [...current, newTrace];
             }
+
+            // Always sort traces based on the original project structure
+            return updated.sort((a, b) => {
+              const orderA = readOrderMap.get(a.readId) ?? 999;
+              const orderB = readOrderMap.get(b.readId) ?? 999;
+              return orderA - orderB;
+            });
           });
         }
 
