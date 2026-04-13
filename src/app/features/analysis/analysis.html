@@ -60,27 +60,44 @@
 
       <!-- Main Visualization Panel -->
       <main class="visualization-panel">
-        <!-- Visualization Toolbar -->
-        <div class="timeline-view">
-          <div class="minimap-wrapper">
-            <app-analysis-minimap [features]="features()" [coverage]="alignmentReadMap()" [maxCoverage]="maxCoverage()">
-            </app-analysis-minimap>
+        <!-- Visualization View Group -->
+        @if (isSequenceVisible()) {
+        <div class="sequence-visualizer-container">
+          <!-- Visualization Toolbar -->
+          <div class="timeline-view">
+            <div class="minimap-wrapper">
+              <app-analysis-minimap [features]="features()" [coverage]="alignmentReadMap()"
+                [maxCoverage]="maxCoverage()">
+              </app-analysis-minimap>
+            </div>
+          </div>
+          <app-nucleotide-row-controls [referenceTrace]="referenceTrace()">
+          </app-nucleotide-row-controls>
+
+          <!-- Alignment View wrapped in scrollable container-->
+          <div class="alignment-view" (scroll)="updateScroll($event)" role="region" aria-label="Alignment View">
+            <app-group-nucleotide-rows [traces]="traces()" [referenceTrace]="referenceTrace()"
+              [alignmentDepthMap]="alignmentDepthMap()" (rowClick)="handleRowClick($event)"
+              (nucleotideSelected)="onNucleotideSelected($event)"></app-group-nucleotide-rows>
           </div>
         </div>
-        <app-nucleotide-row-controls [referenceTrace]="referenceTrace()">
-        </app-nucleotide-row-controls>
-
-        <!-- Alignment View wrapped in scrollable container-->
-        <div class="alignment-view" (scroll)="updateScroll($event)" role="region" aria-label="Alignment View">
-          <app-group-nucleotide-rows [traces]="traces()" [referenceTrace]="referenceTrace()"
-            [alignmentDepthMap]="alignmentDepthMap()" (rowClick)="handleRowClick($event)"
-            (nucleotideSelected)="onNucleotideSelected($event)"></app-group-nucleotide-rows>
-        </div>
+        }
 
         <!-- Chromatogram Section -->
         <div class="chromatogram-section">
           <div class="chromatogram-header">
-            <h4 class="section-title">Chromatogram Trace</h4>
+            <div class="header-left-group">
+              <h4 class="section-title">Chromatogram Traces</h4>
+            </div>
+            <div class="header-actions">
+              <button class="icon-btn-toggle" (click)="toggleSequenceVisibility()"
+                [title]="isSequenceVisible() ? 'Fullscreen Sanger' : 'Show Sequence'"
+                [attr.aria-label]="isSequenceVisible() ? 'Fullscreen Sanger' : 'Show Sequence'">
+                <span class="material-symbols-outlined">
+                  {{ isSequenceVisible() ? 'fullscreen' : 'fullscreen_exit' }}
+                </span>
+              </button>
+            </div>
           </div>
           <div class="chromatogram-container">
             <!-- Using existing sanger chart logic-->

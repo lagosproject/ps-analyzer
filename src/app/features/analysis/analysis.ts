@@ -76,6 +76,16 @@ export class AnalysisComponent implements OnInit {
   /** UI state for the report generation modal */
   readonly showReportModal = signal<boolean>(false);
 
+  /** UI state to toggle visibility of the sequence visualizer (minimap + alignment) */
+  readonly isSequenceVisible = signal<boolean>(true);
+
+  /**
+   * Toggles the visibility of the sequence visualizer to provide more space for chromatograms.
+   */
+  toggleSequenceVisibility() {
+    this.isSequenceVisible.update(v => !v);
+  }
+
   readonly hasMarkedVariants = computed(() => {
     const jobId = this.currentJobId();
     if (!jobId) return false;
