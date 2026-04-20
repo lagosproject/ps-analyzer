@@ -121,6 +121,7 @@ jobs:
       # --- TAURI BUILD ---
 
       - name: build tauri app
+        id: tauri_build
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -131,3 +132,40 @@ jobs:
           releaseBody: "Automated release from GitHub Actions. Optimized Linux bundle (no bgzip sidecar)."
           releaseDraft: false
           prerelease: false
+
+      - name: Get Version (from tauri.conf.json)
+        if: matrix.platform == 'windows-latest'
+        shell: bash
+        run: |
+          VERSION=$(jq -r '.version' src-tauri/tauri.conf.json)
+          echo "PACKAGE_VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Package Portable (Windows)
+        if: matrix.platform == 'windows-latest'
+        shell: pwsh
+        run: |
+          $Version = $env:PACKAGE_VERSION
+          $PortableDir = "ps-analyzer-v$Version-portable"
+          New-Item -ItemType Directory -Force -Path $PortableDir
+          
+          # Copy the main binary
+          Copy-Item "src-tauri/target/release/ps-analyzer.exe" -Destination "$PortableDir/PS Analyzer.exe"
+          
+          # Copy all sidecars and DLL dependencies
+          # We copy the entire binaries folder content to the root of the portable dir
+          # This ensures the exe can find them if it expects them in the same folder or if Tauri extracts them
+          Copy-Item "src-tauri/binaries/*" -Destination "$PortableDir/"
+          
+          # Create the ZIP
+          Compress-Archive -Path "$PortableDir/*" -DestinationPath "ps-analyzer-v$Version-windows-portable.zip"
+          
+          echo "Portable ZIP created: ps-analyzer-v$Version-windows-portable.zip"
+
+      - name: Upload Portable Zip
+        if: matrix.platform == 'windows-latest'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ps-analyzer-*-windows-portable.zip
+          tag_name: v${{ env.PACKAGE_VERSION }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
