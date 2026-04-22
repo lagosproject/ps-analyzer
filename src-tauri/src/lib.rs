@@ -157,6 +157,41 @@ pub fn run() {
                     }
                 }
 
+                // Detect if we are running in a "portable" context
+                let mut data_dir_arg = None;
+                if let Ok(exe_dir) = app_handle.path().executable_dir() {
+                    let mut is_portable = exe_dir.join(".portable").exists() || exe_dir.join("portable").exists();
+                    
+                    // Windows: consider portable if not in Program Files and directory is writable
+                    #[cfg(target_os = "windows")]
+                    if !is_portable {
+                        let exe_dir_str = exe_dir.to_string_lossy().to_lowercase();
+                        let pf = std::env::var("ProgramFiles").unwrap_or_default().to_lowercase();
+                        let pf86 = std::env::var("ProgramFiles(x86)").unwrap_or_default().to_lowercase();
+                        if !exe_dir_str.starts_with(&pf) && !exe_dir_str.starts_with(&pf86) {
+                            is_portable = true;
+                        }
+                    }
+
+                    if is_portable {
+                        data_dir_arg = Some(exe_dir.join("data"));
+                    }
+                }
+
+                // Linux: AppImage specific portable handling
+                if let Ok(appimage_path) = std::env::var("APPIMAGE") {
+                    let path = std::path::Path::new(&appimage_path).parent();
+                    if let Some(p) = path {
+                        data_dir_arg = Some(p.join("ps-analyzer-data"));
+                    }
+                }
+
+                if let Some(data_dir) = data_dir_arg {
+                    let data_dir_str = data_dir.to_string_lossy().to_string();
+                    println!("Portable mode detected. Using data directory: {}", data_dir_str);
+                    sidecar_command = sidecar_command.args(["--data-dir", &data_dir_str]);
+                }
+
                 let (mut rx, _child) = sidecar_command
                     .spawn()
                     .expect("failed to spawn sidecar");
