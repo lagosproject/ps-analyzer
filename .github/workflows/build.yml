@@ -146,15 +146,31 @@ jobs:
         run: |
           $Version = $env:PACKAGE_VERSION
           $PortableDir = "ps-analyzer-v$Version-portable"
-          New-Item -ItemType Directory -Force -Path $PortableDir
+          $TargetTriple = "x86_64-pc-windows-msvc"
           
-          # Copy the main binary
+          New-Item -ItemType Directory -Force -Path $PortableDir
+          New-Item -ItemType Directory -Force -Path "$PortableDir/binaries"
+          
+          # 1. Main Application
           Copy-Item "src-tauri/target/release/ps-analyzer.exe" -Destination "$PortableDir/PS Analyzer.exe"
           
-          # Copy all sidecars and DLL dependencies
-          # We copy the entire binaries folder content to the root of the portable dir
-          # This ensures the exe can find them if it expects them in the same folder or if Tauri extracts them
-          Copy-Item "src-tauri/binaries/*" -Destination "$PortableDir/"
+          # 2. Sidecars in 'binaries' (Long names, for Tauri)
+          # Also copy all DLL dependencies here
+          Copy-Item "src-tauri/binaries/*" -Destination "$PortableDir/binaries/"
+          
+          # 3. Sidecars in root (Short names, for Bio-Engine auto-discovery)
+          # We rename them while copying to remove the target triple
+          $Tools = @("bio-engine", "bgzip", "samtools", "tracy")
+          foreach ($Tool in $Tools) {
+              $LongName = "ps-analyzer-$Tool-$TargetTriple.exe"
+              $ShortName = "ps-analyzer-$Tool.exe"
+              if (Test-Path "src-tauri/binaries/$LongName") {
+                  Copy-Item "src-tauri/binaries/$LongName" -Destination "$PortableDir/$ShortName"
+              }
+          }
+          
+          # 4. Portable marker
+          New-Item -ItemType File -Path "$PortableDir/.portable" -Force
           
           # Create the ZIP
           Compress-Archive -Path "$PortableDir/*" -DestinationPath "ps-analyzer-v$Version-windows-portable.zip"
