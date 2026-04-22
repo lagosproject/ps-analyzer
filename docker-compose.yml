@@ -1,0 +1,21 @@
+services:
+  backend:
+    build:
+      context: ../bio-engine
+      dockerfile: Dockerfile.server
+    environment:
+      - BIO_HOST=0.0.0.0
+      - BIO_PORT=8000
+    volumes:
+      - ./data:/app/data
+    restart: always
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    restart: always

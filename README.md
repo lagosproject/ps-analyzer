@@ -64,6 +64,25 @@ To automatically fix common linting issues:
 npm run lint -- --fix
 ```
 
+## Docker Deployment (Intranet/Server)
+
+For deployments on local servers or intranets where multiple users need to access the application via a web browser, we provide a server-optimized configuration.
+
+### Deployment via Docker Compose
+
+A `docker-compose.yml` is provided in the project root to orchestrate both the frontend and the bio-engine backend.
+
+1.  **Clone the repositories** (ensure `ms-analyzer` and `bio-engine` are siblings).
+2.  **Run with Docker Compose**:
+    ```bash
+    docker-compose up --build -d
+    ```
+3.  **Access the application**: The app will be available at `http://<server-ip>:8080`.
+
+### Purpose of Dockerfiles
+- **`Dockerfile.server`**: Builds the Angular application and serves it using Nginx. It includes a reverse proxy configuration to route `/api` requests to the backend.
+- **`Dockerfile`**: (Standard) Used for development environments and Tauri build pipelines.
+
 ## Configuration
 
 The application communicates with a local FastAPI server (part of the bio-engine). The API URL is configurable in `src/app/core/services/analysis.service.ts` or via environment variables in future releases.

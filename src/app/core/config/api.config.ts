@@ -5,7 +5,9 @@
 export const API_CONFIG = {
     /** 
      * Base URL for the FastAPI server.
-     * Change this to your production address (e.g., http://my-server.com:8000) when deploying.
+     * In Tauri, it uses the local sidecar. In a web deployment, it uses the /api proxy.
      */
-    baseUrl: 'http://127.0.0.1:8000'
+    baseUrl: (typeof window !== 'undefined' && (window as any).__TAURI_INTERNALS__) 
+        ? 'http://127.0.0.1:8000' 
+        : '/api'
 };
