@@ -112,6 +112,25 @@ export class AnalysisService {
   }
 
   /**
+   * Uploads a file to the analysis engine and returns its server-side path.
+   * Useful for web-based deployments where local paths are not accessible.
+   * @param file - The file object to upload
+   */
+  async uploadFile(file: File): Promise<string> {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const res = await firstValueFrom(
+        this.http.post<{ path: string }>(`${this.apiUrl}/upload`, formData)
+      );
+      return res.path;
+    } catch (error: any) {
+      throw this.handleApiError(error);
+    }
+  }
+
+  /**
    * Searches the backend storage for a given reference query (NCBI code or Gene).
    * @param query - The reference search query
    * @returns Promise resolving to a list of matching references

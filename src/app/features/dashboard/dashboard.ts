@@ -114,6 +114,39 @@ export class DashboardComponent implements OnInit {
     // Read Settings State
     editingRead = signal<{ patientId: string, read: SangerRead } | null>(null);
 
+    /** Whether the application is running inside Tauri (native) */
+    readonly isTauri = (typeof window !== 'undefined' && !!(window as any).__TAURI_INTERNALS__);
+
+    /** Temporary store for patient context when uploading via web */
+    private uploadPatientContext: Patient | null = null;
+
+    /**
+     * Handles file selection from the standard web file input.
+     */
+    async onWebFileChange(event: Event, type: 'ref' | 'read') {
+        const input = event.target as HTMLInputElement;
+        if (!input.files || input.files.length === 0) return;
+
+        const files = Array.from(input.files);
+        
+        for (const file of files) {
+            try {
+                const serverPath = await this.analysisService.uploadFile(file);
+                if (type === 'ref') {
+                    this.appState.setLocalRef(serverPath);
+                } else if (type === 'read' && this.uploadPatientContext) {
+                    this.appState.addRead(this.uploadPatientContext.id, serverPath);
+                }
+            } catch (e) {
+                console.error("Upload failed", e);
+                this.toastService.show(`Failed to upload ${file.name}`, "error");
+            }
+        }
+        
+        // Reset input
+        input.value = '';
+    }
+
     /** Computed signal for filtered jobs based on search query */
     readonly filteredJobs = computed(() => {
         const query = this.searchQuery().toLowerCase();
@@ -220,13 +253,18 @@ export class DashboardComponent implements OnInit {
      * Opens a dialog to select a local FASTA file as reference.
      */
     async selectRefFasta() {
-        const selected = await open({
-            multiple: false,
-            filters: [{ name: 'Reference FASTA', extensions: ['fasta', 'fa'] }]
-        });
+        if (this.isTauri) {
+            const selected = await open({
+                multiple: false,
+                filters: [{ name: 'Reference FASTA', extensions: ['fasta', 'fa'] }]
+            });
 
-        if (selected && typeof selected === 'string') {
-            this.appState.setLocalRef(selected);
+            if (selected && typeof selected === 'string') {
+                this.appState.setLocalRef(selected);
+            }
+        } else {
+            const input = document.getElementById('web-ref-input') as HTMLInputElement;
+            input?.click();
         }
     }
 
@@ -267,15 +305,21 @@ export class DashboardComponent implements OnInit {
      * @param patient - The patient to add reads to
      */
     async addRead(patient: Patient) {
-        const selected = await open({
-            multiple: true,
-            filters: [{ name: 'Sanger Data', extensions: ['ab1', 'scf', 'fasta', 'fa', 'txt'] }]
-        });
-
-        if (selected && Array.isArray(selected)) {
-            selected.forEach(filePath => {
-                this.appState.addRead(patient.id, filePath);
+        if (this.isTauri) {
+            const selected = await open({
+                multiple: true,
+                filters: [{ name: 'Sanger Data', extensions: ['ab1', 'scf', 'fasta', 'fa', 'txt'] }]
             });
+
+            if (selected && Array.isArray(selected)) {
+                selected.forEach(filePath => {
+                    this.appState.addRead(patient.id, filePath);
+                });
+            }
+        } else {
+            this.uploadPatientContext = patient;
+            const input = document.getElementById('web-read-input') as HTMLInputElement;
+            input?.click();
         }
     }
 
@@ -284,10 +328,9 @@ export class DashboardComponent implements OnInit {
      * @param id - patient ID
      */
     async removePatient(id: string) {
-        const confirmed = await ask("Are you sure you want to remove this patient?", {
-            title: 'Confirm Deletion',
-            kind: 'warning',
-        });
+        const confirmed = this.isTauri 
+            ? await ask("Are you sure you want to remove this patient?", { title: 'Confirm Deletion', kind: 'warning' })
+            : confirm("Are you sure you want to remove this patient?");
 
         if (confirmed) {
             this.appState.removePatient(id);
@@ -382,10 +425,9 @@ export class DashboardComponent implements OnInit {
      */
     async onDeleteJob(event: Event, job: AnalysisJob) {
         event.stopPropagation();
-        const confirmed = await ask(`Delete job "${job.name}"?`, {
-            title: 'Confirm Deletion',
-            kind: 'warning',
-        });
+        const confirmed = this.isTauri
+            ? await ask(`Delete job "${job.name}"?`, { title: 'Confirm Deletion', kind: 'warning' })
+            : confirm(`Delete job "${job.name}"?`);
 
         if (confirmed) {
             try {
@@ -436,26 +478,30 @@ export class DashboardComponent implements OnInit {
     async onShareJob(event: Event, job: AnalysisJob) {
         event.stopPropagation();
 
-        try {
-            const targetFolder = await open({
-                directory: true,
-                multiple: false,
-                title: 'Select Export Folder'
-            });
+            if (this.isTauri) {
+                const targetFolder = await open({
+                    directory: true,
+                    multiple: false,
+                    title: 'Select Export Folder'
+                });
 
-            if (!targetFolder) return;
+                if (!targetFolder) return;
 
-            const confirmed = await ask(`Export "${job.name}" to this folder?\n\nChoose Export Level:`, {
-                title: 'Share Job',
-                kind: 'info',
-                okLabel: 'Full (Data + Results)',
-                cancelLabel: 'Results Only'
-            });
+                const confirmed = await ask(`Export "${job.name}" to this folder?\n\nChoose Export Level:`, {
+                    title: 'Share Job',
+                    kind: 'info',
+                    okLabel: 'Full (Data + Results)',
+                    cancelLabel: 'Results Only'
+                });
 
-            const level = confirmed ? 'full' : 'results_only';
-
-            await this.analysisService.shareJob(job.id, level, targetFolder as string);
-            this.toastService.show(`Job exported successfully to ${targetFolder}`, 'success');
+                const level = confirmed ? 'full' : 'results_only';
+                await this.analysisService.shareJob(job.id, level, targetFolder as string);
+                this.toastService.show(`Job exported successfully to ${targetFolder}`, 'success');
+            } else {
+                // In web mode, we can't select a local folder. 
+                // We could implement a download as ZIP, but for now we'll just show an error.
+                this.toastService.show("Export to local folder is only available in the desktop version.", "warning");
+            }
         } catch (e) {
             console.error("Failed to share job", e);
             this.toastService.show("Failed to export job", 'error');
@@ -466,21 +512,25 @@ export class DashboardComponent implements OnInit {
      * Opens a dialog to import a previously exported project folder.
      */
     async onImportJob() {
-        try {
-            const sourceFolder = await open({
-                directory: true,
-                multiple: false,
-                title: 'Select Shared Job Folder'
-            });
+        if (this.isTauri) {
+            try {
+                const sourceFolder = await open({
+                    directory: true,
+                    multiple: false,
+                    title: 'Select Shared Job Folder'
+                });
 
-            if (!sourceFolder) return;
+                if (!sourceFolder) return;
 
-            await this.analysisService.importJob(sourceFolder as string);
-            this.toastService.show("Job imported successfully", 'success');
-            this.loadJobs();
-        } catch (e) {
-            console.error("Failed to import job", e);
-            this.toastService.show("Failed to import job. Ensure it is a valid shared job folder.", 'error');
+                await this.analysisService.importJob(sourceFolder as string);
+                this.toastService.show("Job imported successfully", 'success');
+                this.loadJobs();
+            } catch (e) {
+                console.error("Failed to import job", e);
+                this.toastService.show("Failed to import job. Ensure it is a valid shared job folder.", 'error');
+            }
+        } else {
+            this.toastService.show("Importing from local folder is only available in the desktop version.", "warning");
         }
     }
 

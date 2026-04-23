@@ -274,4 +274,10 @@
         (close)="closeReadSettings()"></app-read-settings>
     }
 
+    <!-- Hidden inputs for web-mode file selection -->
+    <input type="file" id="web-ref-input" style="display: none;" accept=".fasta,.fa,.fna"
+        (change)="onWebFileChange($event, 'ref')">
+    <input type="file" id="web-read-input" style="display: none;" multiple accept=".ab1,.scf,.fasta,.fa,.txt"
+        (change)="onWebFileChange($event, 'read')">
+
 </div>
