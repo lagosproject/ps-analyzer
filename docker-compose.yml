@@ -6,8 +6,9 @@ services:
     environment:
       - BIO_HOST=0.0.0.0
       - BIO_PORT=8000
+      - BIO_DATA_DIR=/app/storage
     volumes:
-      - ./data:/app/data
+      - ./storage:/app/storage
     restart: always
 
   frontend:

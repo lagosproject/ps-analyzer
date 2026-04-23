@@ -54,9 +54,11 @@ export class AnalysisService {
    * @returns AnalysisError with structured error information
    */
   private handleApiError(error: any): AnalysisError {
+    const message = error.error?.message || error.error?.detail || error.message || 'Could not connect to the analysis engine.';
+    console.error("API Error Response:", error.error);
     return {
       type: error.error?.type || 'ApiError',
-      message: error.error?.message || error.error?.detail || 'Could not connect to the analysis engine.',
+      message: typeof message === 'string' ? message : JSON.stringify(message),
       traceback: error.error?.traceback || ''
     };
   }

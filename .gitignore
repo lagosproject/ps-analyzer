@@ -53,3 +53,4 @@ src-tauri/binaries/
 
 # Local symlinks
 engine
+storage/

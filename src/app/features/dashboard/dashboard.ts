@@ -153,10 +153,14 @@ export class DashboardComponent implements OnInit {
         return this.jobs().filter(job => job.name.toLowerCase().includes(query));
     });
 
+
+
     /**
      * Initializes the component and waits for the analysis server to be ready.
      */
     async ngOnInit() {
+
+
         const isConnected = await this.analysisService.waitForServer();
         if (isConnected) {
             this.loadJobs();
@@ -478,6 +482,7 @@ export class DashboardComponent implements OnInit {
     async onShareJob(event: Event, job: AnalysisJob) {
         event.stopPropagation();
 
+        try {
             if (this.isTauri) {
                 const targetFolder = await open({
                     directory: true,
@@ -498,8 +503,6 @@ export class DashboardComponent implements OnInit {
                 await this.analysisService.shareJob(job.id, level, targetFolder as string);
                 this.toastService.show(`Job exported successfully to ${targetFolder}`, 'success');
             } else {
-                // In web mode, we can't select a local folder. 
-                // We could implement a download as ZIP, but for now we'll just show an error.
                 this.toastService.show("Export to local folder is only available in the desktop version.", "warning");
             }
         } catch (e) {
@@ -674,7 +677,7 @@ export class DashboardComponent implements OnInit {
                     job = await this.analysisService.updateJob(this.currentJobId()!, jobName, reference, validPatients, this.tracyConfig(), this.hgvsConfig());
                 } else {
                     // Create New Job
-                    const appVersion = await getVersion();
+                    const appVersion = this.isTauri ? await getVersion() : '0.1.0-web';
                     job = await this.analysisService.createJob(jobName, reference, validPatients, appVersion, this.tracyConfig(), this.hgvsConfig());
                     this.currentJobId.set(job.id);
                     this.currentJobName.set(job.name);
