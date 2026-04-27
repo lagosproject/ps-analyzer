@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy, viewChildren, viewChild, effect } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy, viewChildren, viewChild, effect, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -78,6 +78,89 @@ export class AnalysisComponent implements OnInit {
 
   /** UI state to toggle visibility of the sequence visualizer (minimap + alignment) */
   readonly isSequenceVisible = signal<boolean>(true);
+
+  /** Tracks the last interacted read ID for keyboard navigation */
+  private readonly lastSelectedReadId = signal<string | null>(null);
+  /** Indicates if the sequence visualizer currently has keyboard focus */
+  private readonly isSequenceNavActive = signal(false);
+
+  /**
+   * Listens for global keydown events to support sequence navigation.
+   */
+  @HostListener('window:keydown', ['$event'])
+  handleKeyDown(event: KeyboardEvent) {
+    if (!this.isSequenceNavActive()) return;
+
+    // Don't intercept if user is typing in an input or textarea
+    const target = event.target as HTMLElement;
+    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+      return;
+    }
+
+    if (event.key === 'ArrowRight') {
+      this.navigateSequence(1);
+      event.preventDefault();
+    } else if (event.key === 'ArrowLeft') {
+      this.navigateSequence(-1);
+      event.preventDefault();
+    }
+  }
+
+  /**
+   * Detects clicks outside the sequence area to deactivate keyboard navigation.
+   */
+  @HostListener('window:mousedown', ['$event'])
+  handleWindowClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    const isInsideSequence = target.closest('.sequence-visualizer-container');
+    if (!isInsideSequence) {
+      this.isSequenceNavActive.set(false);
+    }
+  }
+
+  /**
+   * Moves the selection highlight by a relative amount in the sequence.
+   * @param delta - Positive to move right, negative to move left
+   */
+  private navigateSequence(delta: number) {
+    const range = this.timelineService.highlightedRange();
+    if (!range) return;
+
+    const newGlobalIndex = range.start + delta;
+    if (newGlobalIndex < 0) return;
+
+    const mapping = this.globalToRefMap().get(newGlobalIndex);
+    if (mapping) {
+      this.onNucleotideSelected({
+        readId: this.lastSelectedReadId() || 'Reference',
+        refPos: mapping.refPos,
+        globalIndex: newGlobalIndex,
+        isInsertion: mapping.isInsertion
+      });
+    }
+  }
+
+  /**
+   * Computes a map that translates linear global indices to genomic reference positions.
+   * Accounts for insertions (multiple slots per ref position).
+   */
+  readonly globalToRefMap = computed(() => {
+    const depthMap = this.alignmentDepthMap();
+    const map = new Map<number, { refPos: number, isInsertion: boolean }>();
+    let currentGlobal = 0;
+    const max = this.timelineService.maxPosition();
+    // Safety check for uninitialized data
+    if (max === Infinity) return map;
+
+    for (let r = 1; r <= max; r++) {
+      const depth = depthMap.get(r) || 1;
+      for (let k = 0; k < depth; k++) {
+        map.set(currentGlobal, { refPos: r, isInsertion: k > 0 });
+        currentGlobal++;
+      }
+    }
+    return map;
+  });
 
   /** Height of the sequence visualizer section */
   readonly sequenceHeight = signal<number>(350);
@@ -179,7 +262,10 @@ export class AnalysisComponent implements OnInit {
    * Highlights the position, centers charts, and selects associated variants.
    * @param event - Contains readId, reference position, and insertion flag
    */
-  onNucleotideSelected(event: { readId: string, refPos: number, isInsertion?: boolean }) {
+  onNucleotideSelected(event: { readId: string, refPos: number, globalIndex?: number, isInsertion?: boolean }) {
+    this.lastSelectedReadId.set(event.readId);
+    this.isSequenceNavActive.set(true);
+
     let trace: AnalysisEntry | undefined;
     if (event.readId === 'Reference') {
       trace = this.referenceTrace();
@@ -192,8 +278,10 @@ export class AnalysisComponent implements OnInit {
     const item = trace.result.consensusAlign[event.refPos];
     if (!item) return;
 
-    const globalIndex = event.refPos - 1;
-    this.timelineService.setHighlight(globalIndex, globalIndex);
+    const gIndex = event.globalIndex !== undefined ? event.globalIndex : event.refPos - 1;
+    this.timelineService.setHighlight(gIndex, gIndex);
+
+    const globalIndex = gIndex;
 
     // Centering Logic:
     // 1. If Reference is clicked: center ALL charts.
