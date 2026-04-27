@@ -63,7 +63,9 @@
       <main class="visualization-panel">
         <!-- Visualization View Group -->
         @if (isSequenceVisible()) {
-        <div class="sequence-visualizer-container">
+        <div class="sequence-visualizer-container" [style.height.px]="sequenceHeight()">
+
+
           <!-- Visualization Toolbar -->
           <div class="timeline-view">
             <div class="minimap-wrapper">
@@ -81,6 +83,12 @@
               [alignmentDepthMap]="alignmentDepthMap()" (rowClick)="handleRowClick($event)"
               (nucleotideSelected)="onNucleotideSelected($event)"></app-group-nucleotide-rows>
           </div>
+        </div>
+
+        <!-- Resizer Handle -->
+        <div class="resizer-handle" (mousedown)="startResizing($event)" role="separator" aria-orientation="horizontal"
+          title="Drag to resize panels">
+          <div class="resizer-indicator"></div>
         </div>
         }
 

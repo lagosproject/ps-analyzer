@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy, viewChildren, viewChild } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy, viewChildren, viewChild, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -78,6 +78,82 @@ export class AnalysisComponent implements OnInit {
 
   /** UI state to toggle visibility of the sequence visualizer (minimap + alignment) */
   readonly isSequenceVisible = signal<boolean>(true);
+
+  /** Height of the sequence visualizer section */
+  readonly sequenceHeight = signal<number>(350);
+  /** Flag indicating if the user is currently resizing the section */
+  private isResizing = false;
+  /** Flag indicating if the user has manually adjusted the height */
+  private userHasResized = false;
+
+  constructor() {
+    // Auto-adjust height based on content until the user manually resizes
+    effect(() => {
+      const tracesCount = this.traces().length;
+      if (!this.userHasResized && tracesCount > 0) {
+        this.autoAdjustSequenceHeight();
+      }
+    }, { allowSignalWrites: true });
+  }
+
+  /**
+   * Calculates and sets the ideal height for the sequence visualizer based on the number of tracks.
+   * Caps at 450px to ensure chromatograms remain visible.
+   */
+  private autoAdjustSequenceHeight() {
+    const overhead = 140; // Minimap(80) + Controls(48) + borders/margins
+    const rowHeight = 22;
+    const rowCount = this.traces().length + 1; // +1 for reference
+    const contentHeight = rowCount * rowHeight;
+    const idealHeight = overhead + contentHeight;
+
+    // Default max of 450px, min of 140px
+    const finalHeight = Math.min(450, Math.max(140, idealHeight));
+    this.sequenceHeight.set(finalHeight);
+  }
+
+  /**
+   * Initializes the resizing process.
+   * @param event The mouse event from the resizer handle
+   */
+  startResizing(event: MouseEvent) {
+    this.isResizing = true;
+    this.userHasResized = true;
+    event.preventDefault();
+
+    const startY = event.clientY;
+    const startHeight = this.sequenceHeight();
+
+    const onMouseMove = (e: MouseEvent) => {
+      if (!this.isResizing) return;
+      const deltaY = e.clientY - startY;
+      const newHeight = Math.max(135, Math.min(1000, startHeight + deltaY));
+      this.sequenceHeight.set(newHeight);
+    };
+
+    const onMouseUp = () => {
+      this.isResizing = false;
+      document.body.style.cursor = 'default';
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+
+    document.body.style.cursor = 'row-resize';
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+  }
+
+  /**
+   * Toggles the sequence visualizer height between default and expanded.
+   */
+  toggleExpandSequence() {
+    if (this.sequenceHeight() > 600) {
+      // Restore to ideal height instead of a fixed 350
+      this.autoAdjustSequenceHeight();
+    } else {
+      this.sequenceHeight.set(window.innerHeight - 300);
+    }
+  }
 
   /**
    * Toggles the visibility of the sequence visualizer to provide more space for chromatograms.

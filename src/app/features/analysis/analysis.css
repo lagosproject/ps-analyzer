@@ -196,10 +196,10 @@
 
 .alignment-view {
   display: flex;
-  flex: 0 0 auto;
+  flex: 1;
   overflow-y: auto;
   flex-direction: column;
-  flex-shrink: 0;
+  min-height: 0;
 }
 
 /* Chromatogram Section (Bottom) */
@@ -207,10 +207,42 @@
   display: flex;
   flex: 1;
   overflow: auto;
-  border-top: 1px solid var(--border-muted);
   background-color: var(--bg-light);
   flex-direction: column;
+  min-height: 0;
+}
+
+/* Resizer Handle */
+.resizer-handle {
+  height: 6px;
+  background-color: var(--bg-light);
+  cursor: row-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 20;
+  transition: background-color 0.2s;
+  border-top: 1px solid var(--border-muted);
+  border-bottom: 1px solid var(--border-muted);
   flex-shrink: 0;
+}
+
+.resizer-handle:hover {
+  background-color: var(--surface-light);
+}
+
+.resizer-indicator {
+  width: 40px;
+  height: 3px;
+  border-radius: 2px;
+  background-color: var(--border-muted);
+  transition: background-color 0.2s, width 0.2s;
+}
+
+.resizer-handle:hover .resizer-indicator {
+  background-color: var(--primary);
+  width: 60px;
 }
 
 .chromatogram-header {
@@ -262,6 +294,19 @@
 .sequence-visualizer-container {
   display: flex;
   flex-direction: column;
+  flex-shrink: 0;
+  min-height: 135px;
+  overflow: hidden;
+}
+
+.sequence-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 2.5rem;
+  padding: 0.25rem 1rem;
+  border-bottom: 1px solid var(--border-muted);
+  background-color: var(--bg-light);
   flex-shrink: 0;
 }
 
