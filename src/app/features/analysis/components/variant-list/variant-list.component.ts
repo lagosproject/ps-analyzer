@@ -46,6 +46,7 @@ export class VariantListComponent {
     filterType = signal<string>('All');
     filterPatient = signal<string>('All');
     filterConsequence = signal<string>('All');
+    filterStatus = signal<string>('All');
 
     filterQuality = signal<string>('All');
     showFilters = signal<boolean>(false);
@@ -140,17 +141,21 @@ export class VariantListComponent {
         return Array.from(patients).sort();
     });
 
+    /** Computes available status filters */
+    availableStatuses = ['All', 'Any', 'None', 'Reviewed', 'Approved', 'Rejected'];
+
     /**
      * Core filtering logic that can be reused for facet counting.
      * @param overrides - Optional filter overrides (e.g. to calculate counts for a different category)
      */
-    private applyFilters(overrides: { type?: string, patient?: string, quality?: string, consequence?: string } = {}): Variant[] {
+    private applyFilters(overrides: { type?: string, patient?: string, quality?: string, consequence?: string, status?: string } = {}): Variant[] {
         let list = this.variants();
         const search = this.searchTerm().toLowerCase().trim();
         const typeFilter = (overrides.type ?? this.filterType()).toLowerCase();
         const patientFilter = overrides.patient ?? this.filterPatient();
         const qualityFilter = overrides.quality ?? this.filterQuality();
         const consequenceFilter = overrides.consequence ?? this.filterConsequence();
+        const statusFilter = overrides.status ?? this.filterStatus();
 
         // Apply Quality Filter
         if (qualityFilter !== 'All') {
@@ -179,6 +184,19 @@ export class VariantListComponent {
         // Apply Consequence Filter
         if (consequenceFilter !== 'All') {
             list = list.filter(v => v['consequence'] === consequenceFilter);
+        }
+
+        // Apply Status Filter
+        if (statusFilter !== 'All') {
+            list = list.filter(v => {
+                const status = this.getVariantStatus(v);
+                if (statusFilter === 'None') return status === 'none';
+                if (statusFilter === 'Reviewed') return status === 'reviewed';
+                if (statusFilter === 'Approved') return status === 'approved';
+                if (statusFilter === 'Rejected') return status === 'rejected';
+                if (statusFilter === 'Any') return status !== 'none';
+                return true;
+            });
         }
 
         // Apply Search Filter
@@ -255,6 +273,22 @@ export class VariantListComponent {
         return counts;
     });
 
+    /** Count of variants for each status, ignoring the current status filter */
+    statusCounts = computed(() => {
+        const counts: Record<string, number> = { 'All': 0, 'Any': 0, 'None': 0, 'Reviewed': 0, 'Approved': 0, 'Rejected': 0 };
+        const baseFiltered = this.applyFilters({ status: 'All' });
+        baseFiltered.forEach(v => {
+            const status = this.getVariantStatus(v);
+            counts['All']++;
+            if (status !== 'none') counts['Any']++;
+            if (status === 'none') counts['None']++;
+            if (status === 'reviewed') counts['Reviewed']++;
+            if (status === 'approved') counts['Approved']++;
+            if (status === 'rejected') counts['Rejected']++;
+        });
+        return counts;
+    });
+
     updateSearchTerm(term: string) {
         this.searchTerm.set(term);
     }
@@ -273,6 +307,10 @@ export class VariantListComponent {
 
     setConsequenceFilter(consequence: string) {
         this.filterConsequence.set(consequence);
+    }
+
+    setStatusFilter(status: string) {
+        this.filterStatus.set(status);
     }
 
     toggleFilters() {
@@ -322,6 +360,22 @@ export class VariantListComponent {
         if (this.filterConsequence() !== 'All' && v['consequence'] !== this.filterConsequence()) {
             this.filterConsequence.set('All');
             needsUpdate = true;
+        }
+
+        if (this.filterStatus() !== 'All') {
+             const status = this.getVariantStatus(v);
+             const fStatus = this.filterStatus();
+             let match = true;
+             if (fStatus === 'None' && status !== 'none') match = false;
+             if (fStatus === 'Reviewed' && status !== 'reviewed') match = false;
+             if (fStatus === 'Approved' && status !== 'approved') match = false;
+             if (fStatus === 'Rejected' && status !== 'rejected') match = false;
+             if (fStatus === 'Any' && status === 'none') match = false;
+             
+             if (!match) {
+                 this.filterStatus.set('All');
+                 needsUpdate = true;
+             }
         }
 
         return needsUpdate;

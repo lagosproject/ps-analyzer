@@ -56,6 +56,17 @@
                     }
                 </div>
             </div>
+            <div class="filter-row">
+                <span class="filter-label">Status:</span>
+                <div class="filter-chips">
+                    @for (status of availableStatuses; track status) {
+                    <button class="chip" [class.active]="filterStatus() === status"
+                        (click)="setStatusFilter(status)">
+                        {{ status }} {{ statusCounts()[status] || 0 }}
+                    </button>
+                    }
+                </div>
+            </div>
             @if(availableConsequences().length > 0){
             <div class="filter-row">
                 <span class="filter-label">Consequence:</span>
