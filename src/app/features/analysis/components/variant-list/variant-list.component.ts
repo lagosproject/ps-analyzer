@@ -32,6 +32,8 @@ export class VariantListComponent {
     hgvsAlternatives = input<Record<string, string[]>>({});
     /** Custom statuses for variants, keyed by variant identifier */
     variantStatuses = input<Record<string, VariantStatus>>({});
+    /** The target transcript for prioritization */
+    targetTranscript = input<string | null>(null);
 
     /** Emitted when a variant is clicked */
     variantClick = output<Variant>();
@@ -506,7 +508,15 @@ export class VariantListComponent {
 
     getVariantName(v: Variant): string {
         const hgvs = this.getHgvs(v);
-        // Priority: find first that starts with NM_
+        const target = this.targetTranscript();
+
+        // 1. Priority: target transcript if set
+        if (target) {
+            const targetName = hgvs.find(h => h.includes(target));
+            if (targetName) return targetName;
+        }
+
+        // 2. Secondary Priority: find first that starts with NM_
         const priority = hgvs.find(h => h.startsWith('NM_'));
         if (priority) return priority;
 
@@ -517,12 +527,37 @@ export class VariantListComponent {
     }
 
     /**
-     * Partitions the HGVS list into priority (NM_ prefixes) and others.
+     * Partitions the HGVS list into priority and others.
+     * Priority includes the target transcript and NM_ prefixes.
      */
     getPartitionedHgvs(v: Variant): { priority: string[], others: string[] } {
         const hgvs = this.getHgvs(v);
-        const priority = hgvs.filter(h => h.startsWith('NM_'));
-        const others = hgvs.filter(h => !h.startsWith('NM_'));
+        const target = this.targetTranscript();
+
+        const priority: string[] = [];
+        const others: string[] = [];
+
+        hgvs.forEach(h => {
+            const isTarget = target && h.includes(target);
+            const isNM = h.startsWith('NM_');
+
+            if (isTarget || isNM) {
+                priority.push(h);
+            } else {
+                others.push(h);
+            }
+        });
+
+        // Ensure the target transcript is first in priority if found
+        if (target) {
+            priority.sort((a, b) => {
+                const aIsTarget = a.includes(target);
+                const bIsTarget = b.includes(target);
+                if (aIsTarget && !bIsTarget) return -1;
+                if (!aIsTarget && bIsTarget) return 1;
+                return 0;
+            });
+        }
 
         if (priority.length === 0 && hgvs.length > 0) {
             return { priority: [hgvs[0]], others: hgvs.slice(1) };
