@@ -28,19 +28,6 @@ export class NucleotideRowControlsComponent {
         });
     }
 
-    updateZoom(direction: number) {
-        const current = this.timelineService.zoom();
-        const factor = 1.2;
-        let newZoom: number;
-
-        if (direction > 0) {
-            newZoom = Math.max(current + 1, Math.round(current * factor));
-        } else {
-            newZoom = Math.min(current - 1, Math.round(current / factor));
-        }
-
-        this.timelineService.setZoom(newZoom);
-    }
 
     updateCursor(event: Event) {
         const target = event.target as HTMLInputElement;

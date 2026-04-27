@@ -20,7 +20,7 @@ export class TimelineService {
      * Internal state of the timeline visualization.
      */
     private state = signal<TimelineState>({
-        zoom: 100, // Default: 100 nucleotides visible
+        zoom: 150, // Default: 150 nucleotides visible
         position: 0,
         maxPosition: Infinity // Default to Infinity until initialized with sequence length
     });

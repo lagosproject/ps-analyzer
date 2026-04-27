@@ -54,7 +54,7 @@
       <aside class="variants-sidebar" aria-label="Variant List">
         <app-variant-list [variants]="allVariants()" [selectedVariant]="selectedVariant()" [comments]="comments()"
           [jobId]="currentJobId()" [hgvsAlternatives]="hgvsAlternatives()" [variantStatuses]="variantStatuses()"
-          (variantClick)="zoomToVariant($event)" (commentAdded)="onCommentAdded($event)"
+          (variantClick)="selectVariant($event)" (commentAdded)="onCommentAdded($event)"
           (commentDeleted)="onCommentDeleted($event)" (statusChanged)="onStatusChanged($event)">
         </app-variant-list>
       </aside>

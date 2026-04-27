@@ -289,11 +289,13 @@ export class AnalysisComponent implements OnInit {
     this.timelineService.setPosition(basePos);
   }
 
-  zoomToVariant(v: Variant) {
-    const window = 10;
-    const start = Math.max(0, v.position - window);
-    const end = v.position + window;
-    this.timelineService.setRange(start, end);
+  selectVariant(v: Variant) {
+    const currentZoom = this.timelineService.zoom();
+    // Center the view on the variant position (v.position is 1-based)
+    const targetGlobalIndex = v.position - 1;
+    const newPos = Math.floor(targetGlobalIndex - currentZoom / 2);
+
+    this.timelineService.setPosition(newPos);
 
     this.selectedVariant.set(v);
     this.timelineService.setHighlight(v.position - 1, v.position - 1);

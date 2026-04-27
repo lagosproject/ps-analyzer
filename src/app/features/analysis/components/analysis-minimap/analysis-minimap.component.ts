@@ -12,8 +12,19 @@ import { TimelineService } from '../../../../core/services/timeline.service';
     standalone: true,
     imports: [CommonModule],
     template: `
-    <div class="minimap-container" role="region" aria-label="Analysis minimap showing read coverage across the reference sequence">
-      <canvas #minimapCanvas (mousedown)="onMouseDown($event)" aria-label="Interactive minimap canvas" role="button" tabindex="0"></canvas>
+    <div class="minimap-container" role="region" aria-label="Analysis minimap showing read coverage across the reference sequence" (mouseleave)="onMouseLeave()">
+      <canvas #minimapCanvas (mousedown)="onMouseDown($event)" (mousemove)="onMouseMove($event)" aria-label="Interactive minimap canvas" role="button" tabindex="0"></canvas>
+      
+      @if (hoveredFeature()) {
+        <div class="minimap-tooltip" [style.left.px]="mousePos().x" [style.top.px]="mousePos().y">
+          <span class="tooltip-type">{{ hoveredFeature()?.type | uppercase }}</span>
+          <span class="tooltip-label">{{ getFeatureLabel(hoveredFeature()!) }}</span>
+          <span class="tooltip-range">
+            {{ hoveredFeature()?.start }} - {{ hoveredFeature()?.end }} 
+            <span class="tooltip-length">({{ (hoveredFeature()?.end || 0) - (hoveredFeature()?.start || 0) + 1 }} bp)</span>
+          </span>
+        </div>
+      }
     </div>
   `,
     styles: [`
@@ -24,7 +35,7 @@ import { TimelineService } from '../../../../core/services/timeline.service';
       background: #ffffff;
       border: 1px solid #e0f2f1;
       border-radius: 8px;
-      overflow: hidden;
+      overflow: visible; /* Changed from hidden to allow tooltip overflow if needed, though container is relative */
       box-shadow: 0 2px 8px rgba(0, 77, 64, 0.08);
       position: relative;
     }
@@ -39,6 +50,44 @@ import { TimelineService } from '../../../../core/services/timeline.service';
       cursor: pointer;
       display: block;
     }
+    .minimap-tooltip {
+      position: absolute;
+      background: rgba(33, 33, 33, 0.95);
+      color: white;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      pointer-events: none;
+      z-index: 1000;
+      white-space: nowrap;
+      transform: translate(-50%, 20px); /* Changed from -110% to 20px to show BELOW cursor */
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      border: 1px solid rgba(255,255,255,0.1);
+      backdrop-filter: blur(4px);
+    }
+    .tooltip-type {
+      font-weight: 700;
+      font-size: 9px;
+      text-transform: uppercase;
+      opacity: 0.7;
+      letter-spacing: 0.5px;
+    }
+    .tooltip-label {
+      font-weight: 600;
+      color: #4db6ac;
+    }
+    .tooltip-range {
+      font-family: monospace;
+      font-size: 10px;
+      opacity: 0.8;
+    }
+    .tooltip-length {
+      color: #80cbc4;
+      margin-left: 4px;
+    }
   `],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -49,6 +98,11 @@ export class AnalysisMinimapComponent implements OnInit, OnDestroy {
     coverage = input<Map<number, number> | null>(null);
     /** Maximum coverage value for scaling the histogram */
     maxCoverage = input<number>(10);
+
+    /** Currently hovered genomic feature */
+    hoveredFeature = signal<GeneFeature | null>(null);
+    /** Current mouse position within the canvas for tooltip placement */
+    mousePos = signal<{ x: number, y: number }>({ x: 0, y: 0 });
 
     private timelineService = inject(TimelineService);
 
@@ -245,5 +299,85 @@ export class AnalysisMinimapComponent implements OnInit, OnDestroy {
         newPos = Math.max(0, Math.min(newPos, lengthValue - zoomValue));
 
         this.timelineService.setPosition(newPos);
+    }
+
+    /**
+     * Updates the hovered feature and mouse position on movement.
+     */
+    onMouseMove(event: MouseEvent) {
+        const canvas = this.canvasRef().nativeElement;
+        const rect = canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+
+        this.mousePos.set({ x, y });
+
+        const lengthValue = this.timelineService.maxPosition();
+        const featuresValue = this.features();
+        const width = rect.width;
+        const height = rect.height;
+
+        // Features are drawn in the top part
+        const trackHeight = height * 0.3;
+        const trackY = 4;
+
+        if (y >= trackY && y <= trackY + trackHeight) {
+            const genomicPos = (x / width) * lengthValue;
+            
+            // Find all features at this position
+            const features = featuresValue.filter(f => genomicPos >= f.start && genomicPos <= f.end);
+            
+            // Prioritize 'exon' over 'cds' to show specific exon numbers if available
+            const relevantFeature = 
+                features.find(f => f.type.toLowerCase() === 'exon') || 
+                features.find(f => f.type.toLowerCase() === 'cds');
+            
+            this.hoveredFeature.set(relevantFeature || null);
+        } else {
+            this.hoveredFeature.set(null);
+        }
+    }
+
+    /**
+     * Clears the hovered feature when the mouse leaves the minimap area.
+     */
+    onMouseLeave() {
+        this.hoveredFeature.set(null);
+    }
+
+    /**
+     * Extracts a human-readable label from a genomic feature's qualifiers.
+     * Combines Gene name and Exon number if both are available.
+     */
+    getFeatureLabel(feature: GeneFeature): string {
+        const q = feature.qualifiers;
+        if (!q) return feature.type;
+
+        // 1. Try to get Gene Name
+        const gene = q['gene'] || q['gene_name'] || q['Name'];
+        const geneStr = gene ? (Array.isArray(gene) ? gene[0] : gene) : '';
+        
+        // 2. Try to get Exon Number
+        let exon = q['exon_number'] || q['number'] || q['exon'];
+        
+        // Fallback: try to extract "exon X" from note if it exists
+        if (!exon && q['note']) {
+            const note = Array.isArray(q['note']) ? q['note'][0] : q['note'];
+            const match = note.match(/exon\s+(\d+)/i);
+            if (match) exon = match[1];
+        }
+
+        const exonStr = exon ? (Array.isArray(exon) ? exon[0] : exon) : '';
+
+        // Format result
+        if (geneStr && exonStr) return `${geneStr} - Exon ${exonStr}`;
+        if (exonStr) return `Exon ${exonStr}`;
+        if (geneStr) return geneStr;
+        
+        // Fallback to other labels
+        const label = q['label'] || q['product'] || q['note'];
+        if (label) return Array.isArray(label) ? label[0] : label;
+
+        return feature.type;
     }
 }

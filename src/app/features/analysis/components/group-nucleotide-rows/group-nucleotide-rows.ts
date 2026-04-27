@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, input, signal, output, inject, computed, HostListener } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, signal, output, inject, computed, HostListener, ElementRef, OnInit, OnDestroy } from '@angular/core';
 import { NucleotideRow } from "../nucleotide-row/nucleotide-row";
 import { SignalPopupComponent } from "../../../../shared/components/signal-popup/signal-popup";
 import { AnalysisEntry } from '../../../../core/models/analysis.model';
@@ -17,7 +17,10 @@ import { ToastService } from '../../../../core/services/toast.service';
     styleUrl: './group-nucleotide-rows.css',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class GroupNucleotideRows {
+export class GroupNucleotideRows implements OnInit, OnDestroy {
+    private readonly el = inject(ElementRef);
+    private resizeObserver?: ResizeObserver;
+
     private readonly timelineService = inject(TimelineService);
     private readonly toastService = inject(ToastService);
     private ignoreNextClick = false;
@@ -99,6 +102,28 @@ export class GroupNucleotideRows {
     });
 
 
+    ngOnInit() {
+        this.resizeObserver = new ResizeObserver(entries => {
+            for (const entry of entries) {
+                // Find the row-wrapper or use the container width minus labels
+                // labels are 200px fixed width
+                const containerWidth = entry.contentRect.width;
+                const wrapperWidth = containerWidth - 200; // 200 is .row-label width
+
+                if (wrapperWidth > 0) {
+                    // Target about 12px per nucleotide for a "tight" but readable look
+                    const targetZoom = Math.max(20, Math.floor(wrapperWidth / 12));
+                    this.timelineService.setZoom(targetZoom);
+                }
+            }
+        });
+
+        this.resizeObserver.observe(this.el.nativeElement);
+    }
+
+    ngOnDestroy() {
+        this.resizeObserver?.disconnect();
+    }
 
     /** Toggles the allele expansion mode for a specific read */
     toggleRow(readId: string) {

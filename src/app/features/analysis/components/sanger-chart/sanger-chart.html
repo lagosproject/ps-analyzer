@@ -1,38 +1,5 @@
 <div class="sanger-wrapper">
 
-    <!-- Controls Toolbar -->
-    <!-- Controls Toolbar (Floating Top Right) -->
-    @if (!staticMode()) {
-    <div class="controls">
-        <div class="control-group">
-            <span class="control-label" aria-hidden="true">H</span>
-            <button (click)="zoomInX()" title="Zoom In Horizontal" aria-label="Zoom In Horizontal">
-                <span class="material-symbols-outlined" aria-hidden="true">zoom_in</span>
-            </button>
-            <button (click)="zoomOutX()" title="Zoom Out Horizontal" aria-label="Zoom Out Horizontal">
-                <span class="material-symbols-outlined" aria-hidden="true">zoom_out</span>
-            </button>
-            <button (click)="zoomFullX()" title="Fit Width" aria-label="Fit Horizontal Width">
-                <span class="material-symbols-outlined" aria-hidden="true">fit_screen</span>
-            </button>
-
-        </div>
-        <div class="nav-divider"></div>
-        <div class="control-group">
-            <span class="control-label" aria-hidden="true">V</span>
-            <button (click)="zoomInY()" title="Increase Amplitude" aria-label="Increase Amplitude">
-                <span class="material-symbols-outlined" aria-hidden="true">zoom_in</span>
-            </button>
-            <button (click)="zoomOutY()" title="Decrease Amplitude" aria-label="Decrease Amplitude">
-                <span class="material-symbols-outlined" aria-hidden="true">zoom_out</span>
-            </button>
-            <button (click)="zoomFullY()" title="Reset Amplitude" aria-label="Reset Amplitude">
-                <span class="material-symbols-outlined" aria-hidden="true">fit_screen</span>
-            </button>
-        </div>
-    </div>
-    }
-
     <!-- Read Overlay (Patient Name + Direction Toggle) -->
     <div class="read-overlay">
         <span class="read-patient-name">{{ patientName() }}</span>

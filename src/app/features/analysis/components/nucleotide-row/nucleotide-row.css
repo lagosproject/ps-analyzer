@@ -14,7 +14,7 @@
 .nucleotide-row {
     display: flex;
     flex-direction: row;
-    height: var(--row-height, 30px);
+    height: var(--row-height, 22px);
     white-space: nowrap;
     will-change: left;
 }
@@ -36,7 +36,7 @@
     cursor: pointer;
     font-family: monospace;
     font-weight: bold;
-    font-size: 14px;
+    font-size: 11px;
     padding: 0;
     box-sizing: border-box;
 }
