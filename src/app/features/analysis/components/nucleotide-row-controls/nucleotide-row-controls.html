@@ -28,5 +28,24 @@
         </div>
     </div>
 
-
+    <div class="nav-controls">
+        <button class="toolbar-btn" [disabled]="timelineService.position() === 0" (click)="scrollToBoundary(false)"
+            title="First Page">
+            <span class="material-symbols-outlined">first_page</span>
+        </button>
+        <button class="toolbar-btn" [disabled]="timelineService.position() === 0" (click)="moveTimeline(-1)"
+            title="Go Left">
+            <span class="material-symbols-outlined">chevron_left</span>
+        </button>
+        <button class="toolbar-btn"
+            [disabled]="timelineService.position() >= timelineService.maxPosition() - timelineService.zoom()"
+            (click)="moveTimeline(1)" title="Go Right">
+            <span class="material-symbols-outlined">chevron_right</span>
+        </button>
+        <button class="toolbar-btn"
+            [disabled]="timelineService.position() >= timelineService.maxPosition() - timelineService.zoom()"
+            (click)="scrollToBoundary(true)" title="Last Page">
+            <span class="material-symbols-outlined">last_page</span>
+        </button>
+    </div>
 </div>
