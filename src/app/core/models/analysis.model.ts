@@ -237,6 +237,12 @@ export interface JobComment {
   /** Timestamp of creation (ISO string) */
   created_at: string;
 }
+
+/**
+ * Status types for genetic variants.
+ */
+export type VariantStatus = 'reviewed' | 'approved' | 'rejected' | 'none';
+
 /**
  * Reference sequence setup for an analysis job.
  */
@@ -311,4 +317,6 @@ export interface AnalysisJob {
   hgvs_alternatives?: Record<string, string[]>;
   /** The reference sequence content */
   reference_sequence?: string;
+  /** Custom status for variants (e.g. reviewed, approved, rejected) */
+  variant_statuses?: Record<string, VariantStatus>;
 }

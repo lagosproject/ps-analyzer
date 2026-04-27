@@ -325,6 +325,20 @@ export class AnalysisService {
   }
 
   /**
+   * Updates the status of a specific variant in a job.
+   */
+  async updateVariantStatus(jobId: string, variantKey: string, status: string): Promise<any> {
+    try {
+      const payload = { variant_key: variantKey, status };
+      return await firstValueFrom(
+        this.http.put<any>(`${this.apiUrl}/jobs/${jobId}/variant-status`, payload)
+      );
+    } catch (error: any) {
+      throw this.handleApiError(error);
+    }
+  }
+
+  /**
    * Deletes a variant comment.
    */
   async deleteComment(jobId: string, variantKey: string, commentId: string): Promise<any> {

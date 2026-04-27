@@ -1,7 +1,7 @@
 import { Component, input, output, signal, computed, ChangeDetectionStrategy, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Variant, JobComment } from '../../../../core/models/analysis.model';
+import { Variant, JobComment, VariantStatus } from '../../../../core/models/analysis.model';
 import { AnalysisService } from '../../../../core/services/analysis.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { ReportService } from '../../../../core/services/report.service';
@@ -30,6 +30,8 @@ export class VariantListComponent {
     jobId = input<string | null>(null);
     /** Alternative HGVS names returned by VEP */
     hgvsAlternatives = input<Record<string, string[]>>({});
+    /** Custom statuses for variants, keyed by variant identifier */
+    variantStatuses = input<Record<string, VariantStatus>>({});
 
     /** Emitted when a variant is clicked */
     variantClick = output<Variant>();
@@ -37,6 +39,8 @@ export class VariantListComponent {
     commentAdded = output<{ variantKey: string, comment: string }>();
     /** Emitted when a comment is deleted */
     commentDeleted = output<{ variantKey: string, commentId: string }>();
+    /** Emitted when a variant's status is changed */
+    statusChanged = output<{ variantKey: string, status: VariantStatus }>();
 
     searchTerm = signal<string>('');
     filterType = signal<string>('All');
@@ -53,6 +57,9 @@ export class VariantListComponent {
     hgvsStates = signal<Map<string, { loading: boolean, error: boolean, alternatives: string[] }>>(new Map());
 
     newCommentText = signal<Record<string, string>>({});
+
+    // UI state for status menu
+    activeStatusMenu = signal<string | null>(null);
 
     private analysisService = inject(AnalysisService);
     private toastService = inject(ToastService);
@@ -546,5 +553,20 @@ export class VariantListComponent {
                 commentId
             });
         }
+    }
+
+    toggleStatusMenu(variantKey: string, event: Event) {
+        event.stopPropagation();
+        this.activeStatusMenu.update(current => current === variantKey ? null : variantKey);
+    }
+
+    updateStatus(variantKey: string, status: VariantStatus, event: Event) {
+        event.stopPropagation();
+        this.statusChanged.emit({ variantKey, status });
+        this.activeStatusMenu.set(null);
+    }
+
+    getVariantStatus(v: Variant): VariantStatus {
+        return this.variantStatuses()[this.getCommentKey(v)] || 'none';
     }
 }

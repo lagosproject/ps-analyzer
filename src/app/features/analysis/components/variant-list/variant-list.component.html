@@ -136,6 +136,37 @@
                         </div>
                         }
                     </div>
+                    
+                    <div class="status-action-wrapper" style="position: relative;">
+                        <button class="status-toggle-btn" 
+                                [class.active]="getVariantStatus(v) !== 'none'"
+                                [attr.data-status]="getVariantStatus(v)"
+                                (click)="toggleStatusMenu(getCommentKey(v), $event)"
+                                [title]="'Status: ' + getVariantStatus(v)">
+                            <span class="material-symbols-outlined" aria-hidden="true">
+                                {{ getVariantStatus(v) === 'none' ? 'flag' : 'flag_circle' }}
+                            </span>
+                        </button>
+
+                        @if (activeStatusMenu() === getCommentKey(v)) {
+                            <div class="status-menu" (click)="$event.stopPropagation()">
+                                <button (click)="updateStatus(getCommentKey(v), 'reviewed', $event)" class="status-option reviewed">
+                                    <span class="material-symbols-outlined">visibility</span> Reviewed
+                                </button>
+                                <button (click)="updateStatus(getCommentKey(v), 'approved', $event)" class="status-option approved">
+                                    <span class="material-symbols-outlined">check_circle</span> Approved
+                                </button>
+                                <button (click)="updateStatus(getCommentKey(v), 'rejected', $event)" class="status-option rejected">
+                                    <span class="material-symbols-outlined">cancel</span> Rejected
+                                </button>
+                                <div class="menu-divider"></div>
+                                <button (click)="updateStatus(getCommentKey(v), 'none', $event)" class="status-option clear">
+                                    Clear Status
+                                </button>
+                            </div>
+                        }
+                    </div>
+
                     <button class="comment-toggle-btn"
                         [class.has-comments]="(comments()[getCommentKey(v)]?.length ?? 0) > 0"
                         (click)="toggleComments(getCommentKey(v), $event)"

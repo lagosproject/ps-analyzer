@@ -886,3 +886,95 @@
 .vep-info-value[data-impact="LOW"] {
     color: #10b981;
 }
+/* Status Flag and Menu */
+.status-toggle-btn {
+    background: none;
+    border: none;
+    padding: 2px;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    min-width: 28px;
+    height: 28px;
+}
+
+.variant-card:hover .status-toggle-btn {
+    display: flex;
+}
+
+.status-toggle-btn:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.status-toggle-btn.active {
+    display: flex !important;
+}
+
+.status-toggle-btn.active[data-status="reviewed"] { color: #3b82f6; }
+.status-toggle-btn.active[data-status="approved"] { color: #10b981; }
+.status-toggle-btn.active[data-status="rejected"] { color: #ef4444; }
+
+.status-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 110;
+    background: white;
+    border: 1px solid var(--border-muted);
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    padding: 6px;
+    min-width: 140px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 4px;
+}
+
+.status-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border: none;
+    background: none;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    color: var(--text-dark);
+    transition: background 0.2s;
+}
+
+.status-option:hover {
+    background: var(--surface-light);
+}
+
+.status-option .material-symbols-outlined {
+    font-size: 18px;
+}
+
+.status-option.reviewed { color: #3b82f6; }
+.status-option.approved { color: #10b981; }
+.status-option.rejected { color: #ef4444; }
+
+.status-option.reviewed:hover { background-color: rgba(59, 130, 246, 0.1); }
+.status-option.approved:hover { background-color: rgba(16, 185, 129, 0.1); }
+.status-option.rejected:hover { background-color: rgba(239, 68, 68, 0.1); }
+
+.menu-divider {
+    height: 1px;
+    background: var(--border-muted);
+    margin: 4px 0;
+}
+
+.status-option.clear {
+    font-size: 12px;
+    color: var(--text-muted);
+}

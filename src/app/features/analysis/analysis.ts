@@ -6,7 +6,7 @@ import { AnalysisService } from '../../core/services/analysis.service';
 import { TimelineService } from '../../core/services/timeline.service';
 import { AppStateService } from '../../core/services/app-state.service';
 import { ToastService } from '../../core/services/toast.service';
-import { AnalysisEntry, TracyConfig, HGVSConfig, Variant, JobComment, AnalysisJob, JobPatient, GeneFeature, ConsensusAlignItem } from '../../core/models/analysis.model';
+import { AnalysisEntry, TracyConfig, HGVSConfig, Variant, JobComment, AnalysisJob, JobPatient, GeneFeature, ConsensusAlignItem, VariantStatus } from '../../core/models/analysis.model';
 import { GroupNucleotideRows } from "./components/group-nucleotide-rows/group-nucleotide-rows";
 import { SangerChartComponent } from "./components/sanger-chart/sanger-chart";
 import { VariantListComponent } from "./components/variant-list/variant-list.component";
@@ -215,6 +215,8 @@ export class AnalysisComponent implements OnInit {
   readonly comments = signal<Record<string, JobComment[]>>({});
   /** Alternative HGVS nomenclatures loaded from VEP */
   readonly hgvsAlternatives = signal<Record<string, string[]>>({});
+  /** Custom status for variants (e.g. reviewed, approved, rejected) */
+  readonly variantStatuses = signal<Record<string, VariantStatus>>({});
 
   /** Signal containing all parsed analysis traces */
   readonly traces = signal<AnalysisEntry[]>([]);
@@ -415,6 +417,10 @@ export class AnalysisComponent implements OnInit {
         this.hgvsAlternatives.set(job.hgvs_alternatives);
       }
 
+      if (job.variant_statuses) {
+        this.variantStatuses.set(job.variant_statuses);
+      }
+
       const results = job.results;
 
       if (!results) {
@@ -539,6 +545,25 @@ export class AnalysisComponent implements OnInit {
     } catch (e) {
       console.error("Failed to delete comment", e);
       alert("Failed to delete comment");
+    }
+  }
+
+  /**
+   * Updates the status of a specific variant.
+   */
+  async onStatusChanged(event: { variantKey: string, status: VariantStatus }) {
+    const jobId = this.currentJobId();
+    if (!jobId) return;
+
+    try {
+      const updatedJob = await this.analysisService.updateVariantStatus(jobId, event.variantKey, event.status);
+      if (updatedJob && updatedJob.variant_statuses) {
+        this.variantStatuses.set(updatedJob.variant_statuses);
+      }
+      this.toastService.show(`Status updated to ${event.status}`, 'success');
+    } catch (e) {
+      console.error("Failed to update status", e);
+      this.toastService.show("Failed to update status", "error");
     }
   }
 
