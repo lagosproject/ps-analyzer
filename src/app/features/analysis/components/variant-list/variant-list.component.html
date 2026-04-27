@@ -119,11 +119,30 @@
                             }
 
                             <div class="hgvs-list">
-                                @for (h of getHgvs(v); track h) {
+                                @let partitioned = getPartitionedHgvs(v);
+                                @for (h of partitioned.priority; track h) {
                                 <div class="hgvs-item" (click)="copyToClipboard(h, $event)">
                                     <span>{{ h }}</span>
                                     <span class="material-symbols-outlined mini-copy">content_copy</span>
                                 </div>
+                                }
+
+                                @if (partitioned.others.length > 0) {
+                                    @if (expandedHgvs().has(getCommentKey(v))) {
+                                        @for (h of partitioned.others; track h) {
+                                        <div class="hgvs-item" (click)="copyToClipboard(h, $event)">
+                                            <span>{{ h }}</span>
+                                            <span class="material-symbols-outlined mini-copy">content_copy</span>
+                                        </div>
+                                        }
+                                        <button class="see-more-btn" (click)="toggleHgvs(getCommentKey(v), $event)">
+                                            See less
+                                        </button>
+                                    } @else {
+                                        <button class="see-more-btn" (click)="toggleHgvs(getCommentKey(v), $event)">
+                                            See more
+                                        </button>
+                                    }
                                 }
                             </div>
 

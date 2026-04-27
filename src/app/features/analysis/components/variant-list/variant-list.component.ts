@@ -62,6 +62,9 @@ export class VariantListComponent {
     // UI state for status menu
     activeStatusMenu = signal<string | null>(null);
 
+    // UI state for HGVS expansion
+    expandedHgvs = signal<Set<string>>(new Set());
+
     private analysisService = inject(AnalysisService);
     private toastService = inject(ToastService);
     private reportService = inject(ReportService);
@@ -503,10 +506,42 @@ export class VariantListComponent {
 
     getVariantName(v: Variant): string {
         const hgvs = this.getHgvs(v);
+        // Priority: find first that starts with NM_
+        const priority = hgvs.find(h => h.startsWith('NM_'));
+        if (priority) return priority;
+
         if (hgvs.length > 0) {
             return hgvs[0];
         }
         return `${v.ref}${v.position}${v.alt}`;
+    }
+
+    /**
+     * Partitions the HGVS list into priority (NM_ prefixes) and others.
+     */
+    getPartitionedHgvs(v: Variant): { priority: string[], others: string[] } {
+        const hgvs = this.getHgvs(v);
+        const priority = hgvs.filter(h => h.startsWith('NM_'));
+        const others = hgvs.filter(h => !h.startsWith('NM_'));
+
+        if (priority.length === 0 && hgvs.length > 0) {
+            return { priority: [hgvs[0]], others: hgvs.slice(1) };
+        }
+
+        return { priority, others };
+    }
+
+    toggleHgvs(variantKey: string, event: Event) {
+        event.stopPropagation();
+        this.expandedHgvs.update(prev => {
+            const next = new Set(prev);
+            if (next.has(variantKey)) {
+                next.delete(variantKey);
+            } else {
+                next.add(variantKey);
+            }
+            return next;
+        });
     }
 
 
