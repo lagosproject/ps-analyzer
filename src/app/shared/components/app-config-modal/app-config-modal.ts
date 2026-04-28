@@ -1,7 +1,9 @@
-import { Component, ChangeDetectionStrategy, model, inject, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, model, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SettingsService, ProxyConfig } from '../../../core/services/settings.service';
+import { UserService } from '../../../core/services/user.service';
+
 
 @Component({
     selector: 'app-config-modal',
@@ -13,15 +15,20 @@ import { SettingsService, ProxyConfig } from '../../../core/services/settings.se
 })
 export class AppConfigModalComponent implements OnInit {
     private settingsService = inject(SettingsService);
+    protected userService = inject(UserService);
 
     proxyConfig: ProxyConfig = {};
+    userName = signal<string>('');
+
 
     /** Controls the visibility of the modal. */
     isVisible = model<boolean>(false);
 
     ngOnInit() {
         this.proxyConfig = this.settingsService.getProxyConfig();
+        this.userName.set(this.userService.getUserName() || '');
     }
+
 
     /**
      * Closes the app config modal and saves proxy config.
@@ -29,6 +36,13 @@ export class AppConfigModalComponent implements OnInit {
     close() {
         this.settingsService.saveProxyConfig(this.proxyConfig);
         this.settingsService.applyProxyConfig(this.proxyConfig);
+        
+        const newName = this.userName().trim();
+        if (newName) {
+            this.userService.setUserName(newName);
+        }
+
         this.isVisible.set(false);
     }
+
 }

@@ -1,2 +1,5 @@
 <router-outlet></router-outlet>
 <app-toast></app-toast>
+@if (userService.showModal()) {
+  <app-user-modal></app-user-modal>
+}

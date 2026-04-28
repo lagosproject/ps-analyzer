@@ -12,6 +12,24 @@
                 <div class="settings-body">
                     <div class="settings-section">
                         <div class="info-box">
+                            <span class="material-symbols-outlined">account_circle</span>
+                            <div>
+                                <strong>User Identity</strong>
+                                <p>This name will be used to identify your comments and actions.</p>
+                            </div>
+                        </div>
+                        <div class="form-group-small">
+                            <label>Your Name</label>
+                            <input type="text" [ngModel]="userName()" (ngModelChange)="userName.set($event)"
+                                placeholder="e.g. Dr. Smith">
+                        </div>
+                    </div>
+
+                    <div class="divider-small"></div>
+
+                    <div class="settings-section">
+
+                        <div class="info-box">
                             <span class="material-symbols-outlined">info</span>
                             <div>
                                 <strong>Proxy Configuration</strong>

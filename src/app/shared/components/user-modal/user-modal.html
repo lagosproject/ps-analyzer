@@ -1,0 +1,42 @@
+<div class="modal-overlay" (click)="cancel()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <header class="modal-header">
+      <div class="header-icon">
+        <span class="material-symbols-outlined">person_add</span>
+      </div>
+      <div class="header-text">
+        <h2 class="modal-title">User Identity</h2>
+        <p class="modal-subtitle">Enter your name to personalize your comments and actions.</p>
+      </div>
+      <button class="close-btn" (click)="cancel()" aria-label="Close modal">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </header>
+
+    <div class="modal-body">
+      <div class="input-group">
+        <label for="username">Your Name</label>
+        <div class="input-wrapper">
+          <span class="material-symbols-outlined input-icon">account_circle</span>
+          <input 
+            type="text" 
+            id="username" 
+            [(ngModel)]="tempName" 
+            placeholder="e.g. Dr. Smith" 
+            (keyup.enter)="save()"
+            autofocus
+          >
+        </div>
+        <small>This name will be attached to your comments and stored locally in this browser.</small>
+      </div>
+    </div>
+
+    <footer class="modal-footer">
+      <button class="btn-ghost" (click)="cancel()">Cancel</button>
+      <button class="btn-primary" [disabled]="!tempName().trim()" (click)="save()">
+        <span>Confirm Name</span>
+        <span class="material-symbols-outlined">check_circle</span>
+      </button>
+    </footer>
+  </div>
+</div>

@@ -16,6 +16,8 @@ import { AnalysisMinimapComponent } from "./components/analysis-minimap/analysis
 import { NucleotideRowControlsComponent } from "./components/nucleotide-row-controls/nucleotide-row-controls";
 import { ReportService, ReportConfig } from '../../core/services/report.service';
 import { ReportModalComponent } from "./components/report-modal/report-modal.component";
+import { UserService } from '../../core/services/user.service';
+
 
 @Component({
   selector: 'app-analysis',
@@ -33,6 +35,8 @@ export class AnalysisComponent implements OnInit {
   protected readonly timelineService = inject(TimelineService);
   private readonly reportService = inject(ReportService);
   private readonly toastService = inject(ToastService);
+  protected readonly userService = inject(UserService);
+
 
   /** ID of the current analysis job */
   readonly currentJobId = signal<string | null>(null);
@@ -711,8 +715,10 @@ export class AnalysisComponent implements OnInit {
     if (!jobId) return;
 
     try {
-      // For now using 'User' as author, ideally we'd have a real user name
-      const updatedJob = await this.analysisService.addComment(jobId, event.variantKey, event.comment, 'User');
+      const author = await this.userService.ensureUserName();
+      if (!author) return;
+
+      const updatedJob = await this.analysisService.addComment(jobId, event.variantKey, event.comment, author);
       if (updatedJob && updatedJob.comments) {
         this.comments.set(updatedJob.comments);
       }
@@ -721,6 +727,7 @@ export class AnalysisComponent implements OnInit {
       alert("Failed to add comment");
     }
   }
+
 
   /**
    * Deletes a comment from a variant.

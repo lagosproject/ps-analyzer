@@ -61,6 +61,12 @@
     overflow-y: auto;
 }
 
+.divider-small {
+    height: 1px;
+    background-color: var(--border-color, #e2e8f0);
+    margin: 24px 0;
+}
+
 .settings-section {
     display: flex;
     flex-direction: column;
