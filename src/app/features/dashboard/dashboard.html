@@ -49,6 +49,17 @@
                 <ul>
                     @for (job of filteredJobs(); track job.id) {
                     <li class="project-item" (click)="loadJob(job)">
+                        @if (job.status === 'completed') {
+                            <span class="status-dot status-success" title="Success"></span>
+                        } @else if (job.status === 'failed') {
+                            <span class="status-dot status-error" title="Error"></span>
+                        } @else if (job.status === 'running') {
+                            <div class="status-running" title="Running: {{ job.progress }}%">
+                                <svg class="spinner" viewBox="0 0 24 24">
+                                    <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="3"></circle>
+                                </svg>
+                            </div>
+                        }
                         <div class="project-info">
                             <span class="project-name">{{ job.name }}</span>
                             <span class="project-date">{{ job.created_at | date:'short' }}</span>
