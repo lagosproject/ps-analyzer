@@ -6,6 +6,7 @@ import { ToastService } from '../../core/services/toast.service';
 import { AnalysisEntry, AnalysisJob, Variant, JobComment } from '../../core/models/analysis.model';
 import { ReportReadEntry, ProcessedReportItem } from './models/report.models';
 import { AnalysisService } from '../../core/services/analysis.service';
+import { FhirService } from '../../core/services/fhir.service';
 import { ReportVariantBlockComponent } from './components/report-variant-block/report-variant-block.component';
 
 /**
@@ -28,6 +29,8 @@ export class ReportViewComponent implements OnInit {
     private toastService = inject(ToastService);
     /** Service for analysis data retrieval and processing */
     public analysisService = inject(AnalysisService);
+    /** Service for FHIR resource generation */
+    private fhirService = inject(FhirService);
 
     /** Current report configuration */
     config = signal<ReportConfig | null>(null);
@@ -168,6 +171,33 @@ export class ReportViewComponent implements OnInit {
      */
     print() {
         window.print();
+    }
+
+    /**
+     * Generates and downloads a FHIR R4 Bundle (JSON) containing Patient and Genomic Observation resources.
+     */
+    exportFhir() {
+        try {
+            const items = this.reportItems();
+            const job = this.job();
+            
+            if (!items.length) {
+                this.toastService.show('No variants selected for export', 'warning');
+                return;
+            }
+
+            this.toastService.show('Generating FHIR Bundle...', 'info');
+            
+            const bundle = this.fhirService.generateReportBundle(items, job);
+            const jsonContent = JSON.stringify(bundle, null, 2);
+            
+            this.downloadFile(jsonContent, `Report_${job?.name || 'Analysis'}_FHIR.json`, 'application/json');
+            
+            this.toastService.show('FHIR Bundle downloaded successfully', 'success');
+        } catch (err) {
+            console.error('FHIR Export failed:', err);
+            this.toastService.show('Failed to generate FHIR export', 'error');
+        }
     }
 
     /**
