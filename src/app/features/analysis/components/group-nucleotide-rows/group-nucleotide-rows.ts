@@ -35,7 +35,7 @@ export class GroupNucleotideRows implements OnInit, OnDestroy {
     /** Emitted when a read row wrapper is clicked */
     readonly rowClick = output<string>();
     /** Emitted when a specific nucleotide is clicked */
-    readonly nucleotideSelected = output<{ readId: string, refPos: number, globalIndex: number, isInsertion?: boolean }>();
+    readonly nucleotideSelected = output<{ readId: string, refPos: number, globalIndex: number, isInsertion?: boolean, subIndex?: number }>();
 
     /** Tracks which read rows have their allele split view expanded */
     readonly expandedRows = signal<Set<string>>(new Set());
@@ -144,9 +144,9 @@ export class GroupNucleotideRows implements OnInit, OnDestroy {
     }
 
     /** Handler for when an individual nucleotide element is clicked */
-    handleNucleotideClick(event: { nucleotide: string; index: number; globalIndex: number; isInsertion?: boolean }, readId?: string) {
+    handleNucleotideClick(event: { nucleotide: string; index: number; globalIndex: number; isInsertion?: boolean, subIndex?: number }, readId?: string) {
         if (readId) {
-            this.nucleotideSelected.emit({ readId, refPos: event.index, globalIndex: event.globalIndex, isInsertion: event.isInsertion });
+            this.nucleotideSelected.emit({ readId, refPos: event.index, globalIndex: event.globalIndex, isInsertion: event.isInsertion, subIndex: event.subIndex });
         }
         // If we were selecting, the selection handles highlighting. If just clicking:
         if (!this.selectionStart()) {

@@ -126,41 +126,61 @@ export class AnalysisComponent implements OnInit {
     const range = this.timelineService.highlightedRange();
     if (!range) return;
 
-    const newGlobalIndex = range.start + delta;
-    if (newGlobalIndex < 0) return;
+    const currentReadId = this.lastSelectedReadId() || 'Reference';
+    let currentGlobalIndex = range.start; // This is actually refPos - 1
+    const max = this.timelineService.maxPosition();
+    
+    // We also need to know the current subIndex if we are in an insertion.
+    // However, since timelineService only tracks globalIndex (refPos - 1), 
+    // let's just use the current refPos and scan forward/backward.
+    let refPos = currentGlobalIndex + 1;
+    let nextRefPos = refPos;
+    let found = false;
+    
+    const trace = currentReadId === 'Reference' 
+      ? this.referenceTrace() 
+      : this.traces().find(t => t.readId === currentReadId);
 
-    const mapping = this.globalToRefMap().get(newGlobalIndex);
-    if (mapping) {
+    // Scan for the next valid position
+    while (true) {
+      nextRefPos += delta;
+      
+      if (nextRefPos < 1 || nextRefPos > max) {
+        break;
+      }
+
+      if (trace && trace.result.consensusAlign) {
+        const item = trace.result.consensusAlign[nextRefPos];
+        if (item) {
+          // Check if there is a valid base at this refPos for this read.
+          // For a read, it has a valid base if cons[0] is not a gap, or if it has any insertions.
+          const hasBase = item.cons.some(c => c !== '-');
+          if (hasBase) {
+            found = true;
+            break;
+          }
+        }
+      } else {
+        // If it's a trace without consensusAlign, just move normally
+        found = true;
+        break;
+      }
+    }
+
+    if (found) {
+      const newGlobalIndex = nextRefPos - 1;
       this.onNucleotideSelected({
-        readId: this.lastSelectedReadId() || 'Reference',
-        refPos: mapping.refPos,
+        readId: currentReadId,
+        refPos: nextRefPos,
         globalIndex: newGlobalIndex,
-        isInsertion: mapping.isInsertion
+        isInsertion: false, // We'll just target the primary base for now
+        insertionIndex: 0
       });
     }
   }
 
-  /**
-   * Computes a map that translates linear global indices to genomic reference positions.
-   * Accounts for insertions (multiple slots per ref position).
-   */
-  readonly globalToRefMap = computed(() => {
-    const depthMap = this.alignmentDepthMap();
-    const map = new Map<number, { refPos: number, isInsertion: boolean }>();
-    let currentGlobal = 0;
-    const max = this.timelineService.maxPosition();
-    // Safety check for uninitialized data
-    if (max === Infinity) return map;
+  // We can remove globalToRefMap as it causes desync due to different globalIndex semantics
 
-    for (let r = 1; r <= max; r++) {
-      const depth = depthMap.get(r) || 1;
-      for (let k = 0; k < depth; k++) {
-        map.set(currentGlobal, { refPos: r, isInsertion: k > 0 });
-        currentGlobal++;
-      }
-    }
-    return map;
-  });
 
   /** Height of the sequence visualizer section */
   readonly sequenceHeight = signal<number>(350);
@@ -262,7 +282,7 @@ export class AnalysisComponent implements OnInit {
    * Highlights the position, centers charts, and selects associated variants.
    * @param event - Contains readId, reference position, and insertion flag
    */
-  onNucleotideSelected(event: { readId: string, refPos: number, globalIndex?: number, isInsertion?: boolean }) {
+  onNucleotideSelected(event: { readId: string, refPos: number, globalIndex?: number, isInsertion?: boolean, subIndex?: number, insertionIndex?: number }) {
     this.lastSelectedReadId.set(event.readId);
     this.isSequenceNavActive.set(true);
 
@@ -294,8 +314,11 @@ export class AnalysisComponent implements OnInit {
         if (traceItem) {
           const chart = this.sangerCharts().find(c => c.readId() === t.readId);
           if (chart) {
-            const sp = traceItem.sangerPos1?.[0] ?? traceItem.sangerPos2?.[0] ?? 0;
-            chart.centerOnIndex(sp - 1);
+            const insIdx = event.subIndex ?? event.insertionIndex ?? 0;
+            const sp = traceItem.sangerPos1?.[insIdx] ?? traceItem.sangerPos2?.[insIdx];
+            if (sp !== undefined) {
+              chart.centerOnIndex(sp - 1);
+            }
           }
         }
       });
@@ -303,8 +326,11 @@ export class AnalysisComponent implements OnInit {
       // Single chart centering for insertions in read rows
       const targetSangerChart = this.sangerCharts().find(c => c.readId() === event.readId);
       if (targetSangerChart) {
-        const sp = item.sangerPos1?.[0] ?? item.sangerPos2?.[0] ?? 0;
-        targetSangerChart.centerOnIndex(sp - 1);
+        const insIdx = event.subIndex ?? event.insertionIndex ?? 0;
+        const sp = item.sangerPos1?.[insIdx] ?? item.sangerPos2?.[insIdx];
+        if (sp !== undefined) {
+          targetSangerChart.centerOnIndex(sp - 1);
+        }
       }
     }
 

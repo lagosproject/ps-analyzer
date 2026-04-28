@@ -10,7 +10,7 @@
                 [class.sequence-selection-highlight]="item.isSequenceSelection" [attr.title]="'Position: ' + item.index"
                 [style.color]="getColorForNucleotide(item.char)"
                 [style.visibility]="(item.isMatch && !item.showAlways) ? 'hidden' : 'visible'"
-                (click)="onNucleotideClick(item.char, item.index, item.globalIndex, item.isInsertion)"
+                (click)="onNucleotideClick(item.char, item.index, item.globalIndex, item.isInsertion, item.subIndex)"
                 (contextmenu)="onContextMenu($event, item.char, item.index, item.globalIndex, item.isInsertion, item.sangerPos1, item.sangerPos2)"
                 (mousedown)="onMouseDown(item.index, item.globalIndex, $index)"
                 (mouseenter)="onMouseEnter(item.index, item.globalIndex, $index)">

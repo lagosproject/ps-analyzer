@@ -19,7 +19,7 @@ export class NucleotideRow {
     readonly alignmentDepthMap = input.required<Map<number, number>>();
 
     // Modern Signal Output
-    readonly nucleotideClicked = output<{ nucleotide: string; index: number; globalIndex: number; isInsertion?: boolean }>();
+    readonly nucleotideClicked = output<{ nucleotide: string; index: number; globalIndex: number; isInsertion?: boolean, subIndex?: number }>();
     readonly nucleotideRightClicked = output<{ event: MouseEvent, nucleotide: string; index: number; globalIndex: number; isInsertion?: boolean, sangerPos1?: number[], sangerPos2?: number[] }>();
     readonly nucleotideMouseDown = output<{ index: number; globalIndex: number; alleleIndex: number }>();
     readonly nucleotideMouseEnter = output<{ index: number; globalIndex: number; alleleIndex: number }>();
@@ -215,8 +215,8 @@ export class NucleotideRow {
         return this.colors[nucleotide as keyof typeof this.colors] || '#999999';
     }
 
-    onNucleotideClick(nucleotide: string, index: number, globalIndex: number, isInsertion?: boolean): void {
-        this.nucleotideClicked.emit({ nucleotide, index, globalIndex, isInsertion });
+    onNucleotideClick(nucleotide: string, index: number, globalIndex: number, isInsertion?: boolean, subIndex?: number): void {
+        this.nucleotideClicked.emit({ nucleotide, index, globalIndex, isInsertion, subIndex });
     }
 
     onContextMenu(event: MouseEvent, nucleotide: string, index: number, globalIndex: number, isInsertion?: boolean, sangerPos1?: number[], sangerPos2?: number[]): void {
