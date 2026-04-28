@@ -300,6 +300,7 @@ export class AnalysisComponent implements OnInit {
 
     const gIndex = event.globalIndex !== undefined ? event.globalIndex : event.refPos - 1;
     this.timelineService.setHighlight(gIndex, gIndex);
+    this.timelineService.ensureVisible(gIndex);
 
     const globalIndex = gIndex;
 

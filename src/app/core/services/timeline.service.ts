@@ -142,4 +142,23 @@ export class TimelineService {
     clearHighlight() {
         this.highlightedRange.set(null);
     }
+
+    /**
+     * Ensures that a given position is within the visible viewport.
+     * If it's outside, it scrolls to make it visible with some padding.
+     * @param index - The position to make visible (0-indexed)
+     * @param padding - Number of bases to keep as padding from the edges
+     */
+    ensureVisible(index: number, padding: number = 8) {
+        const s = this.state();
+        
+        // If index is before the start (with padding)
+        if (index < s.position + padding) {
+            this.setPosition(index - padding);
+        } 
+        // If index is after the end (with padding)
+        else if (index >= s.position + s.zoom - padding) {
+            this.setPosition(index - s.zoom + padding + 1);
+        }
+    }
 }
