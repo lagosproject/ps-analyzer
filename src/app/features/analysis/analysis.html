@@ -18,20 +18,28 @@
           </div>
         </div>
         <div class="header-divider"></div>
-        <div class="flex flex-col">
-          @if (isEditingName()) {
-          <div class="inline-edit-container">
-            <input type="text" [(ngModel)]="editingName" (blur)="saveName()" (keyup.enter)="saveName()"
-              (keyup.escape)="cancelEditingName()" class="header-edit-input" aria-label="Edit job name">
+        <div class="header-info-container">
+          <div class="job-title-container">
+            @if (isEditingName()) {
+            <div class="inline-edit-container">
+              <input type="text" [(ngModel)]="editingName" (blur)="saveName()" (keyup.enter)="saveName()"
+                (keyup.escape)="cancelEditingName()" class="header-edit-input" aria-label="Edit job name">
+            </div>
+            } @else {
+            <h2 class="page-title editable-title" (dblclick)="startEditingName()" title="Double click to rename"
+              aria-label="Job Name">
+              {{ currentJobName() || 'Sequence Analysis' }}
+              <span class="material-symbols-outlined edit-icon" aria-hidden="true">edit</span>
+            </h2>
+            }
           </div>
-          } @else {
-          <h2 class="page-title editable-title" (dblclick)="startEditingName()" title="Double click to rename"
-            aria-label="Job Name">
-            {{ currentJobName() || 'Sequence Analysis' }}
-            <span class="material-symbols-outlined edit-icon" aria-hidden="true">edit</span>
-          </h2>
-          }
-          <p class="page-meta">{{ patients().length }} Patient(s) • {{ totalReads() }} Read(s)</p>
+          <div class="job-meta-badge">
+            <span class="material-symbols-outlined" aria-hidden="true">group</span>
+            <span>{{ patients().length }} Patients</span>
+            <span class="meta-dot"></span>
+            <span class="material-symbols-outlined" aria-hidden="true">analytics</span>
+            <span>{{ totalReads() }} Reads</span>
+          </div>
         </div>
       </div>
       <div class="action-buttons">

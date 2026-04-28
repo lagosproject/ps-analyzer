@@ -95,10 +95,11 @@
 }
 
 .page-title {
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   font-weight: 700;
   color: var(--text-dark);
   line-height: 1;
+  margin: 0;
 }
 
 .editable-title {
@@ -145,10 +146,37 @@
   font-family: inherit;
 }
 
-.page-meta {
-  font-size: 0.875rem;
+.header-info-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.job-meta-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--surface-light);
+  padding: 0.35rem 0.75rem;
+  border-radius: 2rem;
+  border: 1px solid var(--border-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
   color: var(--text-muted);
-  margin-top: 0.25rem;
+  white-space: nowrap;
+}
+
+.job-meta-badge .material-symbols-outlined {
+  font-size: 16px;
+  color: var(--primary);
+}
+
+.meta-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background-color: var(--border-muted);
+  margin: 0 0.25rem;
 }
 
 /* Removed local .btn-secondary and .btn-primary as they are replaced by global btn-outline and btn-solid */
