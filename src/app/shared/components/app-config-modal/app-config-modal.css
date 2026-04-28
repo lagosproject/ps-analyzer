@@ -139,3 +139,45 @@
     display: flex;
     justify-content: flex-end;
 }
+/* Maintenance Section Styles */
+.info-box.danger {
+    background-color: rgba(239, 68, 68, 0.05);
+    border-color: rgba(239, 68, 68, 0.2);
+}
+
+.info-box.danger strong {
+    color: #ef4444;
+}
+
+.setting-info h4 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.help-text {
+    font-size: 12px;
+    color: var(--text-muted, #64748b);
+    line-height: 1.4;
+}
+
+.btn-danger {
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.2s;
+}
+
+.btn-danger:hover {
+    background-color: #dc2626;
+}
+
+.mt-3 { margin-top: 1rem; }
+.mb-2 { margin-bottom: 0.5rem; }

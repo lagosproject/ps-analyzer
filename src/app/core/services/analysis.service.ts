@@ -14,7 +14,9 @@ import {
   AnalysisJob,
   JobReference,
   JobPatient,
-  JobRead
+  JobRead,
+  ApproveVariantRequest,
+  HotspotPoint
 } from '../models/analysis.model';
 
 // Re-export types for backward compatibility with isolatedModules support
@@ -30,7 +32,9 @@ export type {
   AnalysisJob,
   JobReference,
   JobPatient,
-  JobRead
+  JobRead,
+  ApproveVariantRequest,
+  HotspotPoint
 };
 
 @Injectable({
@@ -530,6 +534,49 @@ export class AnalysisService {
       const payload = { source_folder: sourceFolder };
       return await firstValueFrom(
         this.http.post<any>(`${this.apiUrl}/jobs/import`, payload)
+      );
+    } catch (error: any) {
+      throw this.handleApiError(error);
+    }
+  }
+
+  /**
+   * Approves a variant and saves it to the global hotspots database.
+   * @param request - Details of the variant to approve
+   */
+  async approveVariant(request: ApproveVariantRequest): Promise<any> {
+    try {
+      return await firstValueFrom(
+        this.http.post<any>(`${this.apiUrl}/variants/approve`, request)
+      );
+    } catch (error: any) {
+      throw this.handleApiError(error);
+    }
+  }
+
+  /**
+   * Fetches aggregated variant counts (hotspots) from the database.
+   * @param binSize - Genomic window size in base pairs
+   */
+  async getHotspots(binSize = 1000000, assembly = 'GRCh38'): Promise<HotspotPoint[]> {
+    try {
+      return await firstValueFrom(
+        this.http.get<HotspotPoint[]>(`${this.apiUrl}/variants/hotspots`, {
+          params: { bin_size: binSize, assembly: assembly }
+        })
+      );
+    } catch (error: any) {
+      throw this.handleApiError(error);
+    }
+  }
+
+  /**
+   * Flushes the global Redis cache.
+   */
+  async flushCache(): Promise<any> {
+    try {
+      return await firstValueFrom(
+        this.http.post<any>(`${this.apiUrl}/cache/flush`, {})
       );
     } catch (error: any) {
       throw this.handleApiError(error);

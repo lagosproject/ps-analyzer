@@ -1,7 +1,8 @@
-import { Component, ChangeDetectionStrategy, signal, model, input, output, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, model, input, output, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TracyConfig, HGVSConfig } from '../../../core/models/analysis.model';
+import { AnalysisService } from '../../../core/services/analysis.service';
 
 @Component({
     selector: 'app-settings-modal',
@@ -36,6 +37,7 @@ export class SettingsModalComponent {
     /** Currently active tab in the settings sidebar. */
     activeTab = signal<string>('Generic');
 
+
     isHgvsActive = computed(() => {
         const config = this.hgvsConfig();
         return !!config.transcript && config.transcript.length > 0;
@@ -55,6 +57,5 @@ export class SettingsModalComponent {
     close() {
         this.isVisible.set(false);
     }
-
 
 }

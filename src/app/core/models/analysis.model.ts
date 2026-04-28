@@ -320,3 +320,27 @@ export interface AnalysisJob {
   /** Custom status for variants (e.g. reviewed, approved, rejected) */
   variant_statuses?: Record<string, VariantStatus>;
 }
+
+/**
+ * Request for approving a variant and saving it to the hotspots database.
+ */
+export interface ApproveVariantRequest {
+  chromosome: string;
+  position: number;
+  ref_allele: string;
+  alt_allele: string;
+  gene?: string;
+  approved_by: string;
+  job_id?: string;
+  patient_id?: string;
+}
+
+/**
+ * A data point for the hotspots visualization.
+ */
+export interface HotspotPoint {
+  chr: string;
+  start: number;
+  stop: number;
+  count: number;
+}

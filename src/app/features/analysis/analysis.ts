@@ -761,6 +761,7 @@ export class AnalysisComponent implements OnInit {
         this.variantStatuses.set(updatedJob.variant_statuses);
       }
       this.toastService.show(`Status updated to ${event.status}`, 'success');
+
     } catch (e) {
       console.error("Failed to update status", e);
       this.toastService.show("Failed to update status", "error");

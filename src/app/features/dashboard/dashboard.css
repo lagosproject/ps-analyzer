@@ -1,8 +1,86 @@
 :host {
-    display: block;
+    display: flex;
+    flex-direction: column;
     height: 100vh;
     background-color: var(--bg-light);
     color: var(--text-main);
+}
+
+.top-nav {
+    height: 64px;
+    background-color: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    gap: 48px;
+    z-index: 100;
+}
+
+.nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nav-logo {
+    width: 28px;
+    height: 28px;
+}
+
+.nav-title {
+    font-size: 18px;
+    font-weight: 800;
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+
+.nav-tabs {
+    display: flex;
+    gap: 8px;
+    height: 100%;
+}
+
+.tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 16px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s;
+}
+
+.tab-btn:hover {
+    color: var(--text-main);
+}
+
+.tab-btn.active {
+    color: var(--primary);
+}
+
+.tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: var(--primary);
+}
+
+.nav-actions {
+    margin-left: auto;
+}
+
+.dashboard-body {
+    flex: 1;
+    overflow: hidden;
 }
 
 .dashboard-container {
@@ -22,26 +100,9 @@
     overflow-y: auto;
 }
 
-.sidebar-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 24px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.sidebar-header .header-logo {
-    width: 32px;
-    height: 32px;
-}
-
-.sidebar-header .header-title {
-    font-size: 20px;
-    font-weight: 800;
-    margin: 0;
-    color: var(--text-main);
-    letter-spacing: -0.02em;
+.hotspots-view-container {
+    height: 100%;
+    overflow: auto;
 }
 
 .sidebar-actions {
@@ -464,3 +525,42 @@
 
 
 /* Settings Modal Styles have been moved to settings-modal.component.css */
+/* Assembly Selector Pill (Discrete) */
+.section-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.assembly-selector-pill {
+    display: flex;
+    background: var(--input-bg, #f1f5f9);
+    padding: 3px;
+    border-radius: 20px;
+    border: 1px solid var(--border-color, #e2e8f0);
+}
+
+.pill-btn {
+    padding: 4px 12px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted, #64748b);
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.pill-btn.active {
+    background: var(--primary, #0f766e);
+    color: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.pill-btn:hover:not(.active) {
+    color: var(--text-main, #0f172a);
+}

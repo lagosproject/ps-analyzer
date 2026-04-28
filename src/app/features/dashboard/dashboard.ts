@@ -12,6 +12,7 @@ import { TracyConfig, HGVSConfig, AnalysisJob } from '../../core/models/analysis
 import { ReadSettingsComponent } from '../../shared/components/read-settings/read-settings';
 import { SettingsModalComponent } from '../../shared/components/settings-modal/settings-modal';
 import { AppConfigModalComponent } from '../../shared/components/app-config-modal/app-config-modal';
+import { HotspotsComponent } from '../hotspots/hotspots';
 
 /**
  * DashboardComponent handles the main orchestration of analysis projects.
@@ -21,7 +22,7 @@ import { AppConfigModalComponent } from '../../shared/components/app-config-moda
 @Component({
     selector: 'app-dashboard',
     standalone: true,
-    imports: [CommonModule, FormsModule, ReadSettingsComponent, SettingsModalComponent, AppConfigModalComponent],
+    imports: [CommonModule, FormsModule, ReadSettingsComponent, SettingsModalComponent, AppConfigModalComponent, HotspotsComponent],
     templateUrl: './dashboard.html',
     styleUrl: './dashboard.css',
     changeDetection: ChangeDetectionStrategy.OnPush
@@ -35,6 +36,9 @@ export class DashboardComponent implements OnInit {
     private readonly toastService = inject(ToastService);
     /** Angular Router for navigation */
     private readonly router = inject(Router);
+    
+    /** Current active dashboard tab: 'sanger' or 'hotspots' */
+    readonly currentTab = signal<'sanger' | 'hotspots'>('sanger');
 
     // Signals and State exposed for templates
 
@@ -635,6 +639,13 @@ export class DashboardComponent implements OnInit {
     }
 
     /**
+     * Updates the assembly in HGVS config.
+     */
+    setAssembly(assembly: string) {
+        this.hgvsConfig.update(cfg => ({ ...cfg, assembly }));
+    }
+
+    /**
      * Main execution flow: Validates state, creates/updates job, and runs analysis.
      */
     async runAnalysis() {
@@ -693,5 +704,12 @@ export class DashboardComponent implements OnInit {
         } else {
             this.toastService.show("Please add at least one patient and a reference sequence.", "warning");
         }
+    }
+
+    /**
+     * Navigates to the global variant hotspots visualization.
+     */
+    goToHotspots() {
+        this.currentTab.set('hotspots');
     }
 }

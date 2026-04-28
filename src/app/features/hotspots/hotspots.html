@@ -1,0 +1,43 @@
+<div class="hotspots-container">
+  <div class="header">
+    <div class="header-main">
+      <div class="title-group">
+        <h1>Genomic Hotspots</h1>
+        <p>Distribution of <strong>{{ totalVariants() }}</strong> approved variants across the human genome.</p>
+      </div>
+      <div class="header-actions">
+        <div class="assembly-toggle">
+            <button class="toggle-btn" [class.active]="assembly() === 'GRCh38'" (click)="setAssembly('GRCh38')">HG38</button>
+            <button class="toggle-btn" [class.active]="assembly() === 'GRCh37'" (click)="setAssembly('GRCh37')">HG19</button>
+        </div>
+        <button class="btn btn-primary" (click)="loadDataAndRender()" [disabled]="isLoading()">
+          <span class="material-symbols-outlined">refresh</span>
+          Refresh Data
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="visualization-panel">
+
+    @if (isLoading()) {
+      <div class="loading-overlay">
+        <div class="spinner"></div>
+        <p>Loading genomic data...</p>
+      </div>
+    }
+
+    <div id="karyotype-container" [hidden]="isLoading()"></div>
+    
+    @if (!isLoading() && !hasData()) {
+      <div class="empty-state">
+        <div class="empty-icon">
+          <span class="material-symbols-outlined">biotech</span>
+        </div>
+        <h3>Map is currently empty</h3>
+        <p>No approved variants have been recorded in the database yet.</p>
+        <p class="empty-hint">Start by approving variants in the <strong>Sanger Projects</strong> tab to see their genomic distribution here.</p>
+      </div>
+    }
+  </div>
+</div>

@@ -46,6 +46,25 @@
                             <input type="text" [(ngModel)]="proxyConfig.https_proxy"
                                 placeholder="http://127.0.0.1:8080">
                         </div>
+                    <div class="divider-small"></div>
+
+                    <div class="settings-section">
+                        <div class="info-box danger">
+                            <span class="material-symbols-outlined">settings_suggest</span>
+                            <div>
+                                <strong>Maintenance</strong>
+                                <p>Perform system-wide cleanup tasks. Be careful, these actions cannot be undone.</p>
+                            </div>
+                        </div>
+                        <div class="maintenance-block mt-3">
+                            <div class="setting-info mb-2">
+                                <h4 class="m-0">Global Annotation Cache</h4>
+                                <p class="help-text">Clears all stored VEP and HGVS results from the Redis cache. Use this to force fresh re-annotations if you suspect caching errors.</p>
+                            </div>
+                            <button class="btn-outline btn-danger small" (click)="flushCache()">
+                                <span class="material-symbols-outlined">delete_sweep</span> Flush Redis Cache
+                            </button>
+                        </div>
                     </div>
                 </div>
 

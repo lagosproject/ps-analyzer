@@ -10,6 +10,37 @@
             <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
         </button>
     </div>
+    
+    <!-- Floating Zoom Controls -->
+    @if (!staticMode()) {
+    <div class="controls">
+        <div class="control-group">
+            <span class="control-label">X</span>
+            <button (click)="zoomInX()" title="Zoom In X">
+                <span class="material-symbols-outlined">add</span>
+            </button>
+            <button (click)="zoomOutX()" title="Zoom Out X">
+                <span class="material-symbols-outlined">remove</span>
+            </button>
+            <button (click)="zoomFullX()" title="Reset X">
+                <span class="material-symbols-outlined">fit_screen</span>
+            </button>
+        </div>
+        <div class="nav-divider"></div>
+        <div class="control-group">
+            <span class="control-label">Y</span>
+            <button (click)="zoomInY()" title="Zoom In Y">
+                <span class="material-symbols-outlined">expand_less</span>
+            </button>
+            <button (click)="zoomOutY()" title="Zoom Out Y">
+                <span class="material-symbols-outlined">expand_more</span>
+            </button>
+            <button (click)="zoomFullY()" title="Reset Y">
+                <span class="material-symbols-outlined">unfold_less</span>
+            </button>
+        </div>
+    </div>
+    }
 
     <!-- Scrollable Chart Area -->
     <div class="chart-container" #scrollContainer (mousedown)="onMouseDown($event)" (mouseleave)="onMouseLeave()"
