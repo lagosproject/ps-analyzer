@@ -62,6 +62,27 @@ export class DashboardComponent implements OnInit {
         return hasValidRef && hasReads && hasValidNames;
     });
 
+    /** Computed signal that gathers all warnings from sequence reads */
+    readonly sequenceWarnings = computed(() => {
+        const warnings: string[] = [];
+        
+        // Reference error
+        const refError = this.fetchError();
+        if (refError) {
+            warnings.push(`Reference: ${refError}`);
+        }
+
+        this.patients().forEach(p => {
+            p.reads.forEach(r => {
+                if (r.fullLength !== undefined && (r.trimLeft ?? 0) + (r.trimRight ?? 0) >= r.fullLength) {
+                    const fileName = r.file.split(/[/\\]/).pop();
+                    warnings.push(`Sequence "${fileName}" (Patient: ${p.name || 'Unnamed'}) will be empty after trimming.`);
+                }
+            });
+        });
+        return warnings;
+    });
+
     /** Error message from reference fetching */
     readonly fetchError = signal<string | null>(null);
     /** Success message from reference validation */

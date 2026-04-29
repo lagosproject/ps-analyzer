@@ -231,11 +231,20 @@
             </div>
 
             <div class="modal-footer">
-                <div class="footer-actions">
+                <div class="footer-warnings-left">
+                    @if (sequenceWarnings().length > 0) {
+                    <div class="footer-warning-span" [title]="sequenceWarnings().join('\n')">
+                        <span class="material-symbols-outlined">warning</span>
+                        <span>{{ sequenceWarnings().length }} sequence issues found. Hover for details.</span>
+                    </div>
+                    }
+                </div>
+
+                <div class="footer-actions-right">
                     <button class="btn-outline-icon" (click)="openSettings()" title="Run Configuration">
                         <span class="material-symbols-outlined">tune</span>
                     </button>
-                    <div style="flex: 1"></div>
+                    
                     @if (currentJobId()) {
                     <button class="btn-outline" (click)="showCurrentResults()">
                         <span class="material-symbols-outlined">visibility</span>
