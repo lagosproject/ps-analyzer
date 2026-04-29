@@ -235,7 +235,9 @@ export class AnalysisComponent implements OnInit {
       if (!this.isResizing) return;
       const deltaY = e.clientY - startY;
       const newHeight = Math.max(135, Math.min(1000, startHeight + deltaY));
-      this.sequenceHeight.set(newHeight);
+      if (isFinite(newHeight)) {
+        this.sequenceHeight.set(newHeight);
+      }
     };
 
     const onMouseUp = () => {
@@ -303,10 +305,10 @@ export class AnalysisComponent implements OnInit {
     if (!item) return;
 
     const gIndex = event.globalIndex !== undefined ? event.globalIndex : event.refPos - 1;
+    if (!isFinite(gIndex)) return;
+
     this.timelineService.setHighlight(gIndex, gIndex);
     this.timelineService.ensureVisible(gIndex);
-
-    const globalIndex = gIndex;
 
     // Find associated variant if any (including those that span multiple bases like deletions)
     const variantAtPos = this.allVariants().find(v => {
@@ -314,7 +316,8 @@ export class AnalysisComponent implements OnInit {
       const end = v.position + Math.max(1, v.ref.length) - 1;
       return event.refPos >= start && event.refPos <= end;
     });
-    const insIdx = event.subIndex ?? event.insertionIndex ?? 0;
+    let insIdx = event.subIndex ?? event.insertionIndex ?? 0;
+    if (!isFinite(insIdx)) insIdx = 0;
 
     // Centering Logic:
     // 1. If Reference is clicked: center and highlight ALL charts.
@@ -454,13 +457,17 @@ export class AnalysisComponent implements OnInit {
 
       for (const item in trace.result.consensusAlign) {
         const refPos = parseInt(item, 10);
+        if (isNaN(refPos)) continue;
+
         const currentMax = depthMap.get(refPos) || 0;
         try {
-          depthMap.set(refPos, Math.max(currentMax, trace.result.consensusAlign[item].cons.length));
+          const itemData = trace.result.consensusAlign[item];
+          if (itemData && itemData.cons) {
+            depthMap.set(refPos, Math.max(currentMax, itemData.cons.length));
+          }
         } catch (error) {
           console.error(error);
         }
-
       }
     }
     return depthMap;

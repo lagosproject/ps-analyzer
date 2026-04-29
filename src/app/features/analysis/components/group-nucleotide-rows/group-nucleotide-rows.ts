@@ -110,7 +110,7 @@ export class GroupNucleotideRows implements OnInit, OnDestroy {
                 const containerWidth = entry.contentRect.width;
                 const wrapperWidth = containerWidth - 200; // 200 is .row-label width
 
-                if (wrapperWidth > 0) {
+                if (isFinite(wrapperWidth) && wrapperWidth > 0) {
                     // Target about 12px per nucleotide for a "tight" but readable look
                     const targetZoom = Math.max(20, Math.floor(wrapperWidth / 12));
                     this.timelineService.setZoom(targetZoom);

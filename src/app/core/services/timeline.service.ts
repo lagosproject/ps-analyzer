@@ -64,6 +64,7 @@ export class TimelineService {
      * @param zoom - Number of nucleotides
      */
     setZoom(zoom: number) {
+        if (!isFinite(zoom)) return;
         this.state.update(s => ({ ...s, zoom: Math.max(1, zoom) }));
         // Re-validate position because zooming out might push the "end" past maxPosition
         this.setPosition(this.state().position);
@@ -75,6 +76,7 @@ export class TimelineService {
      * @param position - Genomic or relative sequence position
      */
     setPosition(position: number) {
+        if (!isFinite(position)) return;
         this.state.update(s => {
             const viewportInBases = s.zoom;
             // The furthest we can go is maxPosition minus the width of the view
@@ -133,6 +135,7 @@ export class TimelineService {
      * Sets a specific sequence range to be highlighted/focused.
      */
     setHighlight(start: number, end: number) {
+        if (!isFinite(start) || !isFinite(end)) return;
         this.highlightedRange.set({ start, end });
     }
 

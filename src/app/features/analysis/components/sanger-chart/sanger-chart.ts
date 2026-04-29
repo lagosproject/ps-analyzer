@@ -463,15 +463,18 @@ export class SangerChartComponent {
 
         if (indices.length > 0) {
             const t = this.trace();
-            if (t) {
-                const x = t.peakLocations[indices[0].pos - 1] * this.zoomX();
-                this.centerOnX(x);
+            if (t && t.peakLocations) {
+                const scanIdx = t.peakLocations[indices[0].pos - 1];
+                if (isFinite(scanIdx)) {
+                    const x = scanIdx * this.zoomX();
+                    this.centerOnX(x);
+                }
             }
         }
     }
 
     centerOnX(x: number) {
-        if (this.staticMode()) return;
+        if (this.staticMode() || !isFinite(x)) return;
         const container = this.scrollContainer()?.nativeElement;
         if (container) {
             const containerWidth = container.clientWidth;
