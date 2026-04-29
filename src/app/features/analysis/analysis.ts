@@ -308,39 +308,35 @@ export class AnalysisComponent implements OnInit {
 
     const globalIndex = gIndex;
 
+    // Find associated variant if any (including those that span multiple bases like deletions)
+    const variantAtPos = this.allVariants().find(v => {
+      const start = v.position;
+      const end = v.position + Math.max(1, v.ref.length) - 1;
+      return event.refPos >= start && event.refPos <= end;
+    });
+    const insIdx = event.subIndex ?? event.insertionIndex ?? 0;
+
     // Centering Logic:
-    // 1. If Reference is clicked: center ALL charts.
+    // 1. If Reference is clicked: center and highlight ALL charts.
     // 2. If Read Row is clicked:
-    //    - If NOT an insertion: center ALL charts.
-    //    - If IS an insertion: center ONLY that chart.
+    //    - If NOT an insertion: center and highlight ALL charts.
+    //    - If IS an insertion: center and highlight ONLY that chart.
     if (event.readId === 'Reference' || !event.isInsertion) {
       this.traces().forEach(t => {
-        const traceItem = t.result.consensusAlign?.[event.refPos];
-        if (traceItem) {
-          const chart = this.sangerCharts().find(c => c.readId() === t.readId);
-          if (chart) {
-            const insIdx = event.subIndex ?? event.insertionIndex ?? 0;
-            const sp = traceItem.sangerPos1?.[insIdx] ?? traceItem.sangerPos2?.[insIdx];
-            if (sp !== undefined) {
-              chart.centerOnIndex(sp - 1);
-            }
-          }
+        const chart = this.sangerCharts().find(c => c.readId() === t.readId);
+        if (chart) {
+          chart.highlightRefPos(event.refPos, variantAtPos?.['genotype'], insIdx);
         }
       });
     } else {
       // Single chart centering for insertions in read rows
       const targetSangerChart = this.sangerCharts().find(c => c.readId() === event.readId);
       if (targetSangerChart) {
-        const insIdx = event.subIndex ?? event.insertionIndex ?? 0;
-        const sp = item.sangerPos1?.[insIdx] ?? item.sangerPos2?.[insIdx];
-        if (sp !== undefined) {
-          targetSangerChart.centerOnIndex(sp - 1);
-        }
+        targetSangerChart.highlightRefPos(event.refPos, variantAtPos?.['genotype'], insIdx);
       }
     }
 
     // Find and select variant if associated
-    const variantAtPos = this.allVariants().find(v => v.position === event.refPos);
     if (variantAtPos) {
       this.selectedVariant.set(variantAtPos);
 
@@ -539,7 +535,7 @@ export class AnalysisComponent implements OnInit {
           acc[refPos] = {
             refPos,
             cons: [char.toUpperCase()],
-            sangerPos1: [i], // Mock value, straightforward for reference
+            sangerPos1: [i + 1], // Mock value, straightforward for reference
             alt1: [],
             alt2: []
           };

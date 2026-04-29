@@ -131,8 +131,8 @@ export class SangerChartComponent {
                 const startItem = align[range.start.toString()];
                 const endItem = align[range.end.toString()];
 
-                let sangerStartIdx = startItem?.sangerPos1?.[0] ?? (range.start - this.refStart());
-                let sangerEndIdx = endItem?.sangerPos1?.[0] ?? (range.end - this.refStart());
+                let sangerStartIdx = (startItem?.sangerPos1?.[0] !== undefined ? startItem.sangerPos1[0] - 1 : (range.start - this.refStart()));
+                let sangerEndIdx = (endItem?.sangerPos1?.[0] !== undefined ? endItem.sangerPos1[0] - 1 : (range.end - this.refStart()));
 
                 // Ensure bounds
                 sangerStartIdx = Math.max(0, Math.min(sangerStartIdx, locs.length - 1));
@@ -656,15 +656,16 @@ export class SangerChartComponent {
         const x = scanIndex * this.zoomX();
         this.centerOnX(x);
 
-        this.highlightConfigs.set([{ pos: baseIndex + 1, color: 'rgba(255, 255, 0, 0.5)' }]);
+        this.highlightConfigs.set([{ pos: baseIndex + 1, color: 'rgba(128, 0, 128, 0.5)' }]);
     }
 
     /**
      * Highlights standard genotype annotations along the reference position.
      * @param refPos Reference coordinate
      * @param genotype VCF/genotype string e.g. 'hom. ALT'
+     * @param insIdx Index of the base within an insertion (0 for primary base)
      */
-    highlightRefPos(refPos: number, genotype?: string) {
+    highlightRefPos(refPos: number, genotype?: string, insIdx: number = 0) {
         const item = this.consensusAlign()[refPos.toString()];
         if (!item) {
             this.highlightConfigs.set([]);
@@ -672,16 +673,17 @@ export class SangerChartComponent {
         }
 
         const indicesToHighlight: { pos: number, color: string, label?: string }[] = [];
-        const sangerPos1 = item.sangerPos1?.[0];
-        const sangerPos2 = item.sangerPos2?.[0];
+        const sangerPos1 = item.sangerPos1?.[insIdx];
+        const sangerPos2 = item.sangerPos2?.[insIdx];
 
-        if (genotype === 'hom. ALT' || (sangerPos1 !== undefined && (sangerPos1 === sangerPos2))) {
-            const purple = 'rgba(128, 0, 128, 0.8)';
-            if (sangerPos1 !== undefined || sangerPos2 !== undefined) {
-                indicesToHighlight.push({ pos: sangerPos1 || sangerPos2!, color: purple });
-            }
-        } else {
-            // For het or other, use blue/red and numbers
+        // Determine if we should show two cursors:
+        // 1. If positions are different (Divergence / Frameshift)
+        // 2. If it's a known heterozygous variant (even if positions are same, e.g. Het SNV)
+        const isDivergent = sangerPos1 !== undefined && sangerPos2 !== undefined && sangerPos1 !== sangerPos2;
+        const isHeterozygous = genotype?.toLowerCase().includes('het');
+
+        if (isDivergent || isHeterozygous) {
+            // For het, frameshifts or other dual-allele situations, use blue/red and numbers
             if (sangerPos1 !== undefined) {
                 indicesToHighlight.push({ pos: sangerPos1, color: 'rgba(255, 0, 0, 0.8)', label: '1' });
             }
@@ -689,6 +691,10 @@ export class SangerChartComponent {
             if (sangerPos2 !== undefined) {
                 indicesToHighlight.push({ pos: sangerPos2, color: 'rgba(0, 0, 255, 0.8)', label: '2' });
             }
+        } else if (sangerPos1 !== undefined || sangerPos2 !== undefined) {
+            // Show single Purple cursor for homozygous or wildtype
+            const purple = 'rgba(128, 0, 128, 0.8)';
+            indicesToHighlight.push({ pos: sangerPos1 || sangerPos2!, color: purple });
         }
 
         if (indicesToHighlight.length > 0) {
