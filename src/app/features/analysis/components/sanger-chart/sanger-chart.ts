@@ -678,15 +678,13 @@ export class SangerChartComponent {
         const indicesToHighlight: { pos: number, color: string, label?: string }[] = [];
         const sangerPos1 = item.sangerPos1?.[insIdx];
         const sangerPos2 = item.sangerPos2?.[insIdx];
-
         // Determine if we should show two cursors:
-        // 1. If positions are different (Divergence / Frameshift)
-        // 2. If it's a known heterozygous variant (even if positions are same, e.g. Het SNV)
+        // We show two cursors ONLY if they are at different positions (Divergence / Frameshift).
+        // If they are at the same position (even if Heterozygous), we show one single Purple cursor.
         const isDivergent = sangerPos1 !== undefined && sangerPos2 !== undefined && sangerPos1 !== sangerPos2;
-        const isHeterozygous = genotype?.toLowerCase().includes('het');
 
-        if (isDivergent || isHeterozygous) {
-            // For het, frameshifts or other dual-allele situations, use blue/red and numbers
+        if (isDivergent) {
+            // For frameshifts or other dual-allele situations where positions differ, use Red/Blue and numbers
             if (sangerPos1 !== undefined) {
                 indicesToHighlight.push({ pos: sangerPos1, color: 'rgba(255, 0, 0, 0.8)', label: '1' });
             }
@@ -694,10 +692,13 @@ export class SangerChartComponent {
             if (sangerPos2 !== undefined) {
                 indicesToHighlight.push({ pos: sangerPos2, color: 'rgba(0, 0, 255, 0.8)', label: '2' });
             }
-        } else if (sangerPos1 !== undefined || sangerPos2 !== undefined) {
-            // Show single Purple cursor for homozygous or wildtype
-            const purple = 'rgba(128, 0, 128, 0.8)';
-            indicesToHighlight.push({ pos: sangerPos1 || sangerPos2!, color: purple });
+        } else {
+            // Show single Purple cursor for homozygous, wildtype, or Heterozygous SNVs (where positions are same)
+            const pos = sangerPos1 || sangerPos2;
+            if (pos !== undefined) {
+                const purple = 'rgba(128, 0, 128, 0.8)';
+                indicesToHighlight.push({ pos: pos, color: purple });
+            }
         }
 
         if (indicesToHighlight.length > 0) {
