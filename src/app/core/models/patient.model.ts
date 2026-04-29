@@ -10,6 +10,8 @@ export interface SangerRead {
   trimLeft?: number;
   /** Optional right trimming value in base pairs */
   trimRight?: number;
+  /** Optional total length of the sequence in base pairs */
+  fullLength?: number;
 }
 
 /**

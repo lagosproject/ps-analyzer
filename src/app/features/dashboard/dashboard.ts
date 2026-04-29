@@ -139,7 +139,11 @@ export class DashboardComponent implements OnInit {
                 if (type === 'ref') {
                     this.appState.setLocalRef(serverPath);
                 } else if (type === 'read' && this.uploadPatientContext) {
-                    this.appState.addRead(this.uploadPatientContext.id, serverPath);
+                    this.appState.addRead(this.uploadPatientContext.id, serverPath, undefined, {
+                        trimLeft: this.tracyConfig().trimLeft,
+                        trimRight: this.tracyConfig().trimRight
+                    });
+                    this.processReadLength(this.uploadPatientContext.id, serverPath);
                 }
             } catch (e) {
                 console.error("Upload failed", e);
@@ -321,7 +325,11 @@ export class DashboardComponent implements OnInit {
 
             if (selected && Array.isArray(selected)) {
                 selected.forEach(filePath => {
-                    this.appState.addRead(patient.id, filePath);
+                    this.appState.addRead(patient.id, filePath, undefined, {
+                        trimLeft: this.tracyConfig().trimLeft,
+                        trimRight: this.tracyConfig().trimRight
+                    });
+                    this.processReadLength(patient.id, filePath);
                 });
             }
         } else {
@@ -397,7 +405,21 @@ export class DashboardComponent implements OnInit {
             this.fetchSuccess.set(`Loaded reference: ${job.reference.value}`);
         }
 
-        // 2. Set patients
+        // 2. Set config
+        if (job.config) {
+            this.tracyConfig.set({ ...job.config });
+        } else {
+            this.resetTracyConfig();
+        }
+
+        // 3. Set HGVS config
+        if (job.hgvs_config) {
+            this.hgvsConfig.set({ ...job.hgvs_config });
+        } else {
+            this.hgvsConfig.set({ transcript: '', gene: '', assembly: 'GRCh38', auto_vep: false });
+        }
+
+        // 4. Set patients
         this.appState.patients.set([]); // Clear existing
         job.patients.forEach((p: any) => {
             this.appState.addPatient(p.name, p.id);
@@ -405,27 +427,18 @@ export class DashboardComponent implements OnInit {
             if (addedP) {
                 p.reads.forEach((r: any) => {
                     if (typeof r === 'string') {
-                        this.appState.addRead(addedP.id, r);
+                        this.appState.addRead(addedP.id, r, undefined, {
+                            trimLeft: this.tracyConfig().trimLeft,
+                            trimRight: this.tracyConfig().trimRight
+                        });
                     } else {
                         this.appState.addRead(addedP.id, r.file, r.id, { trimLeft: r.trimLeft, trimRight: r.trimRight });
                     }
+                    // Fetch length in background if missing
+                    this.processReadLength(addedP.id, typeof r === 'string' ? r : r.file);
                 });
             }
         });
-
-        // 3. Set config
-        if (job.config) {
-            this.tracyConfig.set({ ...job.config });
-        } else {
-            this.resetTracyConfig();
-        }
-
-        // 4. Set HGVS config
-        if (job.hgvs_config) {
-            this.hgvsConfig.set({ ...job.hgvs_config });
-        } else {
-            this.hgvsConfig.set({ transcript: '', gene: '', assembly: 'GRCh38', auto_vep: false });
-        }
     }
 
     /**
@@ -703,6 +716,27 @@ export class DashboardComponent implements OnInit {
             }
         } else {
             this.toastService.show("Please add at least one patient and a reference sequence.", "warning");
+        }
+    }
+
+    /**
+     * Fetches the total sequence length for a read to validate trimming.
+     */
+    private async processReadLength(patientId: string, filePath: string) {
+        try {
+            const data = await this.analysisService.getReadPreview(filePath);
+            if (data && data.peakLocations) {
+                const patients = this.patients();
+                const patient = patients.find(p => p.id === patientId);
+                if (patient) {
+                    const read = patient.reads.find(r => r.file === filePath);
+                    if (read) {
+                        this.appState.updateReadFullLength(patientId, read.id, data.peakLocations.length);
+                    }
+                }
+            }
+        } catch (e) {
+            console.error("Failed to process read length", e);
         }
     }
 

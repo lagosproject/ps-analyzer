@@ -538,6 +538,18 @@
     font-weight: 500;
 }
 
+.file-tag.tag-error {
+    background-color: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    color: #b91c1c;
+}
+
+.warning-icon {
+    font-size: 16px !important;
+    color: #ef4444;
+    cursor: help;
+}
+
 /* Empty Placeholder */
 .empty-placeholder {
     border: 2px dashed var(--border-color);

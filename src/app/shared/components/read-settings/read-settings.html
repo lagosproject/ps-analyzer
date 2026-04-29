@@ -14,6 +14,14 @@
             <div class="error">{{ error() }}</div>
             } @else {
             <div class="preview-container">
+                @if (trimLeft() + trimRight() >= previewSequenceLength()) {
+                <div class="alert-banner">
+                    <span class="material-symbols-outlined">warning</span>
+                    <div>
+                        <strong>Warning:</strong> Trimming exceeds sequence length. The resulting sequence will be empty.
+                    </div>
+                </div>
+                }
                 <div class="settings-section">
                     <h4>Trim Settings</h4>
                     <div class="grid-2">

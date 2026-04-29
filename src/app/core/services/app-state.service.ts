@@ -78,7 +78,7 @@ export class AppStateService {
      * @param readId - Optional unique identifier
      * @param config - Optional initial trimming settings
      */
-    addRead(patientId: string, filePath: string, readId?: string, config?: { trimLeft: number, trimRight: number }) {
+    addRead(patientId: string, filePath: string, readId?: string, config?: { trimLeft: number, trimRight: number, fullLength?: number }) {
         this.patients.update(patients => {
             const patient = patients.find(p => p.id === patientId);
             if (patient) {
@@ -88,7 +88,8 @@ export class AppStateService {
                         id: readId || Math.random().toString(36).substring(2, 9),
                         file: filePath,
                         trimLeft: config?.trimLeft ?? 50,
-                        trimRight: config?.trimRight ?? 50
+                        trimRight: config?.trimRight ?? 50,
+                        fullLength: config?.fullLength
                     });
                 }
             }
@@ -107,6 +108,22 @@ export class AppStateService {
                 if (read) {
                     read.trimLeft = config.trimLeft;
                     read.trimRight = config.trimRight;
+                }
+            }
+            return [...patients];
+        });
+    }
+
+    /**
+     * Updates the full length of a specific read.
+     */
+    updateReadFullLength(patientId: string, readId: string, fullLength: number) {
+        this.patients.update(patients => {
+            const patient = patients.find(p => p.id === patientId);
+            if (patient) {
+                const read = patient.reads.find(r => r.id === readId);
+                if (read) {
+                    read.fullLength = fullLength;
                 }
             }
             return [...patients];

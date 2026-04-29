@@ -202,8 +202,11 @@
 
                                 <div class="file-tags">
                                     @for (read of patient.reads; track $index) {
-                                    <div class="file-tag">
+                                    <div class="file-tag" [class.tag-error]="read.fullLength !== undefined && (read.trimLeft ?? 0) + (read.trimRight ?? 0) >= read.fullLength">
                                         <span>{{ read.file.split('/').pop() }}</span>
+                                        @if (read.fullLength !== undefined && (read.trimLeft ?? 0) + (read.trimRight ?? 0) >= read.fullLength) {
+                                            <span class="material-symbols-outlined warning-icon" title="Sequence is empty after trimming!">warning</span>
+                                        }
                                         <button class="btn-tag-action" (click)="openReadSettings(patient.id, read)">
                                             <span class="material-symbols-outlined">settings</span>
                                         </button>
