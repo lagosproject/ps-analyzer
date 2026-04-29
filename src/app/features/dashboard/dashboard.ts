@@ -246,7 +246,7 @@ export class DashboardComponent implements OnInit {
 
         this.isSearching.set(true);
         try {
-            const results = await this.analysisService.searchReference(query);
+            const results = await this.analysisService.searchReference(query, this.hgvsConfig().assembly);
             this.isSearching.set(false);
             if (results && results.length > 0) {
                 if (results.length === 1 || query.toUpperCase().startsWith('NM_') || query.toUpperCase().startsWith('NC_') || query.toUpperCase().startsWith('NG_') || query.toUpperCase().startsWith('NR_')) {

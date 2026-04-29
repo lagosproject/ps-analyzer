@@ -141,12 +141,14 @@ export class AnalysisService {
    * @param query - The reference search query
    * @returns Promise resolving to a list of matching references
    */
-  async searchReference(query: string): Promise<any[]> {
+  async searchReference(query: string, assembly?: string): Promise<any[]> {
     try {
+      const params: any = { query };
+      if (assembly) {
+        params.assembly = assembly;
+      }
       const res = await firstValueFrom(
-        this.http.get<{ results: any[] }>(`${this.apiUrl}/search-reference`, {
-          params: { query }
-        })
+        this.http.get<{ results: any[] }>(`${this.apiUrl}/search-reference`, { params })
       );
       return res.results;
     } catch (error: any) {
