@@ -29,6 +29,7 @@
     <div class="visualization-panel">
         <div class="alignment-view">
             <app-group-nucleotide-rows [traces]="traces()"
+                [allVariants]="[item().variant]"
                 [referenceTrace]="item().config.includeReference ? referenceTrace() : undefined"
                 [alignmentDepthMap]="alignmentDepthMap()"
                 (nucleotideSelected)="onNucleotideSelected($event)"></app-group-nucleotide-rows>

@@ -9,6 +9,7 @@
         <div class="row-wrapper">
             <app-nucleotide-row [trace]="referenceTrace()" [alignmentDepthMap]="alignmentDepthMap()"
                 [isSelectedRow]="selectingRowId() === 'Reference'"
+                [isReference]="true" [variantPositions]="variantPositions()"
                 (nucleotideClicked)="handleNucleotideClick($event, 'Reference')"
                 (nucleotideRightClicked)="handleContextMenu($event, 'Reference')"
                 (nucleotideMouseDown)="handleMouseDown($event, 'Reference')"

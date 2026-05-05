@@ -91,6 +91,7 @@
           <!-- Alignment View wrapped in scrollable container-->
           <div class="alignment-view" (scroll)="updateScroll($event)" role="region" aria-label="Alignment View">
             <app-group-nucleotide-rows [traces]="traces()" [referenceTrace]="referenceTrace()"
+              [allVariants]="allVariants()"
               [alignmentDepthMap]="alignmentDepthMap()" (rowClick)="handleRowClick($event)"
               (nucleotideSelected)="onNucleotideSelected($event)"></app-group-nucleotide-rows>
           </div>

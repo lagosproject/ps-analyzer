@@ -7,7 +7,9 @@
             @if (item.type === 'nucleotide') {
             <button class="nucleotide-btn" [class.alt-bg]="item.globalIndex % 2 === 0"
                 [class.highlighted-cell]="item.isHighlighted && !item.isSequenceSelection"
-                [class.sequence-selection-highlight]="item.isSequenceSelection" [attr.title]="'Position: ' + item.index"
+                [class.sequence-selection-highlight]="item.isSequenceSelection" 
+                [class.variant-site]="item.isVariant"
+                [attr.title]="'Position: ' + item.index"
                 [style.color]="getColorForNucleotide(item.char)"
                 [style.visibility]="(item.isMatch && !item.showAlways) ? 'hidden' : 'visible'"
                 (click)="onNucleotideClick(item.char, item.index, item.globalIndex, item.isInsertion, item.subIndex)"

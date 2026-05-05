@@ -44,6 +44,8 @@ export class NucleotideRow {
     readonly expanded = input<boolean>(false);
     readonly isSelectedRow = input<boolean>(false);
     readonly showAllBases = input<boolean>(false);
+    readonly isReference = input<boolean>(false);
+    readonly variantPositions = input<Set<number>>(new Set());
 
     readonly hasMultipleAlleles = computed(() => {
         const trace = this.trace();
@@ -102,6 +104,7 @@ export class NucleotideRow {
                     globalIndex: currentGlobalIndex,
                     isMatch: false,
                     isHighlighted,
+                    isVariant: this.isReference() && this.variantPositions().has(refPos),
                     showAlways: true,
                     isSequenceSelection: isHighlighted && this.isSelectedRow(),
                     sangerPos1: item?.sangerPos1,

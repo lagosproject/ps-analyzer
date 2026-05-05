@@ -69,3 +69,14 @@
     border-bottom: 2px solid rgba(0, 0, 0, 0.2);
     font-style: italic;
 }
+
+.nucleotide-btn.variant-site {
+    background-color: rgba(255, 255, 0, 0.4);
+    box-shadow: inset 0 0 4px rgba(255, 215, 0, 0.6);
+    border-radius: 2px;
+    font-weight: 700;
+}
+
+.nucleotide-btn.variant-site:hover {
+    background-color: rgba(255, 255, 0, 0.6);
+}

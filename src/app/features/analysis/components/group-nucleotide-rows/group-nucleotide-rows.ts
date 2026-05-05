@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, input, signal, output, inject, computed, HostListener, ElementRef, OnInit, OnDestroy } from '@angular/core';
 import { NucleotideRow } from "../nucleotide-row/nucleotide-row";
 import { SignalPopupComponent } from "../../../../shared/components/signal-popup/signal-popup";
-import { AnalysisEntry } from '../../../../core/models/analysis.model';
+import { AnalysisEntry, Variant } from '../../../../core/models/analysis.model';
 import { TimelineService } from '../../../../core/services/timeline.service';
 import { ToastService } from '../../../../core/services/toast.service';
 
@@ -29,8 +29,26 @@ export class GroupNucleotideRows implements OnInit, OnDestroy {
     readonly referenceTrace = input<AnalysisEntry | undefined>(undefined);
     /** List of all read traces in the current job */
     readonly traces = input.required<AnalysisEntry[]>();
+    /** List of all aggregated variants in the job */
+    readonly allVariants = input.required<Variant[]>();
     /** Map of base pair position to read depth coverage */
     readonly alignmentDepthMap = input.required<Map<number, number>>();
+
+    /** Set of 1-based positions where variants are present across any read */
+    readonly variantPositions = computed(() => {
+        const variants = this.allVariants();
+        const positions = new Set<number>();
+        for (const v of variants) {
+            positions.add(v.position);
+            // Also add positions spanned by multi-base variants (e.g. deletions)
+            if (v.ref.length > 1) {
+                for (let i = 1; i < v.ref.length; i++) {
+                    positions.add(v.position + i);
+                }
+            }
+        }
+        return positions;
+    });
 
     /** Emitted when a read row wrapper is clicked */
     readonly rowClick = output<string>();
