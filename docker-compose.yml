@@ -15,7 +15,7 @@ services:
     restart: always
 
   redis:
-    image: redis:alpine
+    image: mirror.gcr.io/library/redis:alpine
     restart: always
 
   frontend:

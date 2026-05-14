@@ -1,5 +1,5 @@
 # Development environment for MS-Analyzer (Tauri + Angular)
-FROM rust:1.77-bullseye
+FROM mirror.gcr.io/library/rust:1.77-bullseye
 
 # Install Tauri system dependencies
 RUN apt-get update && apt-get install -y \
