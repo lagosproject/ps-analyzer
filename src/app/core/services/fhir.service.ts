@@ -116,7 +116,7 @@ export class FhirService {
             if (v['clinical_significance']) {
                 observation.component.push({
                     code: {
-                        coding: [{ system: 'http://loinc.org', code: '48019-4', display: 'Clinical significance' }]
+                        coding: [{ system: 'http://loinc.org', code: '48018-6', display: 'Genetic variant clinical significance' }]
                     },
                     valueCodeableConcept: {
                         text: v['clinical_significance']
