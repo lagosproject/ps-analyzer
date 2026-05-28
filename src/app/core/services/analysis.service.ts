@@ -573,6 +573,21 @@ export class AnalysisService {
   }
 
   /**
+   * Fetches detailed approved variants from the database.
+   */
+  async getApprovedVariants(assembly = 'GRCh38'): Promise<any[]> {
+    try {
+      return await firstValueFrom(
+        this.http.get<any[]>(`${this.apiUrl}/variants/approved`, {
+          params: { assembly: assembly }
+        })
+      );
+    } catch (error: any) {
+      throw this.handleApiError(error);
+    }
+  }
+
+  /**
    * Flushes the global Redis cache.
    */
   async flushCache(): Promise<any> {

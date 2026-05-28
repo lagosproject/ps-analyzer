@@ -18,26 +18,156 @@
     </div>
   </div>
 
-  <div class="visualization-panel">
-
-    @if (isLoading()) {
-      <div class="loading-overlay">
-        <div class="spinner"></div>
-        <p>Loading genomic data...</p>
+  <div class="dashboard-split-layout">
+    <!-- Left: Karyotype visualization card -->
+    <div class="visualization-panel">
+      <div class="panel-header-simple">
+        <span class="material-symbols-outlined">analytics</span>
+        <h3>Karyotype Map</h3>
       </div>
-    }
-
-    <div id="karyotype-container" [hidden]="isLoading()"></div>
-    
-    @if (!isLoading() && !hasData()) {
-      <div class="empty-state">
-        <div class="empty-icon">
-          <span class="material-symbols-outlined">biotech</span>
+      
+      @if (isLoading()) {
+        <div class="loading-overlay">
+          <div class="spinner"></div>
+          <p>Loading genomic data...</p>
         </div>
-        <h3>Map is currently empty</h3>
-        <p>No approved variants have been recorded in the database yet.</p>
-        <p class="empty-hint">Start by approving variants in the <strong>Sanger Projects</strong> tab to see their genomic distribution here.</p>
+      }
+
+      @if (!isLoading() && hasData()) {
+        <div class="karyotype-wrapper">
+          @for (chr of chromosomes; track chr.name) {
+            <div class="chr-column" 
+                 [class.selected]="selectedChromosome() === chr.name"
+                 (click)="toggleChromosome(chr.name)">
+              <div class="chr-body" [style.height.%]="(chr.size / maxChrSize) * 100">
+                <div class="chr-arm"></div>
+                <div class="chr-centromere" [style.top.%]="chr.centromereRatio * 100"></div>
+                
+                @for (marker of chromosomeMarkers()[chr.name]; track marker.position) {
+                  <div class="chr-marker" 
+                       [style.top.%]="(marker.position / chr.size) * 100"
+                       [style.background-color]="marker.count > 5 ? '#ef4444' : (marker.count > 2 ? '#f97316' : '#eab308')"
+                       (click)="onMarkerClick($event, chr.name, marker)"
+                       [title]="'Position: g.' + marker.position + '\nGene: ' + marker.gene + '\nVariants: ' + marker.count">
+                  </div>
+                }
+              </div>
+              <div class="chr-label">{{ chr.name }}</div>
+            </div>
+          }
+        </div>
+      }
+      
+      @if (!isLoading() && !hasData()) {
+        <div class="empty-state">
+          <div class="empty-icon">
+            <span class="material-symbols-outlined">biotech</span>
+          </div>
+          <h3>Map is currently empty</h3>
+          <p>No approved variants have been recorded in the database yet.</p>
+          <p class="empty-hint">Start by approving variants in the <strong>Sanger Projects</strong> tab to see their genomic distribution here.</p>
+        </div>
+      }
+    </div>
+
+    <!-- Right: Detailed variants list / selection dashboard -->
+    <div class="details-panel" [class.hidden]="isLoading() || !hasData()">
+      <div class="panel-header">
+        <span class="material-symbols-outlined header-icon">dna</span>
+        <h2>Variant Registry</h2>
       </div>
-    }
+
+      <div class="search-box">
+        <span class="material-symbols-outlined search-icon">search</span>
+        <input 
+          type="text" 
+          placeholder="Search gene, patient, position..." 
+          [value]="searchTerm()" 
+          (input)="onSearchInput($event)"
+        />
+        @if (searchTerm()) {
+          <button class="clear-search-btn" (click)="clearSearch()">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        }
+      </div>
+
+      <div class="filter-status-card">
+        <div class="status-info">
+          <div class="status-label">Active Filter</div>
+          <div class="status-value">
+            @if (selectedChromosome()) {
+              @if (selectedRegion()) {
+                Chr {{ selectedChromosome() }}: {{ formatBp(selectedRegion()!.start) }} - {{ formatBp(selectedRegion()!.stop) }}
+              } @else {
+                Chromosome {{ selectedChromosome() }}
+              }
+            } @else {
+              All Genomes (Cohort-wide)
+            }
+          </div>
+        </div>
+        
+        @if (selectedChromosome()) {
+          <button class="clear-filter-btn" (click)="clearSelection()">
+            <span class="material-symbols-outlined">filter_alt_off</span>
+            Clear Filter
+          </button>
+        }
+      </div>
+
+      <div class="variants-list-container">
+        @if (filteredVariants().length === 0) {
+          <div class="no-variants-state">
+            <span class="material-symbols-outlined">search_off</span>
+            <p>No approved variants found matching criteria.</p>
+          </div>
+        } @else {
+          <div class="variants-table-wrapper">
+            <table class="variants-table">
+              <thead>
+                <tr>
+                  <th>Gene</th>
+                  <th>Variant (HGVS/Pos)</th>
+                  <th>Patient</th>
+                  <th>Project</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (v of filteredVariants(); track v.id) {
+                  <tr class="variant-row" (click)="highlightChromosome(v.chromosome)" [class.selected]="selectedChromosome() === v.chromosome">
+                    <td>
+                      <span class="gene-badge" [class]="getGeneBadgeClass(v.gene)">
+                        {{ v.gene || 'Unknown' }}
+                      </span>
+                    </td>
+                    <td class="coordinate-cell">
+                      <div class="pos-text">g.{{ v.position }} {{ v.ref_allele }}>{{ v.alt_allele }}</div>
+                      <div class="chr-text">Chr {{ v.chromosome }}</div>
+                    </td>
+                    <td>
+                      <span class="patient-id" title="{{ v.patient_id }}">
+                        {{ v.patient_id || 'N/A' }}
+                      </span>
+                    </td>
+                    <td>
+                      <span class="job-name" title="{{ getJobName(v.job_id) }}">
+                        {{ getJobName(v.job_id) }}
+                      </span>
+                    </td>
+                    <td>
+                      <button class="view-job-btn" (click)="viewJob(v.job_id); $event.stopPropagation()" title="View alignment and trace">
+                        <span class="material-symbols-outlined">visibility</span>
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    </div>
   </div>
 </div>
