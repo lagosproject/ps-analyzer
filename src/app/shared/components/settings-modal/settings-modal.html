@@ -180,13 +180,13 @@
                             <label class="form-label">VEP Execution Mode</label>
                             <select [(ngModel)]="hgvsConfig().vep_mode" class="select-input" [disabled]="readOnly()">
                                 <option value="online">Online REST API (Default)</option>
-                                <option value="opencravat">Local OpenCRAVAT</option>
+                                <option value="opencravat">Local Annotator</option>
                             </select>
                         </div>
 
                         @if (hgvsConfig().vep_mode === 'opencravat') {
                         <div class="form-group">
-                            <label class="form-label">OpenCRAVAT Executable Path (Optional)</label>
+                            <label class="form-label">Local Annotator Executable Path (Optional)</label>
                             <input type="text" [(ngModel)]="hgvsConfig().vep_path"
                                 placeholder="e.g. oc"
                                 [disabled]="readOnly()">

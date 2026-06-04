@@ -72,7 +72,7 @@ export class AppConfigModalComponent implements OnInit {
 
     setActiveTab(tab: string) {
         this.activeTab.set(tab);
-        if (tab === 'OpenCRAVAT') {
+        if (tab === 'Local Annotator') {
             this.loadOCInfo();
             this.analysisService.loadAndPollActiveTasks(async () => {
                 await this.loadOCInfo();

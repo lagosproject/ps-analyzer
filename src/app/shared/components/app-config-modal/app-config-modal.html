@@ -12,9 +12,9 @@
                         <span class="material-symbols-outlined">settings</span>
                         <span>General</span>
                     </button>
-                    <button class="menu-item" [class.active]="activeTab() === 'OpenCRAVAT'" (click)="setActiveTab('OpenCRAVAT')" role="tab" [attr.aria-selected]="activeTab() === 'OpenCRAVAT'">
+                    <button class="menu-item" [class.active]="activeTab() === 'Local Annotator'" (click)="setActiveTab('Local Annotator')" role="tab" [attr.aria-selected]="activeTab() === 'Local Annotator'">
                         <span class="material-symbols-outlined">analytics</span>
-                        <span>OpenCRAVAT</span>
+                        <span>Local Annotator</span>
                     </button>
                 </nav>
             </aside>
@@ -87,14 +87,14 @@
                         </div>
                     }
 
-                    <!-- OPENCRAVAT TAB -->
-                    @if (activeTab() === 'OpenCRAVAT') {
+                    <!-- LOCAL ANNOTATOR TAB -->
+                    @if (activeTab() === 'Local Annotator') {
                         @if (isLoading() && !ocStatus()) {
                             <div class="oc-loading-container">
                                 <svg class="spinner" viewBox="0 0 24 24">
                                     <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="3"></circle>
                                 </svg>
-                                <p>Loading OpenCRAVAT status...</p>
+                                <p>Loading Local Annotator status...</p>
                             </div>
                         } @else {
                             @if (ocStatus()?.installed) {
@@ -161,7 +161,7 @@
                                             Installed ({{ installedModules().length }})
                                         </button>
                                         <button class="subtab-btn" [class.active]="ocTab() === 'store'" (click)="setOCTab('store')" role="tab" [attr.aria-selected]="ocTab() === 'store'">
-                                            CRAVAT Store
+                                            Module Store
                                         </button>
                                     </div>
                                     <div class="oc-search">
@@ -255,15 +255,15 @@
                                     }
                                 </div>
                             } @else {
-                                <!-- OpenCRAVAT Not Installed Error View -->
+                                <!-- Local Annotator Not Installed Error View -->
                                 <div class="oc-error-card">
                                     <span class="material-symbols-outlined error-icon">warning</span>
-                                    <h4>OpenCRAVAT Engine Not Found</h4>
-                                    <p class="error-msg">{{ ocStatus()?.error || 'The OpenCRAVAT CLI utility "oc" is not installed or could not be found in the server PATH.' }}</p>
+                                    <h4>Local Annotator Engine Not Found</h4>
+                                    <p class="error-msg">{{ ocStatus()?.error || 'The Local Annotator CLI utility is not installed or could not be found in the server PATH.' }}</p>
                                     
                                     <div class="install-instructions mt-4">
                                         <h5>Installation Guide</h5>
-                                        <p>To enable local variant annotations, install OpenCRAVAT in your python environment:</p>
+                                        <p>To enable local variant annotations, install the local annotator package in your python environment:</p>
                                         <pre><code>pip install open-cravat
 oc module install-base</code></pre>
                                         <p class="mt-2 text-muted">Make sure to reload the dashboard settings once installation is complete.</p>
