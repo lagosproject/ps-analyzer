@@ -158,7 +158,7 @@
                                 <div class="oc-toolbar mt-4">
                                     <div class="oc-subtabs">
                                         <button class="subtab-btn" [class.active]="ocTab() === 'installed'" (click)="setOCTab('installed')" role="tab" [attr.aria-selected]="ocTab() === 'installed'">
-                                            Installed ({{ installedModules().length }})
+                                            Installed ({{ nonDefaultInstalledModules().length }})
                                         </button>
                                         <button class="subtab-btn" [class.active]="ocTab() === 'store'" (click)="setOCTab('store')" role="tab" [attr.aria-selected]="ocTab() === 'store'">
                                             Module Store

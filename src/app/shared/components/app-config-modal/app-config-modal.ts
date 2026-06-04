@@ -7,6 +7,22 @@ import { AnalysisService } from '../../../core/services/analysis.service';
 import { OCStatus, OCModule, OCInstallTask } from '../../../core/models/analysis.model';
 
 
+const DEFAULT_MODULES = new Set([
+    'base',
+    'cravat-converter',
+    'excelreporter',
+    'textreporter',
+    'vcf-converter',
+    'pi-converter',
+    'trio-converter',
+    'webviewer',
+    'webviewerwidget',
+    'template-reporter',
+    'tags',
+    'crm',
+    'oldcravat-converter'
+]);
+
 @Component({
     selector: 'app-config-modal',
     standalone: true,
@@ -39,10 +55,19 @@ export class AppConfigModalComponent implements OnInit {
         );
     });
 
+    // Helper computed properties to filter out core/default-installed modules
+    nonDefaultInstalledModules = computed(() => {
+        return this.installedModules().filter(m => !DEFAULT_MODULES.has(m.name.toLowerCase()));
+    });
+
+    nonDefaultStoreModules = computed(() => {
+        return this.storeModules().filter(m => !DEFAULT_MODULES.has(m.name.toLowerCase()));
+    });
+
     // Filtered lists based on search query
     filteredInstalledModules = computed(() => {
         const query = this.ocSearchQuery().toLowerCase().trim();
-        const modules = this.installedModules();
+        const modules = this.nonDefaultInstalledModules();
         if (!query) return modules;
         return modules.filter(m => 
             m.name.toLowerCase().includes(query) || 
@@ -53,7 +78,7 @@ export class AppConfigModalComponent implements OnInit {
 
     filteredStoreModules = computed(() => {
         const query = this.ocSearchQuery().toLowerCase().trim();
-        const modules = this.storeModules();
+        const modules = this.nonDefaultStoreModules();
         if (!query) return modules;
         return modules.filter(m => 
             m.name.toLowerCase().includes(query) || 
