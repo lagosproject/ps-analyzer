@@ -39,4 +39,14 @@ export class SettingsService {
         }
         return {};
     }
+
+    async getBioEngineVersion(): Promise<string> {
+        try {
+            const res = await firstValueFrom(this.http.get<{ version: string }>(`${API_CONFIG.baseUrl}/version`));
+            return res.version;
+        } catch (e) {
+            console.error('Failed to get bio-engine version', e);
+            return 'Unknown (Offline/Unreachable)';
+        }
+    }
 }

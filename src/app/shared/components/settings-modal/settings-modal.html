@@ -64,6 +64,20 @@
                             <label>Max Indel size</label>
                             <input type="number" [(ngModel)]="tracyConfig().maxindel" [disabled]="readOnly()">
                         </div>
+
+                        <!-- System Info Section -->
+                        <div class="divider-small"></div>
+                        <div class="system-info-section">
+                            <h4 class="section-title">System Info</h4>
+                            <div class="version-row">
+                                <span class="version-label">Frontend Version</span>
+                                <span class="version-badge">{{ frontendVersion }}</span>
+                            </div>
+                            <div class="version-row">
+                                <span class="version-label">Bio-Engine Version</span>
+                                <span class="version-badge highlight">{{ bioEngineVersion() }}</span>
+                            </div>
+                        </div>
                     </div>
                     }
 
@@ -166,27 +180,17 @@
                             <label class="form-label">VEP Execution Mode</label>
                             <select [(ngModel)]="hgvsConfig().vep_mode" class="select-input" [disabled]="readOnly()">
                                 <option value="online">Online REST API (Default)</option>
-                                <option value="local">Local Installation</option>
-                                <option value="docker">Docker Container</option>
+                                <option value="opencravat">Local OpenCRAVAT</option>
                             </select>
                         </div>
 
-                        @if (hgvsConfig().vep_mode === 'local' || hgvsConfig().vep_mode === 'docker') {
+                        @if (hgvsConfig().vep_mode === 'opencravat') {
                         <div class="form-group">
-                            <label class="form-label">
-                                {{ hgvsConfig().vep_mode === 'local' ? 'VEP Executable Path' : 'Docker Image Name' }}
-                            </label>
-                            <input type="text" [(ngModel)]="hgvsConfig().vep_path" 
-                                [placeholder]="hgvsConfig().vep_mode === 'local' ? 'e.g. /usr/local/bin/vep' : 'e.g. ensemblorg/ensembl-vep'"
+                            <label class="form-label">OpenCRAVAT Executable Path (Optional)</label>
+                            <input type="text" [(ngModel)]="hgvsConfig().vep_path"
+                                placeholder="e.g. oc"
                                 [disabled]="readOnly()">
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">VEP Data/Cache Directory (Optional)</label>
-                            <input type="text" [(ngModel)]="hgvsConfig().vep_data" 
-                                placeholder="e.g. /home/user/.vep"
-                                [disabled]="readOnly()">
-                            <span class="help-text">Path to folder containing VEP caches and plugins.</span>
+                            <span class="help-text">Executable name or absolute path if not in system PATH.</span>
                         </div>
                         }
 

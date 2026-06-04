@@ -76,6 +76,50 @@
 
 .nav-actions {
     margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* Installing Banner Pill (Header Notification) */
+.installing-banner-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, rgba(13, 148, 136, 0.1), rgba(15, 118, 110, 0.15));
+    border: 1px solid rgba(13, 148, 136, 0.3);
+    border-radius: 20px;
+    padding: 6px 14px;
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 6px rgba(13, 148, 136, 0.05);
+    user-select: none;
+}
+
+.installing-banner-pill:hover {
+    background: linear-gradient(135deg, rgba(13, 148, 136, 0.15), rgba(15, 118, 110, 0.25));
+    border-color: var(--primary);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(13, 148, 136, 0.15);
+}
+
+.spinner-mini {
+    width: 14px;
+    height: 14px;
+    animation: rotate 2s linear infinite;
+    color: var(--primary);
+    flex-shrink: 0;
+}
+
+.spinner-mini circle {
+    stroke: currentColor;
+    stroke-dasharray: 60;
+    stroke-dashoffset: 0;
+    transform-origin: center;
+    animation: dash 1.5s ease-in-out infinite;
 }
 
 .dashboard-body {

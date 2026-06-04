@@ -200,8 +200,8 @@ export interface HGVSConfig {
   auto_hgvs?: boolean;
   /** Whether to automatically fetch VEP annotations */
   auto_vep?: boolean;
-  /** VEP execution mode (online, local, docker) */
-  vep_mode?: 'online' | 'local' | 'docker';
+  /** VEP execution mode (online, opencravat) */
+  vep_mode?: 'online' | 'opencravat';
   /** Path to VEP executable or docker image */
   vep_path?: string;
   /** Path to VEP cache/data directory */
@@ -343,4 +343,38 @@ export interface HotspotPoint {
   start: number;
   stop: number;
   count: number;
+}
+
+/**
+ * OpenCRAVAT status information
+ */
+export interface OCStatus {
+  installed: boolean;
+  version?: string;
+  data_dir?: string;
+  disk_used_bytes?: number;
+  disk_free_bytes?: number;
+  error?: string;
+}
+
+/**
+ * OpenCRAVAT module metadata
+ */
+export interface OCModule {
+  name: string;
+  version?: string;
+  type?: string;
+  size_bytes?: number;
+  installed?: boolean;
+  title?: string;
+}
+
+/**
+ * OpenCRAVAT module install/uninstall task status
+ */
+export interface OCInstallTask {
+  task_id: string;
+  module: string;
+  status: string; // 'pending' | 'running' | 'completed' | 'failed'
+  error?: string;
 }

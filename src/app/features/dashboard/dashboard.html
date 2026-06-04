@@ -16,6 +16,14 @@
     </nav>
 
     <div class="nav-actions">
+        @if (installingModulesCount() > 0) {
+            <div class="installing-banner-pill" (click)="openAppConfigToTab('OpenCRAVAT')" title="Click to view active installations">
+                <svg class="spinner-mini" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="3"></circle>
+                </svg>
+                <span>Installing {{ installingModulesCount() }} module(s)...</span>
+            </div>
+        }
         <button class="btn-icon-small" (click)="openAppConfig()" title="App Settings">
             <span class="material-symbols-outlined">settings</span>
         </button>
@@ -283,7 +291,7 @@
 
     <!-- App Config Modal -->
     @if (showAppConfig()) {
-    <app-config-modal [(isVisible)]="showAppConfig"></app-config-modal>
+    <app-config-modal [(isVisible)]="showAppConfig" [(activeTab)]="configModalTab"></app-config-modal>
     }
 
     <!-- Read Settings Modal -->

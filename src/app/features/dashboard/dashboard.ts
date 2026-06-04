@@ -113,6 +113,8 @@ export class DashboardComponent implements OnInit {
 
     /** UI state for showing/hiding app config modal */
     readonly showAppConfig = signal<boolean>(false);
+    readonly configModalTab = signal<string>('General');
+    readonly installingModulesCount = this.analysisService.installingModulesCount;
 
     tracyConfig = signal<TracyConfig>({
         pratio: 0.33,
@@ -669,6 +671,15 @@ export class DashboardComponent implements OnInit {
      * Opens the app config modal.
      */
     openAppConfig() {
+        this.configModalTab.set('General');
+        this.showAppConfig.set(true);
+    }
+
+    /**
+     * Opens the app config modal to a specific tab.
+     */
+    openAppConfigToTab(tab: string) {
+        this.configModalTab.set(tab);
         this.showAppConfig.set(true);
     }
 

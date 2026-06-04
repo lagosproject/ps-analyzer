@@ -1,4 +1,4 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { API_CONFIG } from '../config/api.config';
@@ -16,7 +16,10 @@ import {
   JobPatient,
   JobRead,
   ApproveVariantRequest,
-  HotspotPoint
+  HotspotPoint,
+  OCStatus,
+  OCModule,
+  OCInstallTask
 } from '../models/analysis.model';
 
 // Re-export types for backward compatibility with isolatedModules support
@@ -34,7 +37,10 @@ export type {
   JobPatient,
   JobRead,
   ApproveVariantRequest,
-  HotspotPoint
+  HotspotPoint,
+  OCStatus,
+  OCModule,
+  OCInstallTask
 };
 
 @Injectable({
@@ -50,7 +56,79 @@ export class AnalysisService {
   /** Signal indicating if the backend server is reachable */
   readonly serverReady = this.serverReadySignal.asReadonly();
 
-  constructor() { }
+  // OpenCRAVAT active tasks signals
+  readonly activeTasks = signal<Record<string, OCInstallTask>>({});
+  
+  readonly installingModulesCount = computed(() => {
+    return Object.values(this.activeTasks()).filter(
+      task => task.status === 'pending' || task.status === 'running'
+    ).length;
+  });
+
+  private activePollers = new Set<string>();
+
+  constructor() {
+    this.waitForServer().then(ready => {
+      if (ready) {
+        this.loadAndPollActiveTasks();
+      }
+    });
+  }
+
+  /**
+   * Starts polling progress for a specific task.
+   */
+  pollTask(taskId: string, onStatusChange?: () => void) {
+    if (this.activePollers.has(taskId)) return;
+    this.activePollers.add(taskId);
+
+    const interval = setInterval(async () => {
+      try {
+        const task = await this.getOCTask(taskId);
+        this.activeTasks.update(tasks => ({
+          ...tasks,
+          [taskId]: task
+        }));
+
+        if (onStatusChange) {
+          onStatusChange();
+        }
+
+        if (task.status === 'completed' || task.status === 'failed') {
+          clearInterval(interval);
+          this.activePollers.delete(taskId);
+        }
+      } catch (e) {
+        console.error("Error polling task in service:", e);
+        clearInterval(interval);
+        this.activePollers.delete(taskId);
+      }
+    }, 2000);
+  }
+
+  /**
+   * Initializes polling for any running tasks on the backend.
+   */
+  async loadAndPollActiveTasks(onStatusChange?: () => void) {
+    try {
+      const status = await this.getOCStatus();
+      if (!status.installed) return;
+
+      const tasks = await this.getOCTasks();
+      const taskRecord = { ...this.activeTasks() };
+      
+      tasks.forEach(task => {
+        taskRecord[task.task_id] = task;
+        if (task.status === 'pending' || task.status === 'running') {
+          this.pollTask(task.task_id, onStatusChange);
+        }
+      });
+      
+      this.activeTasks.set(taskRecord);
+    } catch (e) {
+      console.error("Failed to load and poll active OpenCRAVAT tasks:", e);
+    }
+  }
 
   /**
    * Unified error handler that converts API errors to AnalysisError format.
@@ -126,7 +204,7 @@ export class AnalysisService {
     try {
       const formData = new FormData();
       formData.append('file', file);
-      
+
       const res = await firstValueFrom(
         this.http.post<{ path: string }>(`${this.apiUrl}/upload`, formData)
       );
@@ -594,6 +672,97 @@ export class AnalysisService {
     try {
       return await firstValueFrom(
         this.http.post<any>(`${this.apiUrl}/cache/flush`, {})
+      );
+    } catch (error: any) {
+      throw this.handleApiError(error);
+    }
+  }
+
+  /**
+   * Gets the OpenCRAVAT status from the sidecar.
+   */
+  async getOCStatus(): Promise<OCStatus> {
+    try {
+      return await firstValueFrom(
+        this.http.get<OCStatus>(`${this.apiUrl}/opencravat/status`)
+      );
+    } catch (error: any) {
+      throw this.handleApiError(error);
+    }
+  }
+
+  /**
+   * Gets the list of installed OpenCRAVAT modules.
+   */
+  async getOCModules(): Promise<OCModule[]> {
+    try {
+      return await firstValueFrom(
+        this.http.get<OCModule[]>(`${this.apiUrl}/opencravat/modules`)
+      );
+    } catch (error: any) {
+      throw this.handleApiError(error);
+    }
+  }
+
+  /**
+   * Gets the list of all OpenCRAVAT modules available in the store.
+   */
+  async getOCStoreModules(): Promise<OCModule[]> {
+    try {
+      return await firstValueFrom(
+        this.http.get<OCModule[]>(`${this.apiUrl}/opencravat/modules/store`)
+      );
+    } catch (error: any) {
+      throw this.handleApiError(error);
+    }
+  }
+
+  /**
+   * Installs an OpenCRAVAT module in the background.
+   */
+  async installOCModule(moduleName: string): Promise<OCInstallTask> {
+    try {
+      return await firstValueFrom(
+        this.http.post<OCInstallTask>(`${this.apiUrl}/opencravat/modules/${moduleName}/install`, {})
+      );
+    } catch (error: any) {
+      throw this.handleApiError(error);
+    }
+  }
+
+  /**
+   * Polls the status of an OpenCRAVAT installation task.
+   */
+  async getOCTask(taskId: string): Promise<OCInstallTask> {
+    try {
+      return await firstValueFrom(
+        this.http.get<OCInstallTask>(`${this.apiUrl}/opencravat/tasks/${taskId}`)
+      );
+    } catch (error: any) {
+      throw this.handleApiError(error);
+    }
+  }
+
+  /**
+   * Gets all active and historic OpenCRAVAT module installation tasks.
+   */
+  async getOCTasks(): Promise<OCInstallTask[]> {
+    try {
+      return await firstValueFrom(
+        this.http.get<OCInstallTask[]>(`${this.apiUrl}/opencravat/tasks`)
+      );
+    } catch (error: any) {
+      throw this.handleApiError(error);
+    }
+  }
+
+  /**
+   * Uninstalls an OpenCRAVAT module.
+   */
+  async uninstallOCModule(moduleName: string): Promise<any> {
+    try {
+      return await firstValueFrom(
+        this.http.delete<any>(`${this.apiUrl}/opencravat/modules/${moduleName}`)
       );
     } catch (error: any) {
       throw this.handleApiError(error);
