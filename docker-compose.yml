@@ -16,6 +16,8 @@ services:
 
   redis:
     image: mirror.gcr.io/library/redis:alpine
+    volumes:
+      - ./storage/redis:/data
     restart: always
 
   frontend:
