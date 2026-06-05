@@ -1,8 +1,7 @@
-import { Component, ChangeDetectionStrategy, signal, model, input, output, computed, inject, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, model, input, output, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TracyConfig, HGVSConfig } from '../../../core/models/analysis.model';
-import { SettingsService } from '../../../core/services/settings.service';
 
 @Component({
     selector: 'app-settings-modal',
@@ -12,11 +11,8 @@ import { SettingsService } from '../../../core/services/settings.service';
     styleUrl: './settings-modal.css',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SettingsModalComponent implements OnInit {
-    private readonly settingsService = inject(SettingsService);
+export class SettingsModalComponent {
 
-    frontendVersion = '0.2.0';
-    bioEngineVersion = signal<string>('Loading...');
     /** Controls the visibility of the modal. */
     isVisible = model<boolean>(false);
 
@@ -46,12 +42,6 @@ export class SettingsModalComponent implements OnInit {
         const config = this.hgvsConfig();
         return !!config.transcript && config.transcript.length > 0;
     });
-
-    ngOnInit() {
-        this.settingsService.getBioEngineVersion().then(v => {
-            this.bioEngineVersion.set(v);
-        });
-    }
 
     /**
      * Updates the active tab.

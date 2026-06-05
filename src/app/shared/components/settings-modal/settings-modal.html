@@ -65,19 +65,6 @@
                             <input type="number" [(ngModel)]="tracyConfig().maxindel" [disabled]="readOnly()">
                         </div>
 
-                        <!-- System Info Section -->
-                        <div class="divider-small"></div>
-                        <div class="system-info-section">
-                            <h4 class="section-title">System Info</h4>
-                            <div class="version-row">
-                                <span class="version-label">Frontend Version</span>
-                                <span class="version-badge">{{ frontendVersion }}</span>
-                            </div>
-                            <div class="version-row">
-                                <span class="version-label">Bio-Engine Version</span>
-                                <span class="version-badge highlight">{{ bioEngineVersion() }}</span>
-                            </div>
-                        </div>
                     </div>
                     }
 
@@ -165,7 +152,7 @@
 
                         <div class="settings-row">
                             <div class="setting-info">
-                                <label>Enable VEP Annotation (Beta)</label>
+                                <label>Annotation</label>
                                 <span class="help-text">Annotates variants with impact and consequence.</span>
                             </div>
                             <label class="switch">
@@ -176,12 +163,22 @@
                         </div>
 
                         @if (hgvsConfig().auto_vep) {
-                        <div class="form-group mt-3">
-                            <label class="form-label">VEP Execution Mode</label>
-                            <select [(ngModel)]="hgvsConfig().vep_mode" class="select-input" [disabled]="readOnly()">
-                                <option value="online">Online REST API (Default)</option>
-                                <option value="opencravat">Local Annotator</option>
-                            </select>
+                        <div class="settings-row mt-3">
+                            <div class="setting-info">
+                                <label>Annotation Mode</label>
+                                <span class="help-text">Select execution environment.</span>
+                            </div>
+                            <div class="mode-switch-container">
+                                <span class="mode-label" [class.active]="hgvsConfig().vep_mode === 'online'">Online</span>
+                                <label class="switch">
+                                    <input type="checkbox"
+                                        [checked]="hgvsConfig().vep_mode === 'opencravat'"
+                                        (change)="hgvsConfig().vep_mode = $any($event.target).checked ? 'opencravat' : 'online'"
+                                        [disabled]="readOnly()">
+                                    <span class="slider"></span>
+                                </label>
+                                <span class="mode-label" [class.active]="hgvsConfig().vep_mode === 'opencravat'">Local</span>
+                            </div>
                         </div>
 
                         @if (hgvsConfig().vep_mode === 'opencravat') {

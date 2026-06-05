@@ -431,3 +431,22 @@ input:disabled+.slider {
     color: var(--primary, #0f766e);
     border-color: rgba(15, 118, 110, 0.2);
 }
+
+/* Mode Switch Styles */
+.mode-switch-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.mode-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted, #64748b);
+    transition: color 0.2s ease;
+}
+
+.mode-label.active {
+    color: var(--text-main, #0f172a);
+    font-weight: 600;
+}

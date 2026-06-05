@@ -734,3 +734,46 @@
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
 }
+
+/* Sidebar Footer / System Info Styles */
+.sidebar-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border-color, #e2e8f0);
+    margin-top: auto;
+    background-color: var(--sidebar-bg, #f8fafc);
+}
+
+.system-info-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.version-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+}
+
+.version-label {
+    color: var(--text-muted, #64748b);
+    font-weight: 500;
+}
+
+.version-badge {
+    background-color: var(--bg-light, #f1f5f9);
+    color: var(--text-main, #0f172a);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 11px;
+    font-weight: 600;
+    border: 1px solid var(--border-color, #e2e8f0);
+}
+
+.version-badge.highlight {
+    background-color: rgba(15, 118, 110, 0.08);
+    color: var(--primary, #0f766e);
+    border-color: rgba(15, 118, 110, 0.2);
+}

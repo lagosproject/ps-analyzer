@@ -87,12 +87,18 @@ export class AppConfigModalComponent implements OnInit {
         );
     });
 
+    frontendVersion = '0.2.0';
+    bioEngineVersion = signal<string>('Loading...');
+
     /** Controls the visibility of the modal. */
     isVisible = model<boolean>(false);
 
     ngOnInit() {
         this.proxyConfig = this.settingsService.getProxyConfig();
         this.userName.set(this.userService.getUserName() || '');
+        this.settingsService.getBioEngineVersion().then(v => {
+            this.bioEngineVersion.set(v);
+        });
     }
 
     setActiveTab(tab: string) {
