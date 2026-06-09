@@ -233,6 +233,10 @@
                                 <div class="vep-tooltip-header">VEP Annotations</div>
                                 <div class="vep-info-grid">
                                     <div class="vep-info-item">
+                                        <span class="vep-info-label">Consequence:</span>
+                                        <span class="vep-info-value">{{ getConsequenceDisplayName(v['consequence']) }}</span>
+                                    </div>
+                                    <div class="vep-info-item">
                                         <span class="vep-info-label">Gene:</span>
                                         <span class="vep-info-value">{{ v['gene_symbol'] || 'N/A' }}</span>
                                     </div>

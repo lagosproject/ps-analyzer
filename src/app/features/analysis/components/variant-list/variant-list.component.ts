@@ -693,4 +693,38 @@ export class VariantListComponent {
     getVariantStatus(v: Variant): VariantStatus {
         return this.variantStatuses()[this.getCommentKey(v)] || 'none';
     }
+
+    /** Map of OpenCRAVAT/VEP Sequence Ontology terms to full descriptive names */
+    readonly consequenceMap: Record<string, string> = {
+        'MIS': 'Missense',
+        'SYN': 'Synonymous',
+        'INT': 'Intronic',
+        'IND': 'Indel',
+        'DEL': 'Deletion',
+        'INS': 'Insertion',
+        'CSH': 'Complex Substitution',
+        'FSD': 'Frameshift Deletion',
+        'FSI': 'Frameshift Insertion',
+        'CSS': 'Canonical Splice Site',
+        'SPL': 'Splice Site Region',
+        'STG': 'Stop Gain',
+        'STL': 'Stop Loss',
+        'UNG': 'Unknown',
+        '2KU': '2kb Upstream',
+        '2KD': '2kb Downstream',
+        'UT3': "3' UTR",
+        'UT5': "5' UTR",
+        'NMD': 'Nonsense Mediated Decay'
+    };
+
+    /** Formats a consequence abbreviation into a descriptive name alongside the code */
+    getConsequenceDisplayName(consequence: string | undefined | null): string {
+        if (!consequence) return 'N/A';
+        const clean = consequence.trim().toUpperCase();
+        const mapped = this.consequenceMap[clean];
+        if (mapped && mapped.toUpperCase() !== clean) {
+            return `${mapped} (${consequence})`;
+        }
+        return consequence;
+    }
 }

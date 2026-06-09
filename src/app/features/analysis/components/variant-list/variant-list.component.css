@@ -189,6 +189,7 @@
 }
 
 .variant-card {
+    position: relative;
     padding: 1rem;
     border-bottom: 1px solid var(--border-muted);
     border-left: 4px solid transparent;
@@ -562,7 +563,6 @@
 
 /* HGVS Tooltip Styles */
 .variant-name-container {
-    position: relative;
     display: flex;
     align-items: center;
     flex: 1;
@@ -642,17 +642,15 @@
 .hgvs-tooltip {
     display: none;
     position: absolute;
-    top: 100%;
-    left: 0;
+    top: calc(100% - 6px);
+    left: 8px;
+    right: 8px;
     z-index: 100;
     background: white;
     border: 1px solid var(--border-muted);
     border-radius: 8px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    min-width: 250px;
-    max-width: 400px;
     padding: 12px;
-    margin-top: 8px;
 }
 
 .variant-name-container:hover .hgvs-tooltip {
@@ -801,7 +799,6 @@
 
 /* VEP Styles */
 .consequence-pill-container {
-    position: relative;
     display: inline-flex;
     align-items: center;
 }
@@ -831,14 +828,14 @@
 .vep-tooltip {
     display: none;
     position: absolute;
-    top: calc(100% + 8px);
-    right: 0;
+    top: calc(100% - 6px);
+    left: 8px;
+    right: 8px;
     z-index: 100;
     background: white;
     border: 1px solid var(--border-muted);
     border-radius: 8px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    min-width: 220px;
     padding: 12px;
 }
 
