@@ -6,6 +6,14 @@
 
 PS Analyzer is a modern Sanger sequence analysis tool designed for clinical and research use. It provides a comprehensive suite of features for variant detection, visualization, and report generation, built with performance and security in mind using Angular and Tauri.
 
+## Features at a Glance
+
+PS Analyzer guides you through a seamless, automated end-to-end clinical workflow:
+1. **Upload Trace (.ab1)**: Import your Sanger chromatogram file directly.
+2. **Align to Reference**: Automatically align the trace to a reference FASTA template sequence.
+3. **Detect Variants**: Call single nucleotide variants (SNVs) and insertions/deletions (indels) with high-confidence quality filtering.
+4. **Generate Report**: Review findings and export a clinical-grade PDF or HTML report with fully annotated variants.
+
 ## Features
 
 - **High-Performance Visualization**: Smooth, zoomed, and interactive Sanger trace dashboards.
@@ -50,6 +58,28 @@ This script will:
 2.  Build the `bio-engine` sidecar.
 3.  Start the Tauri development server and Angular frontend.
 
+## Quick Start
+
+Get started quickly using our pre-packaged public sample data:
+
+1. **Prerequisites**: Ensure you have Node.js (v20+), Rust, and Conda installed.
+2. **Clone & Setup**:
+   ```bash
+   git clone https://github.com/lagosproject/ps-analyzer.git
+   cd ps-analyzer
+   npm install
+   ```
+3. **Run the App**:
+   ```bash
+   ./debug/build_run.sh
+   ```
+4. **Run a Demo Analysis**:
+   - Once the application window opens, click **New Project**.
+   - For **Sanger Trace file**, choose: `sample-data/sample1_3100.ab1`
+   - For **Reference sequence**, choose: `sample-data/sample1_3100.fasta`
+   - Click **Run Alignment & Variant Calling**.
+   - Inspect the aligned chromatogram trace, verify detected variants, and generate your clinical report!
+
 ### Linting
 
 To run the linter and check for code quality issues:
@@ -86,6 +116,24 @@ A `docker-compose.yml` is provided in the project root to orchestrate both the f
 ## Configuration
 
 The application communicates with a local FastAPI server (part of the bio-engine). The API URL is configurable in `src/app/core/services/analysis.service.ts` or via environment variables in future releases.
+
+## Comparison with Related Tools
+
+PS Analyzer stands out by combining ease of use, local data privacy, and clinical-grade reporting:
+
+| Feature / Capability | **PS Analyzer** | **SnackVar** | **Sequencher** | **TraceTrack** | **sangeranalyseR** |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Deployment Model** | Local-First Desktop (Tauri) / Web | Cloud Web App | Local Desktop App | CLI Tool | R Library |
+| **Data Privacy** | **Private (Local Processing)** | Public/Third-party Cloud | Private (Local) | Private (Local) | Private (Local) |
+| **VEP Integration** | **Yes (Automated)** | No | No | No | No |
+| **Clinical PDF Output** | **Yes (Structured)** | No | No | No | No |
+| **Cost / License** | **Open Source (MIT)** | Open Source | Commercial (High Cost) | Open Source | Open Source |
+| **Target Audience** | Clinicians & Researchers | Researchers | General Biologists | Bioinformaticians | R Developers |
+
+### What Makes PS Analyzer Different?
+- **Local-First & Secure**: Unlike web-only tools (e.g., SnackVar), PS Analyzer runs as a local Tauri desktop application. Sensitive patient genomic data never leaves your local machine, ensuring HIPAA and GDPR compliance.
+- **Automated VEP Annotation**: Seamlessly integrates with the Ensembl Variant Effect Predictor (VEP) to automatically annotate functional consequences and clinical significance (ClinVar, etc.) of detected variants.
+- **Clinical-Grade Reporting**: Generates publication-ready and clinical-diagnostic PDF/HTML reports, complete with quality metrics, mutation markers, and sequence alignments.
 
 ## Contributing
 
