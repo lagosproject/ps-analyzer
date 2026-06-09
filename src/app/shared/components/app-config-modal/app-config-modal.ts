@@ -55,13 +55,17 @@ export class AppConfigModalComponent implements OnInit {
         );
     });
 
-    // Helper computed properties to filter out core/default-installed modules
+    // Helper computed properties to filter out core/default-installed modules and keep only annotators
     nonDefaultInstalledModules = computed(() => {
-        return this.installedModules().filter(m => !DEFAULT_MODULES.has(m.name.toLowerCase()));
+        return this.installedModules().filter(m => 
+            m.type === 'annotator' && !DEFAULT_MODULES.has(m.name.toLowerCase())
+        );
     });
 
     nonDefaultStoreModules = computed(() => {
-        return this.storeModules().filter(m => !DEFAULT_MODULES.has(m.name.toLowerCase()));
+        return this.storeModules().filter(m => 
+            m.type === 'annotator' && !DEFAULT_MODULES.has(m.name.toLowerCase())
+        );
     });
 
     // Filtered lists based on search query
