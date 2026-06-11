@@ -25,6 +25,8 @@ export class VariantDetailsModalComponent {
 
   /** Active OpenCRAVAT module tab for filtering */
   activeCravatTab = signal<string>('All');
+  isClinvarExpanded = signal<boolean>(false);
+  isVepExpanded = signal<boolean>(false);
 
   private toastService = inject(ToastService);
 
@@ -126,19 +128,32 @@ export class VariantDetailsModalComponent {
 
     if (v['oc_data']) {
       const rawData = v['oc_data'] as Record<string, any>;
-      Object.entries(rawData).forEach(([key, val]) => {
-        // Exclude simple columns that are already explicitly mapped in standard UI
-        if (['uid', 'hugo', 'so', 'achange', 'coding', 'impact'].includes(key)) return;
+      const ignoredKeys = new Set([
+        'uid', 'hugo', 'so', 'achange', 'coding', 'impact', 
+        'chrom', 'pos', 'ref_base', 'alt_base', 'transcript', 
+        'exonno', 'gposend', 'type', 'filter', 'qual',
+        'allmappings', 'all_mappings', 'cchange'
+      ]);
 
-        let moduleName = 'General';
+      Object.entries(rawData).forEach(([key, val]) => {
+        let moduleName = 'base';
         let fieldName = key;
 
         if (key.includes('__')) {
           const parts = key.split('__');
           moduleName = parts[0];
           fieldName = parts[1];
+        } else {
+          // Check if there is another key that has a prefix and identical suffix/value
+          const isDuplicate = Object.entries(rawData).some(([otherKey, otherVal]) => {
+            return otherKey.includes('__') && 
+                   otherKey.endsWith('__' + key) && 
+                   otherVal === val;
+          });
+          if (isDuplicate) return;
         }
 
+        if (ignoredKeys.has(key.toLowerCase()) || ignoredKeys.has(fieldName.toLowerCase())) return;
         if (['original_input', 'tagsampler'].includes(moduleName.toLowerCase())) return;
 
         // Format field name nicely (e.g. "sig" -> "Sig", "disease_names" -> "Disease Names")
@@ -460,6 +475,82 @@ export class VariantDetailsModalComponent {
     }
     
     return { label: cleanRef, url };
+  }
+
+  getReviewStarsCount(revStat: any): number {
+    if (!revStat) return 0;
+    const clean = String(revStat).trim().toLowerCase();
+    if (clean.includes('practice guideline')) return 4;
+    if (clean.includes('expert panel')) return 3;
+    if (clean.includes('multiple submitters') || clean.includes('no conflicts')) return 2;
+    if (clean.includes('single submitter') || clean.includes('conflicting interpretations') || clean.includes('criteria provided')) return 1;
+    return 0;
+  }
+
+  getClinvarField(fields: { name: string; value: any }[], name: string): any {
+    return fields.find(f => f.name === name)?.value;
+  }
+
+  getRemainingClinvarFields(fields: { name: string; value: any }[]): { name: string; value: any }[] {
+    const known = new Set(['Id', 'Dbsnp Id', 'Sig', 'Disease Associations Linked', 'Variant Clinical Sources', 'Rev Stat', 'Hgvs']);
+    return fields.filter(f => !known.has(f.name));
+  }
+
+  toggleClinvar() {
+    this.isClinvarExpanded.update(exp => !exp);
+  }
+
+  toggleVep() {
+    this.isVepExpanded.update(exp => !exp);
+  }
+
+  getVepField(fields: { name: string; value: any }[], name: string): any {
+    return fields.find(f => f.name === name)?.value;
+  }
+
+  getRemainingVepFields(fields: { name: string; value: any }[]): { name: string; value: any }[] {
+    const known = new Set(['Gene Symbol', 'Consequence', 'Impact', 'HGVS coding', 'HGVS protein', 'SIFT', 'PolyPhen', 'Clinical Significance', 'Phenotype']);
+    return fields.filter(f => !known.has(f.name));
+  }
+
+  splitVepPhenotypes(val: any): string[] {
+    if (!val) return [];
+    const raw = String(val);
+    const parts: string[] = [];
+    raw.split(/[,|]/).forEach(p => {
+      const trimmed = p.trim();
+      if (trimmed && trimmed !== '.' && trimmed !== '-' && trimmed.toLowerCase() !== 'not provided') {
+        parts.push(trimmed);
+      }
+    });
+    return parts;
+  }
+
+  getVepPhenotypesAndRefs(val: any) {
+    const rawList = this.splitVepPhenotypes(val);
+    const refs: { label: string; url: string; type: string }[] = [];
+    const disorders: string[] = [];
+    
+    rawList.forEach(item => {
+      if (item.toUpperCase().startsWith('PMID:')) {
+        const numeric = item.replace(/PMID:/i, '').trim();
+        refs.push({
+          label: item,
+          url: `https://pubmed.ncbi.nlm.nih.gov/${numeric}/`,
+          type: 'pmid'
+        });
+      } else if (item.toLowerCase().startsWith('rs')) {
+        refs.push({
+          label: item,
+          url: `https://www.ncbi.nlm.nih.gov/snp/${item.trim()}`,
+          type: 'dbsnp'
+        });
+      } else {
+        disorders.push(item);
+      }
+    });
+    
+    return { disorders, refs };
   }
 
   close() {

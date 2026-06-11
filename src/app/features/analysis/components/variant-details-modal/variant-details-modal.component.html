@@ -28,10 +28,32 @@
       <!-- Section 1: Variant Coordinates & Nomenclatures -->
       <div class="details-card primary-card">
         <div class="card-header-row">
-          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-            <div class="variant-hgvs-badge" (click)="copyText(getVariantName())" title="Click to copy principal HGVS" style="margin: 0;">
-              <span class="hgvs-text">{{ getVariantName() }}</span>
-              <span class="material-symbols-outlined copy-icon">content_copy</span>
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; position: relative;">
+            <div class="variant-name-container" [class.has-hgvs-interaction]="getAlternateNames().length > 0">
+              <div class="variant-hgvs-badge" (click)="copyText(getVariantName())" title="Click to copy principal HGVS" style="margin: 0;">
+                <span class="hgvs-text">{{ getVariantName() }}</span>
+                <span class="material-symbols-outlined copy-icon">content_copy</span>
+              </div>
+              
+              @if (getAlternateNames().length > 0) {
+              <span class="alt-badge">+{{ getAlternateNames().length }}</span>
+              <div class="hgvs-tooltip">
+                <div class="hgvs-tooltip-header">
+                  <span>Equivalent Transcripts</span>
+                  <button class="copy-all-btn" (click)="copyText(getAlternateNames().concat(getVariantName()).join('\n'))" title="Copy all" aria-label="Copy all HGVS variants">
+                    <span class="material-symbols-outlined" aria-hidden="true">content_copy</span>
+                  </button>
+                </div>
+                <div class="hgvs-list">
+                  @for (altName of getAlternateNames(); track altName) {
+                  <div class="hgvs-item" (click)="copyText(altName)">
+                    <span>{{ altName }}</span>
+                    <span class="material-symbols-outlined mini-copy">content_copy</span>
+                  </div>
+                  }
+                </div>
+              </div>
+              }
             </div>
             @if (variant()!['gene_symbol']) {
             <span class="header-gene" title="Gene Symbol" style="font-size: 0.85rem; padding: 4px 10px; border-radius: 6px; margin: 0;">{{ variant()!['gene_symbol'] }}</span>
@@ -42,20 +64,6 @@
             <span class="allele-change">{{ variant()!.ref }} <span class="arrow">&rarr;</span> {{ variant()!.alt }}</span>
           </div>
         </div>
-
-        @if (getAlternateNames().length > 0) {
-        <div class="alt-names-section">
-          <span class="section-label">Equivalent Transcripts:</span>
-          <div class="alt-names-list">
-            @for (altName of getAlternateNames(); track altName) {
-            <span class="alt-name-pill" (click)="copyText(altName)" title="Click to copy equivalent transcript HGVS">
-              {{ altName }}
-              <span class="material-symbols-outlined tiny-copy">content_copy</span>
-            </span>
-            }
-          </div>
-        </div>
-        }
 
         <div class="metadata-grid">
           <div class="meta-item">
@@ -126,124 +134,418 @@
         
         <div class="cravat-grid">
           @for (grp of filteredCravatGroups(); track grp.module) {
-          <div class="cravat-card">
-            <div class="cravat-card-title">{{ grp.module }}</div>
-            <div class="cravat-card-body">
-              @for (field of grp.fields; track field.name) {
-              <div class="cravat-field" [class.full-width]="field.name === 'SIFT' || field.name === 'PolyPhen' || field.name === 'Clinical Significance' || field.name === 'Phenotype' || (grp.module === 'ClinVar' && (field.name === 'Sig' || field.name === 'Disease Names' || field.name === 'Variant Clinical Sources')) || isLongValue(field.name) || isLongValue(field.value)">
-                @if (field.name === 'SIFT' || field.name === 'PolyPhen') {
-                  <div class="score-label-group">
-                    <span class="score-name">{{ field.name }}</span>
-                    <span class="score-desc">
-                      {{ field.name === 'SIFT' ? 'Sorting Intolerant From Tolerant' : 'Polymorphism Phenotyping v2' }}
-                    </span>
+            @if (grp.module === 'ClinVar') {
+              <div class="cravat-card clinvar-custom-card">
+                <div class="cravat-card-title clinvar-custom-title" (click)="toggleClinvar()" style="cursor: pointer;" title="Click to collapse/expand details">
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="material-symbols-outlined clinvar-title-icon">medical_information</span>
+                    <span>ClinVar Clinical Annotation</span>
                   </div>
-                  <span class="score-val" [class.damaging]="field.value?.toLowerCase()?.includes('damage')">{{ field.value }}</span>
-                } @else if (grp.module === 'VEP' && field.name === 'Consequence') {
-                  <span class="field-label" [title]="field.name">{{ field.name }}</span>
-                  <span class="consequence-pill">{{ formatConsequence(field.value) }}</span>
-                } @else if (grp.module === 'VEP' && field.name === 'Impact') {
-                  <span class="field-label" [title]="field.name">{{ field.name }}</span>
-                  <span class="impact-badge" [attr.data-impact]="field.value">{{ field.value }}</span>
-                } @else if (grp.module === 'VEP' && field.name === 'Clinical Significance') {
-                  <span class="field-label" [title]="field.name">{{ field.name }}</span>
-                  <div class="clin-sig-pills">
-                    @for (sig of splitCommaString(field.value); track sig) {
-                      <span class="clin-sig-badge" [attr.data-sig]="sig.toLowerCase()">{{ sig }}</span>
-                    }
-                  </div>
-                } @else if (grp.module === 'VEP' && field.name === 'Phenotype') {
-                  <span class="field-label" [title]="field.name">{{ field.name }}</span>
-                  <div class="phenotype-pills">
-                    @for (pheno of splitCommaString(field.value); track pheno) {
-                      @if (pheno.startsWith('PMID:')) {
-                        <span class="pheno-pill pmid" (click)="openPubmed(pheno)" title="Click to open PubMed article">
-                          {{ pheno }}
-                          <span class="material-symbols-outlined tiny-icon">launch</span>
-                        </span>
-                      } @else if (pheno.toLowerCase().startsWith('rs')) {
-                        <span class="pheno-pill pmid" (click)="openDbsnp(pheno)" title="Click to open dbSNP details">
-                          {{ pheno }}
-                          <span class="material-symbols-outlined tiny-icon">launch</span>
-                        </span>
-                      } @else {
-                        <span class="pheno-pill">{{ pheno }}</span>
-                      }
-                    }
-                  </div>
-                } @else if (grp.module === 'ClinVar' && field.name === 'Id') {
-                  <span class="field-label" [title]="field.name">ClinVar Variation ID</span>
-                  <span class="pheno-pill pmid" (click)="openClinvar(field.value)" title="Click to view variation in NCBI ClinVar">
-                    {{ field.value }}
-                    <span class="material-symbols-outlined tiny-icon">launch</span>
+                  <span class="material-symbols-outlined toggle-chevron">
+                    {{ (activeCravatTab() === 'ClinVar' || isClinvarExpanded()) ? 'expand_less' : 'expand_more' }}
                   </span>
-                } @else if (grp.module === 'ClinVar' && field.name === 'Dbsnp Id') {
-                  <span class="field-label" [title]="field.name">dbSNP rsID</span>
-                  <span class="pheno-pill pmid" (click)="openDbsnpId(field.value)" title="Click to view SNP details">
-                    rs{{ field.value }}
-                    <span class="material-symbols-outlined tiny-icon">launch</span>
-                  </span>
-                } @else if (grp.module === 'ClinVar' && field.name === 'Sig') {
-                  <span class="field-label" [title]="field.name">Clinical Significance</span>
-                  <div class="clin-sig-pills">
-                    @for (sig of splitPipeString(field.value); track sig) {
-                      <span class="clin-sig-badge" [attr.data-sig]="sig.toLowerCase()">{{ sig }}</span>
-                    }
-                  </div>
-                } @else if (grp.module === 'ClinVar' && field.name === 'Disease Associations Linked') {
-                  <span class="field-label" [title]="field.name">Disease Associations & References</span>
-                  <div class="clinvar-diseases-container" style="display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: 6px;">
-                    @for (item of field.value; track item.name) {
-                      <div class="clinvar-disease-row" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 6px 0; border-bottom: 1px dashed rgba(0,0,0,0.05); gap: 12px;">
-                        <span class="pheno-pill" style="text-align: left; white-space: normal; line-height: 1.3; font-weight: 600;">{{ item.name }}</span>
-                        <div style="display: flex; flex-wrap: wrap; gap: 4px; justify-content: flex-end;">
-                          @for (r of item.refs; track r.label) {
-                            @if (r.url) {
-                              <span class="pheno-pill pmid" (click)="openExternalUrl(r.url)" title="Click to view reference details" style="font-size: 0.68rem; padding: 2px 6px; font-weight: 500;">
-                                {{ r.label }}
-                                <span class="material-symbols-outlined" style="font-size: 10px;">launch</span>
-                              </span>
-                            } @else {
-                              <span class="pheno-pill" style="font-size: 0.68rem; padding: 2px 6px; font-weight: 500;">
-                                {{ r.label }}
-                              </span>
+                </div>
+                
+                <div class="clinvar-custom-body">
+                  <!-- Top Section: Significance, Stars, and IDs (Always visible) -->
+                  <div class="clinvar-header-section">
+                    <!-- Column 1: Significance & Stars -->
+                    <div class="clinvar-header-main">
+                      @if (getClinvarField(grp.fields, 'Sig'); as sig) {
+                        <div class="clinvar-sig-display">
+                          <span class="clin-sig-label">Clinical Significance</span>
+                          <div class="clin-sig-pills">
+                            @for (s of splitPipeString(sig); track s) {
+                              <span class="clin-sig-badge large-badge" [attr.data-sig]="s.toLowerCase()">{{ s }}</span>
                             }
+                          </div>
+                        </div>
+                      }
+                      
+                      @if (getClinvarField(grp.fields, 'Rev Stat'); as revStat) {
+                        <div class="clinvar-stars-display">
+                          <span class="clin-stars-label">Review Status</span>
+                          <div class="stars-row-container">
+                            <div class="stars-stars">
+                              @for (star of [1, 2, 3, 4]; track star) {
+                                <span class="material-symbols-outlined star-icon" [class.filled]="star <= getReviewStarsCount(revStat)">
+                                  {{ star <= getReviewStarsCount(revStat) ? 'star' : 'star_outline' }}
+                                </span>
+                              }
+                            </div>
+                            <span class="stars-text-desc">{{ revStat }}</span>
+                          </div>
+                        </div>
+                      }
+                    </div>
+
+                    <!-- Column 2: External Database IDs -->
+                    <div class="clinvar-header-ids">
+                      @if (getClinvarField(grp.fields, 'Id'); as cvId) {
+                        <div class="clinvar-id-row">
+                          <span class="clinvar-id-label">Variation ID</span>
+                          <span class="pheno-pill pmid" (click)="$event.stopPropagation(); openClinvar(cvId)" title="Click to view variation in NCBI ClinVar">
+                            {{ cvId }}
+                            <span class="material-symbols-outlined tiny-icon">launch</span>
+                          </span>
+                        </div>
+                      }
+                      @if (getClinvarField(grp.fields, 'Dbsnp Id'); as dbsnpId) {
+                        <div class="clinvar-id-row">
+                          <span class="clinvar-id-label">dbSNP rsID</span>
+                          <span class="pheno-pill pmid" (click)="$event.stopPropagation(); openDbsnpId(dbsnpId)" title="Click to view SNP details">
+                            rs{{ dbsnpId }}
+                            <span class="material-symbols-outlined tiny-icon">launch</span>
+                          </span>
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                  @if (activeCravatTab() === 'ClinVar' || isClinvarExpanded()) {
+                    <!-- Collapsible Details Block -->
+                    <div class="clinvar-collapsible-content">
+                      <!-- Disease Associations & References -->
+                      @if (getClinvarField(grp.fields, 'Disease Associations Linked'); as diseases) {
+                        <div class="clinvar-section-divider"></div>
+                        <div class="clinvar-diseases-section">
+                          <div class="section-subtitle-row">
+                            <span class="material-symbols-outlined section-subtitle-icon">healing</span>
+                            <h3>Disease Associations & References</h3>
+                          </div>
+                          <div class="clinvar-diseases-grid">
+                            @for (item of diseases; track item.name) {
+                              <div class="clinvar-disease-card">
+                                <span class="disease-name-pill">{{ item.name }}</span>
+                                <div class="disease-refs-container">
+                                  @for (r of item.refs.slice(0, 1); track r.label) {
+                                    @if (r.url) {
+                                      <span class="pheno-pill pmid ref-pill" (click)="openExternalUrl(r.url)" title="Click to view reference details">
+                                        {{ r.label }}
+                                        <span class="material-symbols-outlined" style="font-size: 10px;">launch</span>
+                                      </span>
+                                    } @else {
+                                      <span class="pheno-pill ref-pill">{{ r.label }}</span>
+                                    }
+                                  }
+                                  @if (item.refs.length > 1) {
+                                    <span class="pheno-pill ref-pill more-refs-pill">
+                                      +{{ item.refs.length - 1 }} refs
+                                      <span class="refs-tooltip">
+                                        <span class="refs-tooltip-title">Additional References</span>
+                                        <span class="refs-tooltip-list">
+                                          @for (r of item.refs.slice(1); track r.label) {
+                                            @if (r.url) {
+                                              <span class="refs-tooltip-item clickable" (click)="$event.stopPropagation(); openExternalUrl(r.url)" title="Click to open link">
+                                                <span>{{ r.label }}</span>
+                                                <span class="material-symbols-outlined" style="font-size: 10px;">launch</span>
+                                              </span>
+                                            } @else {
+                                              <span class="refs-tooltip-item">{{ r.label }}</span>
+                                            }
+                                          }
+                                        </span>
+                                      </span>
+                                    </span>
+                                  }
+                                </div>
+                              </div>
+                            }
+                          </div>
+                        </div>
+                      }
+
+                      <!-- Technical details grid -->
+                      <div class="clinvar-section-divider"></div>
+                      <div class="clinvar-tech-section">
+                        <div class="section-subtitle-row">
+                          <span class="material-symbols-outlined section-subtitle-icon">settings</span>
+                          <h3>Technical & Nomenclature Details</h3>
+                        </div>
+                        <div class="clinvar-tech-grid">
+                          @if (getClinvarField(grp.fields, 'Hgvs'); as hgvs) {
+                            <div class="clinvar-tech-item">
+                              <span class="tech-label">HGVS Nomenclature</span>
+                              <span class="tech-value mono-val">{{ hgvs }}</span>
+                            </div>
+                          }
+                          @if (getClinvarField(grp.fields, 'Variant Clinical Sources'); as sources) {
+                            <div class="clinvar-tech-item full-width-item">
+                              <span class="tech-label">Clinical Evidence Sources</span>
+                              <div class="phenotype-pills">
+                                @for (source of splitPipeString(sources); track source) {
+                                  @if (getClinicalSourceUrl(source); as url) {
+                                    <span class="pheno-pill pmid" (click)="openExternalUrl(url)" title="View source evidence">
+                                      {{ source }}
+                                      <span class="material-symbols-outlined tiny-icon">launch</span>
+                                    </span>
+                                  } @else {
+                                    <span class="pheno-pill">{{ source }}</span>
+                                  }
+                                }
+                              </div>
+                            </div>
+                          }
+                          <!-- Any other fields not explicitly structured above -->
+                          @for (field of getRemainingClinvarFields(grp.fields); track field.name) {
+                            <div class="clinvar-tech-item">
+                              <span class="tech-label">{{ field.name }}</span>
+                              <span class="tech-value">{{ field.value }}</span>
+                            </div>
                           }
                         </div>
                       </div>
-                    }
-                  </div>
-                } @else if (grp.module === 'ClinVar' && field.name === 'Variant Clinical Sources') {
-                  <span class="field-label" [title]="field.name">Clinical Evidence Sources</span>
-                  <div class="phenotype-pills">
-                    @for (source of splitPipeString(field.value); track source) {
-                      @if (getClinicalSourceUrl(source); as url) {
-                        <span class="pheno-pill pmid" (click)="openExternalUrl(url)" title="View source evidence">
-                          {{ source }}
-                          <span class="material-symbols-outlined tiny-icon">launch</span>
-                        </span>
-                      } @else {
-                        <span class="pheno-pill">{{ source }}</span>
-                      }
-                    }
-                  </div>
-                } @else if (grp.module === 'ClinVar' && field.name === 'Rev Stat') {
-                  <span class="field-label" [title]="field.name">Review Status</span>
-                  <span class="patient-pill" style="display: inline-flex; align-items: center; gap: 4px; background: rgba(56, 168, 157, 0.08); text-transform: capitalize;">
-                    <span class="material-symbols-outlined" style="font-size: 14px; color: var(--primary);">verified</span>
-                    {{ field.value }}
-                  </span>
-                } @else if (grp.module === 'ClinVar' && field.name === 'Hgvs') {
-                  <span class="field-label" [title]="field.name">HGVS Nomenclature</span>
-                  <span class="alt-name-pill" style="font-family: monospace;">{{ field.value }}</span>
-                } @else {
-                  <span class="field-label" [title]="field.name">{{ field.name }}</span>
-                  <span class="field-value" [title]="field.value">{{ field.value }}</span>
-                }
+                    </div>
+                  }
+
+                </div>
               </div>
-              }
-            </div>
-          </div>
+            } @else if (grp.module === 'VEP') {
+              <div class="cravat-card vep-custom-card">
+                <div class="cravat-card-title vep-custom-title" (click)="toggleVep()" style="cursor: pointer;" title="Click to collapse/expand details">
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="material-symbols-outlined vep-title-icon">analytics</span>
+                    <span>VEP Functional Annotation</span>
+                  </div>
+                  <span class="material-symbols-outlined toggle-chevron">
+                    {{ (activeCravatTab() === 'VEP' || isVepExpanded()) ? 'expand_less' : 'expand_more' }}
+                  </span>
+                </div>
+                
+                <div class="vep-custom-body">
+                  <!-- Top Section: Consequence, Impact, Clinical Significance, Gene (Always visible) -->
+                  <div class="vep-header-section">
+                    <div class="vep-header-main">
+                      <!-- Consequence & Gene Row -->
+                      <div class="vep-consequence-row">
+                        @if (getVepField(grp.fields, 'Consequence'); as consequence) {
+                          <div class="vep-item-display">
+                            <span class="vep-label">Consequence</span>
+                            <span class="consequence-pill large-pill">{{ formatConsequence(consequence) }}</span>
+                          </div>
+                        }
+                        @if (getVepField(grp.fields, 'Gene Symbol'); as gene) {
+                          <div class="vep-item-display">
+                            <span class="vep-label">Gene Symbol</span>
+                            <span class="header-gene large-pill" style="font-size: 0.85rem; padding: 5px 12px; margin: 0; display: inline-block;">{{ gene }}</span>
+                          </div>
+                        }
+                      </div>
+                      
+                      <!-- Impact & Clinical Significance Row -->
+                      <div class="vep-impact-row">
+                        @if (getVepField(grp.fields, 'Impact'); as impact) {
+                          <div class="vep-item-display">
+                            <span class="vep-label">Impact Severity</span>
+                            <span class="impact-badge large-pill" [attr.data-impact]="impact" style="display: inline-block; font-size: 0.8rem; padding: 5px 12px; font-weight: 700;">
+                              {{ impact }}
+                            </span>
+                          </div>
+                        }
+                        
+                        @if (getVepField(grp.fields, 'Clinical Significance'); as clinSig) {
+                          <div class="vep-item-display">
+                            <span class="vep-label">Clinical Significance</span>
+                            <div class="clin-sig-pills">
+                              @for (sig of splitCommaString(clinSig); track sig) {
+                                <span class="clin-sig-badge large-badge" [attr.data-sig]="sig.toLowerCase()">{{ sig }}</span>
+                              }
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  </div>
+
+                  @if (activeCravatTab() === 'VEP' || isVepExpanded()) {
+                    <!-- Collapsible Details Block -->
+                    <div class="vep-collapsible-content">
+                      
+                      <!-- SIFT and PolyPhen Predictors section -->
+                      @if (getVepField(grp.fields, 'SIFT') || getVepField(grp.fields, 'PolyPhen'); as hasPredictors) {
+                        <div class="vep-section-divider"></div>
+                        <div class="vep-predictors-section">
+                          <div class="section-subtitle-row">
+                            <span class="material-symbols-outlined section-subtitle-icon">psychology</span>
+                            <h3>Computational Functional Predictors</h3>
+                          </div>
+                          <div class="vep-predictors-grid">
+                            @if (getVepField(grp.fields, 'SIFT'); as sift) {
+                              <div class="vep-predictor-card">
+                                <div class="predictor-header">
+                                  <span class="predictor-name">SIFT</span>
+                                  <span class="predictor-desc">Sorting Intolerant From Tolerant</span>
+                                </div>
+                                <span class="score-val" [class.damaging]="sift?.toLowerCase()?.includes('damage')" style="font-size: 0.85rem; padding: 6px 12px;">{{ sift }}</span>
+                              </div>
+                            }
+                            @if (getVepField(grp.fields, 'PolyPhen'); as polyphen) {
+                              <div class="vep-predictor-card">
+                                <div class="predictor-header">
+                                  <span class="predictor-name">PolyPhen-2</span>
+                                  <span class="predictor-desc">Polymorphism Phenotyping v2</span>
+                                </div>
+                                <span class="score-val" [class.damaging]="polyphen?.toLowerCase()?.includes('damage')" style="font-size: 0.85rem; padding: 6px 12px;">{{ polyphen }}</span>
+                              </div>
+                            }
+                          </div>
+                        </div>
+                      }
+
+                      <!-- Phenotype & Disorders -->
+                      @if (getVepField(grp.fields, 'Phenotype'); as phenotype) {
+                        @if (getVepPhenotypesAndRefs(phenotype); as data) {
+                          @if (data.disorders.length > 0 || data.refs.length > 0) {
+                            <div class="vep-section-divider"></div>
+                            <div class="vep-phenotype-section">
+                              <div class="section-subtitle-row">
+                                <span class="material-symbols-outlined section-subtitle-icon">healing</span>
+                                <h3>Associated Phenotypes & References</h3>
+                              </div>
+                              
+                              @if (data.disorders.length > 0) {
+                                <div class="vep-disorders-container" style="margin-bottom: 12px;">
+                                  <span class="vep-label" style="display: block; margin-bottom: 6px;">Reported Conditions</span>
+                                  <div class="phenotype-pills">
+                                    @for (dis of data.disorders; track dis) {
+                                      <span class="pheno-pill" style="font-weight: 600; white-space: normal; line-height: 1.3;">{{ dis }}</span>
+                                    }
+                                  </div>
+                                </div>
+                              }
+
+                              @if (data.refs.length > 0) {
+                                <div class="vep-refs-container">
+                                  <span class="vep-label" style="display: block; margin-bottom: 6px;">Literature & Database References</span>
+                                  <div class="disease-refs-container">
+                                    @for (r of data.refs.slice(0, 1); track r.label) {
+                                      @if (r.url) {
+                                        <span class="pheno-pill pmid ref-pill" (click)="openExternalUrl(r.url)" title="Click to view reference details">
+                                          {{ r.label }}
+                                          <span class="material-symbols-outlined" style="font-size: 10px;">launch</span>
+                                        </span>
+                                      } @else {
+                                        <span class="pheno-pill ref-pill">{{ r.label }}</span>
+                                      }
+                                    }
+                                    @if (data.refs.length > 1) {
+                                      <span class="pheno-pill ref-pill more-refs-pill">
+                                        +{{ data.refs.length - 1 }} refs
+                                        <span class="refs-tooltip">
+                                          <span class="refs-tooltip-title">Additional References</span>
+                                          <span class="refs-tooltip-list">
+                                            @for (r of data.refs.slice(1); track r.label) {
+                                              @if (r.url) {
+                                                <span class="refs-tooltip-item clickable" (click)="$event.stopPropagation(); openExternalUrl(r.url)" title="Click to open link">
+                                                  <span>{{ r.label }}</span>
+                                                  <span class="material-symbols-outlined" style="font-size: 10px;">launch</span>
+                                                </span>
+                                              } @else {
+                                                <span class="refs-tooltip-item">{{ r.label }}</span>
+                                              }
+                                            }
+                                          </span>
+                                        </span>
+                                      </span>
+                                    }
+                                  </div>
+                                </div>
+                              }
+                            </div>
+                          }
+                        }
+                      }
+
+                      <!-- Technical Details Grid -->
+                      <div class="vep-section-divider"></div>
+                      <div class="vep-tech-section">
+                        <div class="section-subtitle-row">
+                          <span class="material-symbols-outlined section-subtitle-icon">settings</span>
+                          <h3>Technical & Nomenclature Details</h3>
+                        </div>
+                        <div class="vep-tech-grid">
+                          @if (getVepField(grp.fields, 'HGVS coding'); as hgvsC) {
+                            <div class="vep-tech-item">
+                              <span class="tech-label">HGVS Coding Nomenclature</span>
+                              <span class="tech-value mono-val">{{ hgvsC }}</span>
+                            </div>
+                          }
+                          @if (getVepField(grp.fields, 'HGVS protein'); as hgvsP) {
+                            <div class="vep-tech-item">
+                              <span class="tech-label">HGVS Protein Nomenclature</span>
+                              <span class="tech-value mono-val">{{ hgvsP }}</span>
+                            </div>
+                          }
+                          <!-- Any other VEP fields -->
+                          @for (field of getRemainingVepFields(grp.fields); track field.name) {
+                            <div class="vep-tech-item">
+                              <span class="tech-label">{{ field.name }}</span>
+                              <span class="tech-value">{{ field.value }}</span>
+                            </div>
+                          }
+                        </div>
+                      </div>
+
+                    </div>
+                  }
+
+                </div>
+              </div>
+            } @else {
+              <div class="cravat-card">
+                <div class="cravat-card-title">{{ grp.module }}</div>
+                <div class="cravat-card-body">
+                  @for (field of grp.fields; track field.name) {
+                  <div class="cravat-field" [class.full-width]="field.name === 'SIFT' || field.name === 'PolyPhen' || field.name === 'Clinical Significance' || field.name === 'Phenotype' || isLongValue(field.name) || isLongValue(field.value)">
+                    @if (field.name === 'SIFT' || field.name === 'PolyPhen') {
+                      <div class="score-label-group">
+                        <span class="score-name">{{ field.name }}</span>
+                        <span class="score-desc">
+                          {{ field.name === 'SIFT' ? 'Sorting Intolerant From Tolerant' : 'Polymorphism Phenotyping v2' }}
+                        </span>
+                      </div>
+                      <span class="score-val" [class.damaging]="field.value?.toLowerCase()?.includes('damage')">{{ field.value }}</span>
+                    } @else if (grp.module === 'VEP' && field.name === 'Consequence') {
+                      <span class="field-label" [title]="field.name">{{ field.name }}</span>
+                      <span class="consequence-pill">{{ formatConsequence(field.value) }}</span>
+                    } @else if (grp.module === 'VEP' && field.name === 'Impact') {
+                      <span class="field-label" [title]="field.name">{{ field.name }}</span>
+                      <span class="impact-badge" [attr.data-impact]="field.value">{{ field.value }}</span>
+                    } @else if (grp.module === 'VEP' && field.name === 'Clinical Significance') {
+                      <span class="field-label" [title]="field.name">{{ field.name }}</span>
+                      <div class="clin-sig-pills">
+                        @for (sig of splitCommaString(field.value); track sig) {
+                          <span class="clin-sig-badge" [attr.data-sig]="sig.toLowerCase()">{{ sig }}</span>
+                        }
+                      </div>
+                    } @else if (grp.module === 'VEP' && field.name === 'Phenotype') {
+                      <span class="field-label" [title]="field.name">{{ field.name }}</span>
+                      <div class="phenotype-pills">
+                        @for (pheno of splitCommaString(field.value); track pheno) {
+                          @if (pheno.startsWith('PMID:')) {
+                            <span class="pheno-pill pmid" (click)="openPubmed(pheno)" title="Click to open PubMed article">
+                              {{ pheno }}
+                              <span class="material-symbols-outlined tiny-icon">launch</span>
+                            </span>
+                          } @else if (pheno.toLowerCase().startsWith('rs')) {
+                            <span class="pheno-pill pmid" (click)="openDbsnp(pheno)" title="Click to open dbSNP details">
+                              {{ pheno }}
+                              <span class="material-symbols-outlined tiny-icon">launch</span>
+                            </span>
+                          } @else {
+                            <span class="pheno-pill">{{ pheno }}</span>
+                          }
+                        }
+                      </div>
+                    } @else {
+                      <span class="field-label" [title]="field.name">{{ field.name }}</span>
+                      <span class="field-value" [title]="field.value">{{ field.value }}</span>
+                    }
+                  </div>
+                  }
+                </div>
+              </div>
+            }
           }
         </div>
       </div>
