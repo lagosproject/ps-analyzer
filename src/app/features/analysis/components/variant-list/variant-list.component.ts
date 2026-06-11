@@ -43,6 +43,8 @@ export class VariantListComponent {
     commentDeleted = output<{ variantKey: string, commentId: string }>();
     /** Emitted when a variant's status is changed */
     statusChanged = output<{ variantKey: string, status: VariantStatus }>();
+    /** Emitted when the user requests detailed annotations for a variant */
+    viewDetails = output<Variant>();
 
     searchTerm = signal<string>('');
     filterType = signal<string>('All');
@@ -580,6 +582,11 @@ export class VariantListComponent {
     }
 
 
+
+    openDetails(v: Variant, event: Event) {
+        event.stopPropagation();
+        this.viewDetails.emit(v);
+    }
 
     onPillClick(type: string, event: Event) {
         event.stopPropagation();

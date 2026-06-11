@@ -523,6 +523,10 @@ export class AnalysisService {
       enhancedVariant['hgvs_p'] = vepData.hgvs_p;
       enhancedVariant['sift'] = vepData.sift;
       enhancedVariant['polyphen'] = vepData.polyphen;
+      enhancedVariant['clin_sig'] = vepData.clin_sig;
+      enhancedVariant['phenotype'] = vepData.phenotype;
+      enhancedVariant['oc_data'] = vepData.oc_data;
+      enhancedVariant['vep_raw'] = vepData.vep_raw;
     }
 
     return enhancedVariant;

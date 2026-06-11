@@ -11,6 +11,7 @@ import { GroupNucleotideRows } from "./components/group-nucleotide-rows/group-nu
 import { SangerChartComponent } from "./components/sanger-chart/sanger-chart";
 import { VariantListComponent } from "./components/variant-list/variant-list.component";
 import { SettingsModalComponent } from "../../shared/components/settings-modal/settings-modal";
+import { VariantDetailsModalComponent } from "./components/variant-details-modal/variant-details-modal.component";
 
 import { AnalysisMinimapComponent } from "./components/analysis-minimap/analysis-minimap.component";
 import { NucleotideRowControlsComponent } from "./components/nucleotide-row-controls/nucleotide-row-controls";
@@ -22,7 +23,7 @@ import { UserService } from '../../core/services/user.service';
 @Component({
   selector: 'app-analysis',
   standalone: true,
-  imports: [CommonModule, GroupNucleotideRows, SangerChartComponent, VariantListComponent, FormsModule, SettingsModalComponent, AnalysisMinimapComponent, NucleotideRowControlsComponent, ReportModalComponent],
+  imports: [CommonModule, GroupNucleotideRows, SangerChartComponent, VariantListComponent, FormsModule, SettingsModalComponent, AnalysisMinimapComponent, NucleotideRowControlsComponent, ReportModalComponent, VariantDetailsModalComponent],
   templateUrl: './analysis.html',
   styleUrl: './analysis.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -79,6 +80,10 @@ export class AnalysisComponent implements OnInit {
 
   /** UI state for the report generation modal */
   readonly showReportModal = signal<boolean>(false);
+
+  /** UI state for the detailed annotations modal */
+  readonly showDetailsModal = signal<boolean>(false);
+  readonly detailsVariant = signal<Variant | null>(null);
 
   /** UI state to toggle visibility of the sequence visualizer (minimap + alignment) */
   readonly isSequenceVisible = signal<boolean>(true);
@@ -809,5 +814,13 @@ export class AnalysisComponent implements OnInit {
     // Navigate to report page
     console.log("Generating report with config:", config);
     this.router.navigate(['/report']);
+  }
+
+  /**
+   * Opens the detailed annotation modal for a variant.
+   */
+  openDetailsModal(variant: Variant) {
+    this.detailsVariant.set(variant);
+    this.showDetailsModal.set(true);
   }
 }

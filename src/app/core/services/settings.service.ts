@@ -15,6 +15,23 @@ export class SettingsService {
     private readonly http = inject(HttpClient);
     private readonly STORAGE_KEY = 'ms_analyzer_proxy_config';
 
+    private readonly OC_PATH_KEY = 'ms_analyzer_oc_path';
+
+    constructor() {
+        this.applySavedSettings();
+    }
+
+    private async applySavedSettings(): Promise<void> {
+        const proxy = this.getProxyConfig();
+        if (proxy.http_proxy || proxy.https_proxy) {
+            this.applyProxyConfig(proxy);
+        }
+        const ocPath = this.getOCPath();
+        if (ocPath) {
+            this.applyOCPath(ocPath);
+        }
+    }
+
     async applyProxyConfig(config: ProxyConfig): Promise<void> {
         try {
             await firstValueFrom(this.http.post(`${API_CONFIG.baseUrl}/config/proxy`, config));
@@ -38,6 +55,23 @@ export class SettingsService {
             }
         }
         return {};
+    }
+
+    async applyOCPath(ocPath: string): Promise<void> {
+        try {
+            await firstValueFrom(this.http.post(`${API_CONFIG.baseUrl}/config/opencravat`, { oc_path: ocPath }));
+            console.log('OpenCRAVAT path configuration applied to backend:', ocPath);
+        } catch (e) {
+            console.error('Failed to apply OpenCRAVAT path to backend', e);
+        }
+    }
+
+    saveOCPath(ocPath: string): void {
+        localStorage.setItem(this.OC_PATH_KEY, ocPath);
+    }
+
+    getOCPath(): string {
+        return localStorage.getItem(this.OC_PATH_KEY) || '';
     }
 
     async getBioEngineVersion(): Promise<string> {

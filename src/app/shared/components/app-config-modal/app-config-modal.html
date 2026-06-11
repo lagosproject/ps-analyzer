@@ -101,6 +101,27 @@
 
                     <!-- LOCAL ANNOTATOR TAB -->
                     @if (activeTab() === 'Local Annotator') {
+                        <div class="settings-section">
+                            <div class="info-box">
+                                <span class="material-symbols-outlined">terminal</span>
+                                <div>
+                                    <strong>Local Annotator Executable Path</strong>
+                                    <p>Specify the name or absolute path of the OpenCRAVAT executable. Leave as "oc" if it is in the system PATH.</p>
+                                </div>
+                            </div>
+                            <div class="form-group-small">
+                                <label for="ocPathInput">Executable Path</label>
+                                <div style="display: flex; gap: 8px;">
+                                    <input id="ocPathInput" type="text" style="flex: 1;" [ngModel]="ocPath()" (ngModelChange)="ocPath.set($event)" placeholder="e.g. oc, or /usr/local/bin/oc">
+                                    <button class="btn-outline small" (click)="loadOCInfo()" style="display: inline-flex; align-items: center; gap: 4px; padding: 0 12px; height: 36px; white-space: nowrap;">
+                                        <span class="material-symbols-outlined" style="font-size: 18px;">refresh</span> Apply & Test
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="divider-small"></div>
+
                         @if (isLoading() && !ocStatus()) {
                             <div class="oc-loading-container">
                                 <svg class="spinner" viewBox="0 0 24 24">

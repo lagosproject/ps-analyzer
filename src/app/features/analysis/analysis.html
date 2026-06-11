@@ -66,7 +66,8 @@
           [jobId]="currentJobId()" [hgvsAlternatives]="hgvsAlternatives()" [variantStatuses]="variantStatuses()"
           [targetTranscript]="hgvsConfig().transcript || null"
           (variantClick)="selectVariant($event)" (commentAdded)="onCommentAdded($event)"
-          (commentDeleted)="onCommentDeleted($event)" (statusChanged)="onStatusChanged($event)">
+          (commentDeleted)="onCommentDeleted($event)" (statusChanged)="onStatusChanged($event)"
+          (viewDetails)="openDetailsModal($event)">
         </app-variant-list>
       </aside>
 
@@ -153,5 +154,12 @@
   @if (showReportModal()) {
   <app-report-modal [(isVisible)]="showReportModal" [jobId]="currentJobId() || ''" [jobName]="currentJobName() || ''"
     [allVariants]="allVariants()" [patients]="patients()" (generate)="onReportGenerate($event)"></app-report-modal>
+  }
+
+  <!-- Variant Details Modal -->
+  @if (showDetailsModal() && detailsVariant()) {
+  <app-variant-details-modal [(isVisible)]="showDetailsModal" [variant]="detailsVariant()"
+    [targetTranscript]="hgvsConfig().transcript || null">
+  </app-variant-details-modal>
   }
 </div>

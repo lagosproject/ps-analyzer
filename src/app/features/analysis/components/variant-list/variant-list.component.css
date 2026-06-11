@@ -640,9 +640,8 @@
 }
 
 .hgvs-tooltip {
-    display: none;
     position: absolute;
-    top: calc(100% - 6px);
+    top: 34px;
     left: 8px;
     right: 8px;
     z-index: 100;
@@ -651,6 +650,7 @@
     border-radius: 8px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     padding: 12px;
+    display: none;
 }
 
 .variant-name-container:hover .hgvs-tooltip {
@@ -797,7 +797,6 @@
     text-decoration: underline;
 }
 
-/* VEP Styles */
 .consequence-pill-container {
     display: inline-flex;
     align-items: center;
@@ -825,10 +824,10 @@
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
+/* VEP Styles */
 .vep-tooltip {
-    display: none;
     position: absolute;
-    top: calc(100% - 6px);
+    top: 64px;
     left: 8px;
     right: 8px;
     z-index: 100;
@@ -837,6 +836,7 @@
     border-radius: 8px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     padding: 12px;
+    display: none;
 }
 
 .consequence-pill-container:hover .vep-tooltip {
@@ -998,3 +998,62 @@
     font-size: 12px;
     color: var(--text-muted);
 }
+
+/* Tooltip & Card Annotation Details Triggers */
+.vep-tooltip-footer {
+    margin-top: 8px;
+    border-top: 1px solid var(--border-muted);
+    padding-top: 8px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-tooltip-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-tooltip-action:hover {
+    background-color: #2e8b82;
+}
+
+.btn-tooltip-action .material-symbols-outlined {
+    font-size: 14px !important;
+}
+
+.variant-details-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border: 1px solid var(--border-muted);
+    border-radius: 4px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 22px;
+    height: 22px;
+    margin-left: 6px;
+    vertical-align: middle;
+}
+
+.variant-details-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background-color: rgba(56, 168, 157, 0.05);
+}
+
+.variant-details-btn .material-symbols-outlined {
+    font-size: 16px !important;
+}
+

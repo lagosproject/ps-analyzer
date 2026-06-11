@@ -38,6 +38,7 @@ export class AppConfigModalComponent implements OnInit {
 
     proxyConfig: ProxyConfig = {};
     userName = signal<string>('');
+    ocPath = signal<string>('');
     activeTab = model<string>('General');
 
     // OpenCRAVAT State
@@ -100,6 +101,7 @@ export class AppConfigModalComponent implements OnInit {
     ngOnInit() {
         this.proxyConfig = this.settingsService.getProxyConfig();
         this.userName.set(this.userService.getUserName() || '');
+        this.ocPath.set(this.settingsService.getOCPath() || '');
         this.settingsService.getBioEngineVersion().then(v => {
             this.bioEngineVersion.set(v);
         });
@@ -135,6 +137,10 @@ export class AppConfigModalComponent implements OnInit {
         this.settingsService.saveProxyConfig(this.proxyConfig);
         this.settingsService.applyProxyConfig(this.proxyConfig);
         
+        const path = this.ocPath().trim();
+        this.settingsService.saveOCPath(path);
+        this.settingsService.applyOCPath(path);
+
         const newName = this.userName().trim();
         if (newName) {
             this.userService.setUserName(newName);
@@ -167,6 +173,7 @@ export class AppConfigModalComponent implements OnInit {
     async loadOCInfo() {
         this.isLoading.set(true);
         try {
+            await this.settingsService.applyOCPath(this.ocPath().trim());
             const status = await this.analysisService.getOCStatus();
             this.ocStatus.set(status);
             if (status.installed) {

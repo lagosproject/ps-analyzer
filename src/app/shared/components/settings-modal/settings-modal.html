@@ -181,15 +181,6 @@
                             </div>
                         </div>
 
-                        @if (hgvsConfig().vep_mode === 'opencravat') {
-                        <div class="form-group">
-                            <label class="form-label">Local Annotator Executable Path (Optional)</label>
-                            <input type="text" [(ngModel)]="hgvsConfig().vep_path"
-                                placeholder="e.g. oc"
-                                [disabled]="readOnly()">
-                            <span class="help-text">Executable name or absolute path if not in system PATH.</span>
-                        </div>
-                        }
 
                         @if (hgvsConfig().vep_mode === 'online') {
                         <div class="info-box mt-2">
