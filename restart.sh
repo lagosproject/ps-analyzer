@@ -3,6 +3,10 @@
 # Script to rebuild and restart the MSAnalyzer Docker containers
 # This ensures that any code changes (like the new resizable panels) are applied.
 
+# Workaround for corporate proxies generating certificates with negative serial numbers.
+# This instructs Go-based CLIs (like podman, podman-compose, or docker-compose) to accept them.
+export GODEBUG=x509negativeserial=1
+
 # Determine container compose tool
 COMPOSE_CMD="docker compose"
 if command -v podman-compose &> /dev/null && ! command -v docker &> /dev/null; then
