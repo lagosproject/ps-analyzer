@@ -150,47 +150,36 @@
                         </div>
                         }
 
+                        <div class="info-box mb-3">
+                            <span class="material-symbols-outlined">info</span>
+                            <div>
+                                <strong>Local Annotation Active</strong>
+                                <p>Variants will always be annotated locally using OpenCRAVAT (consequence, ClinVar, etc.) using your downloaded modules.</p>
+                            </div>
+                        </div>
+
                         <div class="settings-row">
                             <div class="setting-info">
-                                <label>Annotation</label>
-                                <span class="help-text">Annotates variants with impact and consequence.</span>
+                                <label>Enrich with Ensembl VEP (Online)</label>
+                                <span class="help-text">Retrieve additional predictions (SIFT, PolyPhen, MANE) from Ensembl REST API.</span>
                             </div>
                             <label class="switch">
-                                <input type="checkbox" [(ngModel)]="hgvsConfig().auto_vep"
+                                <input type="checkbox"
+                                    [checked]="hgvsConfig().vep_mode === 'online'"
+                                    (change)="hgvsConfig().vep_mode = $any($event.target).checked ? 'online' : 'opencravat'"
                                     [disabled]="readOnly() || !isHgvsActive()">
                                 <span class="slider"></span>
                             </label>
                         </div>
 
-                        @if (hgvsConfig().auto_vep) {
-                        <div class="settings-row mt-3">
-                            <div class="setting-info">
-                                <label>Annotation Mode</label>
-                                <span class="help-text">Select execution environment.</span>
-                            </div>
-                            <div class="mode-switch-container">
-                                <span class="mode-label" [class.active]="hgvsConfig().vep_mode === 'online'">Online</span>
-                                <label class="switch">
-                                    <input type="checkbox"
-                                        [checked]="hgvsConfig().vep_mode === 'opencravat'"
-                                        (change)="hgvsConfig().vep_mode = $any($event.target).checked ? 'opencravat' : 'online'"
-                                        [disabled]="readOnly()">
-                                    <span class="slider"></span>
-                                </label>
-                                <span class="mode-label" [class.active]="hgvsConfig().vep_mode === 'opencravat'">Local</span>
-                            </div>
-                        </div>
-
-
                         @if (hgvsConfig().vep_mode === 'online') {
                         <div class="info-box mt-2">
                             <span class="material-symbols-outlined">info</span>
                             <div>
-                                <strong>Network Required</strong>
-                                <p>VEP annotation requires an active internet connection to query Ensembl servers.</p>
+                                <strong>Network Connection Required</strong>
+                                <p>VEP annotation queries online Ensembl servers, which may introduce network latency.</p>
                             </div>
                         </div>
-                        }
                         }
                     </div>
                     }
