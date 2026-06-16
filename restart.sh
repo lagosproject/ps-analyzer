@@ -9,7 +9,7 @@ export GODEBUG=x509negativeserial=1
 
 # Determine container compose tool
 COMPOSE_CMD="docker compose"
-if command -v podman-compose &> /dev/null && ! command -v docker &> /dev/null; then
+if command -v podman-compose > /dev/null 2>&1 && ! command -v docker > /dev/null 2>&1; then
     COMPOSE_CMD="podman-compose"
 fi
 
