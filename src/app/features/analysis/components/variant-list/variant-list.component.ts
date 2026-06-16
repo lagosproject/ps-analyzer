@@ -1,6 +1,7 @@
 import { Component, input, output, signal, computed, ChangeDetectionStrategy, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { Variant, JobComment, VariantStatus } from '../../../../core/models/analysis.model';
 import { AnalysisService } from '../../../../core/services/analysis.service';
 import { ToastService } from '../../../../core/services/toast.service';
@@ -14,7 +15,7 @@ import { ask } from '@tauri-apps/plugin-dialog';
 @Component({
     selector: 'app-variant-list',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, TranslatePipe],
     templateUrl: './variant-list.component.html',
     styleUrl: './variant-list.component.css',
     changeDetection: ChangeDetectionStrategy.OnPush
@@ -72,6 +73,7 @@ export class VariantListComponent {
     private analysisService = inject(AnalysisService);
     private toastService = inject(ToastService);
     private reportService = inject(ReportService);
+    private translate = inject(TranslateService);
 
     constructor() {
         effect(() => {
@@ -101,10 +103,10 @@ export class VariantListComponent {
         event.stopPropagation();
         try {
             await navigator.clipboard.writeText(text);
-            this.toastService.show('Copied to clipboard!', 'success');
+            this.toastService.show(this.translate.instant('common.copied'), 'success');
         } catch (err) {
             console.error('Failed to copy text: ', err);
-            this.toastService.show('Failed to copy', 'error');
+            this.toastService.show(this.translate.instant('common.failedCopy'), 'error');
         }
     }
 
@@ -396,12 +398,12 @@ export class VariantListComponent {
         event.stopPropagation();
         const jId = this.jobId();
         if (!jId) {
-            this.toastService.show('Job ID not found', 'error');
+            this.toastService.show(this.translate.instant('variantList.jobIdNotFound'), 'error');
             return;
         }
         this.reportService.toggleMark(jId, v.position);
         const newState = this.reportService.isMarked(jId, v.position);
-        this.toastService.show(newState ? 'Added to report' : 'Removed from report', 'success');
+        this.toastService.show(newState ? this.translate.instant('variantList.addedToReport') : this.translate.instant('variantList.removedFromReport'), 'success');
     }
 
     isMarkedForReport(v: Variant): boolean {
@@ -456,7 +458,7 @@ export class VariantListComponent {
                 next.set(key, { loading: false, error: false, alternatives });
                 return next;
             });
-            this.toastService.show('Alternatives received', 'success');
+            this.toastService.show(this.translate.instant('variantList.alternativesReceived'), 'success');
 
             // Save to job if jobId is present
             const jId = this.jobId();
@@ -498,7 +500,7 @@ export class VariantListComponent {
         const query = primary; // Ensembl search works great with HGVS or just accession
         const url = `https://www.ensembl.org/Homo_sapiens/Search/Results?q=${encodeURIComponent(query)}`;
 
-        this.toastService.show('Opening Ensembl page...', 'info');
+        this.toastService.show(this.translate.instant('variantList.openingEnsembl'), 'info');
 
         try {
             await openUrl(url);
@@ -673,8 +675,8 @@ export class VariantListComponent {
 
     async onDeleteComment(variantKey: string, commentId: string, event: Event) {
         event.stopPropagation();
-        const confirmed = await ask('Are you sure you want to delete this comment?', {
-            title: 'Confirm Deletion',
+        const confirmed = await ask(this.translate.instant('variantList.confirmDeleteComment'), {
+            title: this.translate.instant('variantList.confirmDeletion'),
             kind: 'warning',
         });
 

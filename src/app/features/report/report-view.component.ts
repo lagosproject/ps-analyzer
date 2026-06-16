@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { ReportService, ReportConfig, ReportConfigItem } from '../../core/services/report.service';
 import { ToastService } from '../../core/services/toast.service';
 import { AnalysisEntry, AnalysisJob, Variant, JobComment } from '../../core/models/analysis.model';
@@ -16,7 +17,7 @@ import { ReportVariantBlockComponent } from './components/report-variant-block/r
 @Component({
     selector: 'app-report-view',
     standalone: true,
-    imports: [CommonModule, ReportVariantBlockComponent],
+    imports: [CommonModule, ReportVariantBlockComponent, TranslatePipe],
     templateUrl: './report-view.component.html',
     styleUrl: './report-view.component.css'
 })
@@ -31,6 +32,7 @@ export class ReportViewComponent implements OnInit {
     public analysisService = inject(AnalysisService);
     /** Service for FHIR resource generation */
     private fhirService = inject(FhirService);
+    private translate = inject(TranslateService);
 
     /** Current report configuration */
     config = signal<ReportConfig | null>(null);
@@ -182,21 +184,21 @@ export class ReportViewComponent implements OnInit {
             const job = this.job();
             
             if (!items.length) {
-                this.toastService.show('No variants selected for export', 'warning');
+                this.toastService.show(this.translate.instant('report.noVariantsSelected'), 'warning');
                 return;
             }
 
-            this.toastService.show('Generating FHIR Bundle...', 'info');
+            this.toastService.show(this.translate.instant('report.generatingFhir'), 'info');
             
             const bundle = this.fhirService.generateReportBundle(items, job);
             const jsonContent = JSON.stringify(bundle, null, 2);
             
             this.downloadFile(jsonContent, `Report_${job?.name || 'Analysis'}_FHIR.json`, 'application/json');
             
-            this.toastService.show('FHIR Bundle downloaded successfully', 'success');
+            this.toastService.show(this.translate.instant('report.fhirSuccess'), 'success');
         } catch (err) {
             console.error('FHIR Export failed:', err);
-            this.toastService.show('Failed to generate FHIR export', 'error');
+            this.toastService.show(this.translate.instant('report.fhirFailed'), 'error');
         }
     }
 
@@ -205,7 +207,7 @@ export class ReportViewComponent implements OnInit {
      */
     async exportHtml() {
         try {
-            this.toastService.show('Generating HTML...', 'info');
+            this.toastService.show(this.translate.instant('report.generatingHtml'), 'info');
 
             const container = document.querySelector('.report-container');
             if (!container) throw new Error('Report container not found');
@@ -235,10 +237,10 @@ export class ReportViewComponent implements OnInit {
 
             this.downloadFile(htmlContent, `Report_${this.config()?.jobName || 'Analysis'}.html`, 'text/html');
 
-            this.toastService.show('HTML Report downloaded successfully', 'success');
+            this.toastService.show(this.translate.instant('report.htmlSuccess'), 'success');
         } catch (err) {
             console.error('Export failed:', err);
-            this.toastService.show('Failed to generate HTML report', 'error');
+            this.toastService.show(this.translate.instant('report.htmlFailed'), 'error');
         }
     }
 

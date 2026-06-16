@@ -2,8 +2,8 @@
   <div class="header">
     <div class="header-main">
       <div class="title-group">
-        <h1>Genomic Hotspots</h1>
-        <p>Distribution of <strong>{{ totalVariants() }}</strong> approved variants across the human genome.</p>
+        <h1>{{ 'hotspots.title' | translate }}</h1>
+        <p [innerHTML]="'hotspots.approvedVariantsDistribution' | translate: { count: totalVariants() }"></p>
       </div>
       <div class="header-actions">
         <div class="assembly-toggle">
@@ -12,7 +12,7 @@
         </div>
         <button class="btn btn-primary" (click)="loadDataAndRender()" [disabled]="isLoading()">
           <span class="material-symbols-outlined">refresh</span>
-          Refresh Data
+          {{ 'hotspots.refreshData' | translate }}
         </button>
       </div>
     </div>
@@ -23,13 +23,13 @@
     <div class="visualization-panel">
       <div class="panel-header-simple">
         <span class="material-symbols-outlined">analytics</span>
-        <h3>Karyotype Map</h3>
+        <h3>{{ 'hotspots.karyotypeMap' | translate }}</h3>
       </div>
       
       @if (isLoading()) {
         <div class="loading-overlay">
           <div class="spinner"></div>
-          <p>Loading genomic data...</p>
+          <p>{{ 'hotspots.loadingGenomic' | translate }}</p>
         </div>
       }
 
@@ -63,9 +63,9 @@
           <div class="empty-icon">
             <span class="material-symbols-outlined">biotech</span>
           </div>
-          <h3>Map is currently empty</h3>
-          <p>No approved variants have been recorded in the database yet.</p>
-          <p class="empty-hint">Start by approving variants in the <strong>Sanger Projects</strong> tab to see their genomic distribution here.</p>
+          <h3>{{ 'hotspots.mapIsEmpty' | translate }}</h3>
+          <p>{{ 'hotspots.noApprovedVariants' | translate }}</p>
+          <p class="empty-hint" [innerHTML]="'hotspots.approveVariantsInstruction' | translate"></p>
         </div>
       }
     </div>
@@ -74,14 +74,14 @@
     <div class="details-panel" [class.hidden]="isLoading() || !hasData()">
       <div class="panel-header">
         <span class="material-symbols-outlined header-icon">dna</span>
-        <h2>Variant Registry</h2>
+        <h2>{{ 'hotspots.registry' | translate }}</h2>
       </div>
 
       <div class="search-box">
-        <span class="material-symbols-outlined search-icon">search</span>
+        <span class="material-symbols-outlined">search</span>
         <input 
           type="text" 
-          placeholder="Search gene, patient, position..." 
+          [placeholder]="'hotspots.searchPlaceholder' | translate" 
           [value]="searchTerm()" 
           (input)="onSearchInput($event)"
         />
@@ -94,7 +94,7 @@
 
       <div class="filter-status-card">
         <div class="status-info">
-          <div class="status-label">Active Filter</div>
+          <div class="status-label">{{ 'hotspots.activeFilter' | translate }}</div>
           <div class="status-value">
             @if (selectedChromosome()) {
               @if (selectedRegion()) {
@@ -103,7 +103,7 @@
                 Chromosome {{ selectedChromosome() }}
               }
             } @else {
-              All Genomes (Cohort-wide)
+              {{ 'hotspots.allGenomes' | translate }}
             }
           </div>
         </div>
@@ -111,7 +111,7 @@
         @if (selectedChromosome()) {
           <button class="clear-filter-btn" (click)="clearSelection()">
             <span class="material-symbols-outlined">filter_alt_off</span>
-            Clear Filter
+            {{ 'hotspots.clearFilter' | translate }}
           </button>
         }
       </div>
@@ -120,17 +120,17 @@
         @if (filteredVariants().length === 0) {
           <div class="no-variants-state">
             <span class="material-symbols-outlined">search_off</span>
-            <p>No approved variants found matching criteria.</p>
+            <p>{{ 'hotspots.noApprovedVariantsMatching' | translate }}</p>
           </div>
         } @else {
           <div class="variants-table-wrapper">
             <table class="variants-table">
               <thead>
                 <tr>
-                  <th>Gene</th>
-                  <th>Variant (HGVS/Pos)</th>
-                  <th>Patient</th>
-                  <th>Project</th>
+                  <th>{{ 'hotspots.geneTable' | translate }}</th>
+                  <th>{{ 'hotspots.variantTable' | translate }}</th>
+                  <th>{{ 'hotspots.patientTable' | translate }}</th>
+                  <th>{{ 'hotspots.projectTable' | translate }}</th>
                   <th></th>
                 </tr>
               </thead>

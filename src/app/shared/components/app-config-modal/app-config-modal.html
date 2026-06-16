@@ -10,25 +10,25 @@
                 <nav class="sidebar-menu">
                     <button class="menu-item" [class.active]="activeTab() === 'General'" (click)="setActiveTab('General')" role="tab" [attr.aria-selected]="activeTab() === 'General'">
                         <span class="material-symbols-outlined">settings</span>
-                        <span>General</span>
+                        <span>{{ 'appConfig.general' | translate }}</span>
                     </button>
                     <button class="menu-item" [class.active]="activeTab() === 'Proxy'" (click)="setActiveTab('Proxy')" role="tab" [attr.aria-selected]="activeTab() === 'Proxy'">
                         <span class="material-symbols-outlined">language</span>
-                        <span>Proxy</span>
+                        <span>{{ 'appConfig.proxy' | translate }}</span>
                     </button>
                     <button class="menu-item" [class.active]="activeTab() === 'Local Annotator'" (click)="setActiveTab('Local Annotator')" role="tab" [attr.aria-selected]="activeTab() === 'Local Annotator'">
                         <span class="material-symbols-outlined">analytics</span>
-                        <span>Local Annotator</span>
+                        <span>{{ 'appConfig.localAnnotator' | translate }}</span>
                     </button>
                 </nav>
                 <div class="sidebar-footer">
                     <div class="system-info-section">
                         <div class="version-row">
-                            <span class="version-label">Frontend</span>
+                            <span class="version-label">{{ 'appConfig.frontend' | translate }}</span>
                             <span class="version-badge">{{ frontendVersion }}</span>
                         </div>
                         <div class="version-row">
-                            <span class="version-label">Bio-Engine</span>
+                            <span class="version-label">{{ 'appConfig.bioEngine' | translate }}</span>
                             <span class="version-badge highlight">{{ bioEngineVersion() }}</span>
                         </div>
                     </div>
@@ -38,8 +38,8 @@
             <!-- Main Content Panel -->
             <main class="settings-main">
                 <div class="settings-header">
-                    <h3>{{ activeTab() }} Settings</h3>
-                    <button class="btn-icon-small" (click)="close()" aria-label="Close Settings">
+                    <h3>{{ 'appConfig.settingsTitle' | translate: { tab: (activeTab() === 'Local Annotator' ? ('appConfig.localAnnotator' | translate) : ('appConfig.' + activeTab().toLowerCase() | translate)) } }}</h3>
+                    <button class="btn-icon-small" (click)="close()" [attr.aria-label]="'common.close' | translate">
                         <span class="material-symbols-outlined">close</span>
                     </button>
                 </div>
@@ -51,12 +51,12 @@
                             <div class="info-box">
                                 <span class="material-symbols-outlined">account_circle</span>
                                 <div>
-                                    <strong>User Identity</strong>
-                                    <p>This name will be used to identify your comments and actions.</p>
+                                    <strong>{{ 'appConfig.userIdentity' | translate }}</strong>
+                                    <p>{{ 'appConfig.nameSubtitle' | translate }}</p>
                                 </div>
                             </div>
                             <div class="form-group-small">
-                                <label for="userNameInput">Your Name</label>
+                                <label for="userNameInput">{{ 'appConfig.yourName' | translate }}</label>
                                 <input id="userNameInput" type="text" [ngModel]="userName()" (ngModelChange)="userName.set($event)" placeholder="e.g. Dr. Smith">
                             </div>
                         </div>
@@ -67,17 +67,17 @@
                             <div class="info-box danger">
                                 <span class="material-symbols-outlined">settings_suggest</span>
                                 <div>
-                                    <strong>Maintenance</strong>
-                                    <p>Perform system-wide cleanup tasks. Be careful, these actions cannot be undone.</p>
+                                    <strong>{{ 'appConfig.maintenance' | translate }}</strong>
+                                    <p>{{ 'appConfig.cleanupText' | translate }}</p>
                                 </div>
                             </div>
                             <div class="maintenance-block mt-3">
                                 <div class="setting-info mb-2">
-                                    <h4 class="m-0">Global Annotation Cache</h4>
-                                    <p class="help-text">Clears all stored VEP and HGVS results from the Redis cache. Use this to force fresh re-annotations if you suspect caching errors.</p>
+                                    <h4 class="m-0">{{ 'appConfig.globalCache' | translate }}</h4>
+                                    <p class="help-text">{{ 'appConfig.clearRedisText' | translate }}</p>
                                 </div>
                                 <button class="btn-outline btn-danger small" (click)="flushCache()">
-                                    <span class="material-symbols-outlined">delete_sweep</span> Flush Redis Cache
+                                    <span class="material-symbols-outlined">delete_sweep</span> {{ 'appConfig.flushCache' | translate }}
                                 </button>
                             </div>
                         </div>
@@ -89,16 +89,16 @@
                             <div class="info-box">
                                 <span class="material-symbols-outlined">info</span>
                                 <div>
-                                    <strong>Proxy Configuration</strong>
-                                    <p>Set a custom proxy. Leave empty to use system defaults. To disable an existing proxy, leave it blank and close.</p>
+                                    <strong>{{ 'appConfig.proxyConfig' | translate }}</strong>
+                                    <p>{{ 'appConfig.proxySubtitle' | translate }}</p>
                                 </div>
                             </div>
                             <div class="form-group-small">
-                                <label for="httpProxyInput">HTTP Proxy</label>
+                                <label for="httpProxyInput">{{ 'appConfig.httpProxy' | translate }}</label>
                                 <input id="httpProxyInput" type="text" [(ngModel)]="proxyConfig.http_proxy" placeholder="http://127.0.0.1:8080">
                             </div>
                             <div class="form-group-small">
-                                <label for="httpsProxyInput">HTTPS Proxy</label>
+                                <label for="httpsProxyInput">{{ 'appConfig.httpsProxy' | translate }}</label>
                                 <input id="httpsProxyInput" type="text" [(ngModel)]="proxyConfig.https_proxy" placeholder="http://127.0.0.1:8080">
                             </div>
                         </div>
@@ -111,7 +111,7 @@
                                 <svg class="spinner" viewBox="0 0 24 24">
                                     <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="3"></circle>
                                 </svg>
-                                <p>Loading Local Annotator status...</p>
+                                <p>{{ 'appConfig.loadingAnnotator' | translate }}</p>
                             </div>
                         } @else {
                             @if (ocStatus()?.installed) {
@@ -120,23 +120,23 @@
                                     <div class="oc-dashboard-row">
                                         <div class="oc-status-badge success">
                                             <span class="material-symbols-outlined">check_circle</span>
-                                            <span>Connected</span>
+                                            <span>{{ 'appConfig.connected' | translate }}</span>
                                         </div>
                                         <div class="oc-detail">
-                                            <strong>Version</strong>
+                                            <strong>{{ 'appConfig.version' | translate }}</strong>
                                             <span>{{ ocStatus()?.version || 'N/A' }}</span>
                                         </div>
                                         <div class="oc-detail">
-                                            <strong>Data Directory</strong>
+                                            <strong>{{ 'appConfig.dataDirectory' | translate }}</strong>
                                             <span class="dir-path" [title]="ocStatus()?.data_dir">{{ ocStatus()?.data_dir || 'N/A' }}</span>
                                         </div>
                                     </div>
-
+ 
                                     <!-- Disk Usage Progress Bar -->
                                     @if (ocStatus()?.disk_used_bytes !== undefined && ocStatus()?.disk_free_bytes !== undefined) {
                                         <div class="oc-disk-usage mt-3">
                                             <div class="usage-labels">
-                                                <span>Disk Usage (Data Folder)</span>
+                                                <span>{{ 'appConfig.diskUsage' | translate }}</span>
                                                 <span>{{ formatSize(ocStatus()?.disk_used_bytes) }} / {{ formatSize((ocStatus()?.disk_used_bytes ?? 0) + (ocStatus()?.disk_free_bytes ?? 0)) }}</span>
                                             </div>
                                             <div class="progress-bar-container">
@@ -145,11 +145,11 @@
                                         </div>
                                     }
                                 </div>
-
+ 
                                 <!-- Active Installations Section -->
                                 @if (activeInstallingTasks().length > 0) {
                                     <div class="active-installations-section mt-4">
-                                        <h5 class="section-subtitle-small">Active Installations</h5>
+                                        <h5 class="section-subtitle-small">{{ 'appConfig.activeInstallations' | translate }}</h5>
                                         <div class="active-tasks-list">
                                             @for (task of activeInstallingTasks(); track task.task_id) {
                                                 <div class="active-task-card">
@@ -157,7 +157,7 @@
                                                         <span class="material-symbols-outlined spin-icon">sync</span>
                                                         <div class="task-details">
                                                             <span class="task-module-name">{{ task.module }}</span>
-                                                            <span class="task-status-text">Status: {{ task.status }}</span>
+                                                            <span class="task-status-text">{{ 'appConfig.statusText' | translate: { status: task.status } }}</span>
                                                         </div>
                                                     </div>
                                                     <div class="task-progress-spinner">
@@ -170,23 +170,23 @@
                                         </div>
                                     </div>
                                 }
-
+ 
                                 <!-- Module Management Toolbar -->
                                 <div class="oc-toolbar mt-4">
                                     <div class="oc-subtabs">
                                         <button class="subtab-btn" [class.active]="ocTab() === 'installed'" (click)="setOCTab('installed')" role="tab" [attr.aria-selected]="ocTab() === 'installed'">
-                                            Installed ({{ nonDefaultInstalledModules().length }})
+                                            {{ 'appConfig.installedTab' | translate: { count: nonDefaultInstalledModules().length } }}
                                         </button>
                                         <button class="subtab-btn" [class.active]="ocTab() === 'store'" (click)="setOCTab('store')" role="tab" [attr.aria-selected]="ocTab() === 'store'">
-                                            Module Store
+                                            {{ 'appConfig.storeTab' | translate }}
                                         </button>
                                     </div>
                                     <div class="oc-search">
                                         <span class="material-symbols-outlined search-icon">search</span>
-                                        <input type="text" [ngModel]="ocSearchQuery()" (ngModelChange)="ocSearchQuery.set($event)" placeholder="Search modules..." class="search-input-small" aria-label="Search modules">
+                                        <input type="text" [ngModel]="ocSearchQuery()" (ngModelChange)="ocSearchQuery.set($event)" [placeholder]="'appConfig.searchModules' | translate" class="search-input-small" [attr.aria-label]="'appConfig.searchModules' | translate">
                                     </div>
                                 </div>
-
+ 
                                 <!-- Module list -->
                                 <div class="oc-module-list mt-3">
                                     @if (isLoading()) {
@@ -194,10 +194,10 @@
                                             <svg class="spinner-small" viewBox="0 0 24 24">
                                                 <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="3"></circle>
                                             </svg>
-                                            <span>Refreshing store listing...</span>
+                                            <span>{{ 'appConfig.refreshingStore' | translate }}</span>
                                         </div>
                                     }
-
+ 
                                     <!-- Installed Modules -->
                                     @if (ocTab() === 'installed') {
                                         @for (m of filteredInstalledModules(); track m.name) {
@@ -209,24 +209,24 @@
                                                     </div>
                                                     <div class="module-meta">
                                                         <span class="badge-type">{{ m.type || 'unknown' }}</span>
-                                                        <span class="meta-item">Version: {{ m.version || 'unknown' }}</span>
+                                                        <span class="meta-item">{{ 'appConfig.version' | translate }}: {{ m.version || 'unknown' }}</span>
                                                         <span class="meta-item">Size: {{ formatSize(m.size_bytes) }}</span>
                                                     </div>
                                                 </div>
                                                 <div class="module-actions">
                                                     <button class="btn-outline btn-danger small" (click)="uninstallModule(m.name)">
-                                                        <span class="material-symbols-outlined">delete</span> Uninstall
+                                                        <span class="material-symbols-outlined">delete</span> {{ 'appConfig.uninstall' | translate }}
                                                     </button>
                                                 </div>
                                             </div>
                                         } @empty {
                                             <div class="empty-state">
                                                 <span class="material-symbols-outlined">info</span>
-                                                <p>No installed modules found matching the query.</p>
+                                                <p>{{ 'appConfig.noInstalledModules' | translate }}</p>
                                             </div>
                                         }
                                     }
-
+ 
                                     <!-- CRAVAT Store Modules -->
                                     @if (ocTab() === 'store') {
                                         @for (m of filteredStoreModules(); track m.name) {
@@ -238,25 +238,25 @@
                                                     </div>
                                                     <div class="module-meta">
                                                         <span class="badge-type">{{ m.type || 'unknown' }}</span>
-                                                        <span class="meta-item">Version: {{ m.version || 'unknown' }}</span>
+                                                        <span class="meta-item">{{ 'appConfig.version' | translate }}: {{ m.version || 'unknown' }}</span>
                                                         <span class="meta-item">Size: {{ formatSize(m.size_bytes) }}</span>
                                                     </div>
                                                 </div>
                                                 <div class="module-actions">
                                                     @if (m.installed) {
                                                         <span class="installed-badge">
-                                                            <span class="material-symbols-outlined">check_circle</span> Installed
+                                                            <span class="material-symbols-outlined">check_circle</span> {{ 'appConfig.connectedBadge' | translate }}
                                                         </span>
                                                     } @else if (getModuleTask(m.name); as task) {
                                                         <span class="installing-badge">
                                                             <svg class="spinner-mini" viewBox="0 0 24 24">
                                                                 <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="3"></circle>
                                                             </svg>
-                                                            Installing...
+                                                            {{ 'appConfig.installingBadge' | translate }}
                                                         </span>
                                                     } @else {
                                                         <button class="btn-solid small" (click)="installModule(m.name)">
-                                                            <span class="material-symbols-outlined">download</span> Install
+                                                            <span class="material-symbols-outlined">download</span> {{ 'appConfig.install' | translate }}
                                                         </button>
                                                     }
                                                 </div>
@@ -265,7 +265,7 @@
                                             @if (!isLoading()) {
                                                 <div class="empty-state">
                                                     <span class="material-symbols-outlined">info</span>
-                                                    <p>No modules found matching the query.</p>
+                                                    <p>{{ 'appConfig.noStoreModules' | translate }}</p>
                                                 </div>
                                             }
                                         }
@@ -275,28 +275,28 @@
                                 <!-- Local Annotator Not Installed Error View -->
                                 <div class="oc-error-card">
                                     <span class="material-symbols-outlined error-icon">warning</span>
-                                    <h4>Local Annotator Engine Not Found</h4>
-                                    <p class="error-msg">{{ ocStatus()?.error || 'The Local Annotator CLI utility is not installed or could not be found in the server PATH.' }}</p>
+                                    <h4>{{ 'appConfig.engineNotFound' | translate }}</h4>
+                                    <p class="error-msg">{{ ocStatus()?.error || ('The Local Annotator CLI utility is not installed or could not be found in the server PATH.' | translate) }}</p>
                                     
                                     <div class="install-instructions mt-4">
-                                        <h5>Installation Guide</h5>
-                                        <p>To enable local variant annotations, install the local annotator package in your python environment:</p>
+                                        <h5>{{ 'appConfig.installGuide' | translate }}</h5>
+                                        <p>{{ 'appConfig.installInstructions' | translate }}</p>
                                         <pre><code>pip install open-cravat
 oc module install-base</code></pre>
-                                        <p class="mt-2 text-muted">Make sure to reload the dashboard settings once installation is complete.</p>
+                                        <p class="mt-2 text-muted">{{ 'appConfig.reloadInstructions' | translate }}</p>
                                     </div>
                                     <button class="btn-outline mt-3" (click)="loadOCInfo()">
-                                        <span class="material-symbols-outlined">refresh</span> Retry status check
+                                        <span class="material-symbols-outlined">refresh</span> {{ 'appConfig.retryStatus' | translate }}
                                     </button>
                                 </div>
                             }
-
+ 
                             <!-- Advanced Settings Section -->
                             <div class="divider-small"></div>
                             <div class="advanced-settings-container">
                                 <div class="advanced-settings-header" role="button" tabindex="0" (click)="showAdvanced.set(!showAdvanced())" (keydown.enter)="showAdvanced.set(!showAdvanced())" [class.expanded]="showAdvanced()">
                                     <span class="material-symbols-outlined toggle-icon">expand_more</span>
-                                    <span>Advanced Settings</span>
+                                    <span>{{ 'appConfig.advancedSettings' | translate }}</span>
                                 </div>
                                 
                                 @if (showAdvanced()) {
@@ -305,16 +305,16 @@ oc module install-base</code></pre>
                                             <div class="info-box">
                                                 <span class="material-symbols-outlined">terminal</span>
                                                 <div>
-                                                    <strong>Local Annotator Executable Path</strong>
-                                                    <p>Specify the name or absolute path of the OpenCRAVAT executable. Leave as "oc" if it is in the system PATH.</p>
+                                                    <strong>{{ 'appConfig.executablePathTitle' | translate }}</strong>
+                                                    <p>{{ 'appConfig.executablePathDesc' | translate }}</p>
                                                 </div>
                                             </div>
                                             <div class="form-group-small">
-                                                <label for="ocPathInput">Executable Path</label>
+                                                <label for="ocPathInput">{{ 'appConfig.executablePath' | translate }}</label>
                                                 <div style="display: flex; gap: 8px;">
                                                     <input id="ocPathInput" type="text" style="flex: 1;" [ngModel]="ocPath()" (ngModelChange)="ocPath.set($event)" placeholder="e.g. oc, or /usr/local/bin/oc">
                                                     <button class="btn-outline small" (click)="loadOCInfo()" style="display: inline-flex; align-items: center; gap: 4px; padding: 0 12px; height: 36px; white-space: nowrap;">
-                                                        <span class="material-symbols-outlined" style="font-size: 18px;">refresh</span> Apply & Test
+                                                        <span class="material-symbols-outlined" style="font-size: 18px;">refresh</span> {{ 'appConfig.applyTest' | translate }}
                                                     </button>
                                                 </div>
                                             </div>
@@ -325,9 +325,9 @@ oc module install-base</code></pre>
                         }
                     }
                 </div>
-
+ 
                 <div class="settings-footer-actions">
-                    <button class="btn-solid" (click)="close()">Save & Close</button>
+                    <button class="btn-solid" (click)="close()">{{ 'appConfig.saveClose' | translate }}</button>
                 </div>
             </main>
         </div>

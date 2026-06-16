@@ -4,33 +4,33 @@
             <!-- Settings Sidebar -->
             <div class="settings-sidebar">
                 <div class="settings-sidebar-header">
-                    <h2>Configuration</h2>
+                    <h2>{{ 'settingsModal.configuration' | translate }}</h2>
                 </div>
                 <nav class="settings-nav">
                     <button class="nav-item" [class.active]="activeTab() === 'Generic'"
                         (click)="setActiveTab('Generic')">
-                        <span class="material-symbols-outlined">tune</span> Generic
+                        <span class="material-symbols-outlined">tune</span> {{ 'settingsModal.genericTab' | translate }}
                     </button>
                     <button class="nav-item" [class.active]="activeTab() === 'Alignment'"
                         (click)="setActiveTab('Alignment')">
-                        <span class="material-symbols-outlined">align_horizontal_left</span> Alignment
+                        <span class="material-symbols-outlined">align_horizontal_left</span> {{ 'settingsModal.alignmentTab' | translate }}
                     </button>
                     <button class="nav-item" [class.active]="activeTab() === 'Trimming'"
                         (click)="setActiveTab('Trimming')">
-                        <span class="material-symbols-outlined">content_cut</span> Trimming
+                        <span class="material-symbols-outlined">content_cut</span> {{ 'settingsModal.trimmingTab' | translate }}
                     </button>
                     <div class="nav-divider"></div>
                     <button class="nav-item" [class.active]="activeTab() === 'HGVS'" (click)="setActiveTab('HGVS')">
-                        <span class="material-symbols-outlined">menu_book</span> HGVS
+                        <span class="material-symbols-outlined">menu_book</span> {{ 'settingsModal.hgvsTab' | translate }}
                     </button>
                     <button class="nav-item" [class.active]="activeTab() === 'Annotate'"
                         (click)="setActiveTab('Annotate')">
-                        <span class="material-symbols-outlined">auto_fix_high</span> Annotate
+                        <span class="material-symbols-outlined">auto_fix_high</span> {{ 'settingsModal.annotateTab' | translate }}
                     </button>
                 </nav>
                 @if (!readOnly()) {
                 <div class="settings-sidebar-footer">
-                    <button class="btn-text-action small" (click)="reset.emit()">Results Defaults</button>
+                    <button class="btn-text-action small" (click)="reset.emit()">{{ 'settingsModal.defaultsBtn' | translate }}</button>
                 </div>
                 }
             </div>
@@ -38,7 +38,7 @@
             <!-- Settings Content -->
             <div class="settings-main">
                 <div class="settings-header">
-                    <h3>{{ activeTab() }} Settings</h3>
+                    <h3>{{ 'appConfig.settingsTitle' | translate: { tab: ('settingsModal.' + activeTab().toLowerCase() + 'Tab' | translate) } }}</h3>
                     <button class="btn-icon-small" (click)="close()">
                         <span class="material-symbols-outlined">close</span>
                     </button>
@@ -48,20 +48,20 @@
                     @if (activeTab() === 'Generic') {
                     <div class="settings-section">
                         <div class="form-group-small">
-                            <label>Probability Ratio (pratio)</label>
+                            <label>{{ 'settingsModal.probabilityRatio' | translate }}</label>
                             <input type="number" step="0.01" [(ngModel)]="tracyConfig().pratio" [disabled]="readOnly()">
-                            <span class="help-text">Min. ratio of second best to best basecall.</span>
+                            <span class="help-text">{{ 'settingsModal.minRatioBestBasecall' | translate }}</span>
                         </div>
                         <div class="form-group-small">
-                            <label>K-mer size</label>
+                            <label>{{ 'settingsModal.kmerSize' | translate }}</label>
                             <input type="number" [(ngModel)]="tracyConfig().kmer" [disabled]="readOnly()">
                         </div>
                         <div class="form-group-small">
-                            <label>Minimum support</label>
+                            <label>{{ 'settingsModal.minSupport' | translate }}</label>
                             <input type="number" [(ngModel)]="tracyConfig().support" [disabled]="readOnly()">
                         </div>
                         <div class="form-group-small">
-                            <label>Max Indel size</label>
+                            <label>{{ 'settingsModal.maxIndelSize' | translate }}</label>
                             <input type="number" [(ngModel)]="tracyConfig().maxindel" [disabled]="readOnly()">
                         </div>
 
@@ -71,19 +71,19 @@
                     @if (activeTab() === 'Alignment') {
                     <div class="settings-section">
                         <div class="form-group-small">
-                            <label>Gap Open Penalty</label>
+                            <label>{{ 'settingsModal.gapOpenPenalty' | translate }}</label>
                             <input type="number" [(ngModel)]="tracyConfig().gapopen" [disabled]="readOnly()">
                         </div>
                         <div class="form-group-small">
-                            <label>Gap Extension Penalty</label>
+                            <label>{{ 'settingsModal.gapExtensionPenalty' | translate }}</label>
                             <input type="number" [(ngModel)]="tracyConfig().gapext" [disabled]="readOnly()">
                         </div>
                         <div class="form-group-small">
-                            <label>Match Score</label>
+                            <label>{{ 'settingsModal.matchScore' | translate }}</label>
                             <input type="number" [(ngModel)]="tracyConfig().match" [disabled]="readOnly()">
                         </div>
                         <div class="form-group-small">
-                            <label>Mismatch Penalty</label>
+                            <label>{{ 'settingsModal.mismatchPenalty' | translate }}</label>
                             <input type="number" [(ngModel)]="tracyConfig().mismatch" [disabled]="readOnly()">
                         </div>
                     </div>
@@ -92,37 +92,37 @@
                     @if (activeTab() === 'Trimming') {
                     <div class="settings-section">
                         <div class="form-group-small">
-                            <label>Trim Quality Threshold</label>
+                            <label>{{ 'settingsModal.trimQualityThreshold' | translate }}</label>
                             <input type="number" [(ngModel)]="tracyConfig().trim" [disabled]="readOnly()">
                         </div>
                         <div class="form-group-small">
-                            <label>Global Trim Left (bp)</label>
+                            <label>{{ 'settingsModal.globalTrimLeft' | translate }}</label>
                             <input type="number" [(ngModel)]="tracyConfig().trimLeft" [disabled]="readOnly()">
                         </div>
                         <div class="form-group-small">
-                            <label>Global Trim Right (bp)</label>
+                            <label>{{ 'settingsModal.globalTrimRight' | translate }}</label>
                             <input type="number" [(ngModel)]="tracyConfig().trimRight" [disabled]="readOnly()">
                         </div>
-                        <p class="info-box">Note: You can override these trimmings per-read in the patient list.</p>
+                        <p class="info-box">{{ 'settingsModal.overrideTrimmingNote' | translate }}</p>
                     </div>
                     }
 
                     @if (activeTab() === 'HGVS') {
                     <div class="settings-section">
                         <div class="form-group">
-                            <label class="form-label">Transcript ID (RefSeq)</label>
+                            <label class="form-label">{{ 'settingsModal.transcriptId' | translate }}</label>
                             <input type="text" [(ngModel)]="hgvsConfig().transcript"
                                 [disabled]="readOnly() || (!!ncbiId() && useLocalRef() === false)"
                                 placeholder="e.g. NM_000059.3">
                             @if (!!ncbiId() && useLocalRef() === false) {
-                            <span class="help-text">Linked to NCBI Reference ID.</span>
+                            <span class="help-text">{{ 'settingsModal.linkedNcbiRef' | translate }}</span>
                             } @else {
-                            <span class="help-text">Manually specify RefSeq transcript for local files.</span>
+                            <span class="help-text">{{ 'settingsModal.specifyRefSeqManual' | translate }}</span>
                             }
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label">Genome Assembly</label>
+                            <label class="form-label">{{ 'settingsModal.genomeAssembly' | translate }}</label>
                             <select [(ngModel)]="hgvsConfig().assembly" class="select-input" [disabled]="readOnly()">
                                 <option value="GRCh38">GRCh38 (hg38)</option>
                                 <option value="GRCh37">GRCh37 (hg19)</option>
@@ -131,7 +131,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label">Gene Symbol (Optional)</label>
+                            <label class="form-label">{{ 'settingsModal.geneSymbolOptional' | translate }}</label>
                             <input type="text" [(ngModel)]="hgvsConfig().gene" placeholder="e.g. BRCA2"
                                 [disabled]="readOnly()">
                         </div>
@@ -144,8 +144,8 @@
                         <div class="warning-box">
                             <span class="material-symbols-outlined">warning</span>
                             <div>
-                                <strong>HGVS Required</strong>
-                                <p>You must configure a Transcript ID in the HGVS tab to enable annotations.</p>
+                                <strong>{{ 'settingsModal.hgvsRequired' | translate }}</strong>
+                                <p>{{ 'settingsModal.configureTranscriptWarning' | translate }}</p>
                             </div>
                         </div>
                         }
@@ -153,15 +153,15 @@
                         <div class="info-box mb-3">
                             <span class="material-symbols-outlined">info</span>
                             <div>
-                                <strong>Local Annotation Active</strong>
-                                <p>Variants will always be annotated locally using OpenCRAVAT (consequence, ClinVar, etc.) using your downloaded modules.</p>
+                                <strong>{{ 'settingsModal.localAnnotationActive' | translate }}</strong>
+                                <p>{{ 'settingsModal.opencravatActiveDesc' | translate }}</p>
                             </div>
                         </div>
 
                         <div class="settings-row">
                             <div class="setting-info">
-                                <label>Enrich with Ensembl VEP (Online)</label>
-                                <span class="help-text">Retrieve additional predictions (SIFT, PolyPhen, MANE) from Ensembl REST API.</span>
+                                <label>{{ 'settingsModal.enrichVep' | translate }}</label>
+                                <span class="help-text">{{ 'settingsModal.retrieveAdditionalVep' | translate }}</span>
                             </div>
                             <label class="switch">
                                 <input type="checkbox"
@@ -176,8 +176,8 @@
                         <div class="info-box mt-2">
                             <span class="material-symbols-outlined">info</span>
                             <div>
-                                <strong>Network Connection Required</strong>
-                                <p>VEP annotation queries online Ensembl servers, which may introduce network latency.</p>
+                                <strong>{{ 'settingsModal.networkConnectionRequired' | translate }}</strong>
+                                <p>{{ 'settingsModal.vepNetworkNote' | translate }}</p>
                             </div>
                         </div>
                         }
@@ -188,7 +188,7 @@
                 </div>
 
                 <div class="settings-footer-actions">
-                    <button class="btn-solid" (click)="close()">{{ readOnly() ? 'Close' : 'Done' }}</button>
+                    <button class="btn-solid" (click)="close()">{{ readOnly() ? ('common.close' | translate) : ('common.done' | translate) }}</button>
                 </div>
             </div>
         </div>

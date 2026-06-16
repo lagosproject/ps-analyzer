@@ -1,12 +1,13 @@
 import { Component, ChangeDetectionStrategy, signal, model, input, output, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe } from '@ngx-translate/core';
 import { TracyConfig, HGVSConfig } from '../../../core/models/analysis.model';
 
 @Component({
     selector: 'app-settings-modal',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, TranslatePipe],
     templateUrl: './settings-modal.html',
     styleUrl: './settings-modal.css',
     changeDetection: ChangeDetectionStrategy.OnPush

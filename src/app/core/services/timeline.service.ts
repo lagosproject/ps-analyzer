@@ -152,7 +152,7 @@ export class TimelineService {
      * @param index - The position to make visible (0-indexed)
      * @param padding - Number of bases to keep as padding from the edges
      */
-    ensureVisible(index: number, padding: number = 8) {
+    ensureVisible(index: number, padding = 8) {
         const s = this.state();
         
         // If index is before the start (with padding)

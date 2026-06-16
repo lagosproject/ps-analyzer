@@ -3,14 +3,14 @@
     [style.top.px]="adjustedPosition()?.y ?? position().y" [style.opacity]="adjustedPosition() ? 1 : 0"
     (click)="$event.stopPropagation()" (contextmenu)="$event.stopPropagation()">
     <div class="popover-header">
-        <span class="popover-title">Nucleotide Info</span>
-        <span class="popover-pos">{{ d.posLabel || 'Ref Pos' }}: {{ d.refPos }}</span>
+        <span class="popover-title">{{ 'signalPopup.nucleotideInfo' | translate }}</span>
+        <span class="popover-pos">{{ d.posLabel || ('signalPopup.refPos' | translate) }}: {{ d.refPos }}</span>
     </div>
     <div class="popover-content">
         @for (pos of d.sangerPos; track $index) {
         <div class="sanger-info-group">
             <div class="info-row">
-                <span class="info-label">Sanger Pos:</span>
+                <span class="info-label">{{ 'signalPopup.sangerPos' | translate }}</span>
                 <span class="info-value">{{ pos }}</span>
             </div>
             <div class="signal-grid">
@@ -38,21 +38,21 @@
         <div class="popover-divider"></div>
 
         <div class="copy-section">
-            <span class="section-label">Copy Sequence</span>
+            <span class="section-label">{{ 'signalPopup.copySequence' | translate }}</span>
             <div class="copy-buttons">
                 @if (d.readId === 'Reference') {
                 <button class="copy-btn primary" (click)="onCopy('cons')">
-                    <span class="btn-icon">📋</span> Reference
+                    <span class="btn-icon">📋</span> {{ 'signalPopup.reference' | translate }}
                 </button>
                 } @else {
                 <button class="copy-btn" (click)="onCopy('alt1')">
-                    <span class="btn-icon">📋</span> Allele 1
+                    <span class="btn-icon">📋</span> {{ 'signalPopup.allele1' | translate }}
                 </button>
                 <button class="copy-btn" (click)="onCopy('alt2')">
-                    <span class="btn-icon">📋</span> Allele 2
+                    <span class="btn-icon">📋</span> {{ 'signalPopup.allele2' | translate }}
                 </button>
                 <button class="copy-btn muted" (click)="onCopy('cons')">
-                    <span class="btn-icon">📋</span> Consensus
+                    <span class="btn-icon">📋</span> {{ 'signalPopup.consensus' | translate }}
                 </button>
                 }
             </div>

@@ -3,33 +3,33 @@
         <img src="assets/logo.svg" class="nav-logo" alt="PS Analyzer Logo">
         <h2 class="nav-title">PS Analyzer</h2>
     </div>
-
+ 
     <nav class="nav-tabs">
         <button class="tab-btn" [class.active]="currentTab() === 'sanger'" (click)="currentTab.set('sanger')">
             <span class="material-symbols-outlined">analytics</span>
-            Sanger Projects
+            {{ 'dashboard.sangerProjects' | translate }}
         </button>
         <button class="tab-btn" [class.active]="currentTab() === 'hotspots'" (click)="currentTab.set('hotspots')">
             <span class="material-symbols-outlined">biotech</span>
-            Variant Hotspots
+            {{ 'dashboard.variantHotspots' | translate }}
         </button>
     </nav>
-
+ 
     <div class="nav-actions">
         @if (installingModulesCount() > 0) {
-            <div class="installing-banner-pill" (click)="openAppConfigToTab('Local Annotator')" title="Click to view active installations">
+            <div class="installing-banner-pill" (click)="openAppConfigToTab('Local Annotator')" [attr.title]="'dashboard.clickToViewInstallations' | translate">
                 <svg class="spinner-mini" viewBox="0 0 24 24">
                     <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="3"></circle>
                 </svg>
-                <span>Installing {{ installingModulesCount() }} module(s)...</span>
+                <span>{{ 'dashboard.installingModules' | translate: { count: installingModulesCount() } }}</span>
             </div>
         }
-        <button class="btn-icon-small" (click)="openAppConfig()" title="App Settings">
+        <button class="btn-icon-small" (click)="openAppConfig()" [attr.title]="'dashboard.appSettings' | translate">
             <span class="material-symbols-outlined">settings</span>
         </button>
     </div>
 </header>
-
+ 
 <div class="dashboard-body">
     <!-- Sanger View -->
     @if (currentTab() === 'sanger') {
@@ -38,31 +38,31 @@
             <div class="sidebar-actions">
                 <button class="btn-sidebar-primary" (click)="resetProject()">
                     <span class="material-symbols-outlined">add</span>
-                    New Project
+                    {{ 'dashboard.newProject' | translate }}
                 </button>
-                <button class="btn-sidebar-secondary" (click)="onImportJob()" title="Import Project">
+                <button class="btn-sidebar-secondary" (click)="onImportJob()" [attr.title]="'dashboard.importProject' | translate">
                     <span class="material-symbols-outlined">cloud_download</span>
-                    Import
+                    {{ 'dashboard.import' | translate }}
                 </button>
             </div>
-
+ 
             <div class="search-container">
                 <span class="material-symbols-outlined search-icon">search</span>
                 <input type="text" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)"
-                    placeholder="Search projects..." class="search-input">
+                    [placeholder]="'dashboard.searchProjects' | translate" class="search-input">
             </div>
-
+ 
             <div class="recent-projects">
-                <h3>Recent Projects</h3>
+                <h3>{{ 'dashboard.recentProjects' | translate }}</h3>
                 <ul>
                     @for (job of filteredJobs(); track job.id) {
                     <li class="project-item" (click)="loadJob(job)">
                         @if (job.status === 'completed') {
-                            <span class="status-dot status-success" title="Success"></span>
+                            <span class="status-dot status-success" [attr.title]="'common.success' | translate"></span>
                         } @else if (job.status === 'failed') {
-                            <span class="status-dot status-error" title="Error"></span>
+                            <span class="status-dot status-error" [attr.title]="'common.error' | translate"></span>
                         } @else if (job.status === 'running') {
-                            <div class="status-running" title="Running: {{ job.progress }}%">
+                            <div class="status-running" [attr.title]="('appConfig.statusText' | translate: { status: job.progress + '%' })">
                                 <svg class="spinner" viewBox="0 0 24 24">
                                     <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="3"></circle>
                                 </svg>
@@ -73,14 +73,14 @@
                             <span class="project-date">{{ job.created_at | date:'short' }}</span>
                         </div>
                         <div class="project-actions">
-                            <button class="btn-icon-small hover-scale" (click)="onRenameJob($event, job)" title="Rename">
+                            <button class="btn-icon-small hover-scale" (click)="onRenameJob($event, job)" [attr.title]="'common.rename' | translate">
                                 <span class="material-symbols-outlined">edit</span>
                             </button>
-                            <button class="btn-icon-small hover-scale" (click)="onShareJob($event, job)" title="Share">
+                            <button class="btn-icon-small hover-scale" (click)="onShareJob($event, job)" [attr.title]="'common.share' | translate">
                                 <span class="material-symbols-outlined">share</span>
                             </button>
                             <button class="btn-icon-small btn-icon-danger hover-scale" (click)="onDeleteJob($event, job)"
-                                title="Delete">
+                                [attr.title]="'common.delete' | translate">
                                 <span class="material-symbols-outlined">delete</span>
                             </button>
                         </div>
@@ -89,7 +89,7 @@
                 </ul>
             </div>
         </aside>
-
+ 
         <main class="main-content">
             <div class="modal-header">
                 <div class="header-title-group">
@@ -100,23 +100,23 @@
                             (keyup.escape)="cancelEditingName()" class="header-edit-input">
                     </div>
                     } @else {
-                    <h1 (dblclick)="startEditingName()" title="Double click to rename" class="editable-title">
-                        Edit Project: {{ currentJobName() }}
+                    <h1 (dblclick)="startEditingName()" [attr.title]="'dashboard.doubleClickRename' | translate" class="editable-title">
+                        {{ 'dashboard.editProject' | translate: { name: currentJobName() } }}
                         <span class="material-symbols-outlined edit-icon">edit</span>
                     </h1>
                     }
-                    <p>Modify reference or patient data and re-run analysis.</p>
+                    <p>{{ 'dashboard.modifyReferenceText' | translate }}</p>
                     } @else {
-                    <h1>Create New Project</h1>
-                    <p>Start by importing reference sequences and patient data for alignment.</p>
+                    <h1>{{ 'dashboard.createNewProject' | translate }}</h1>
+                    <p>{{ 'dashboard.startImportingText' | translate }}</p>
                     }
                 </div>
             </div>
-
+ 
             <div class="modal-content">
                 <section class="content-section">
                     <h3 class="section-title">
-                        Reference Genome
+                        {{ 'dashboard.referenceGenome' | translate }}
                         <div class="assembly-selector-pill">
                             <button class="pill-btn" [class.active]="hgvsConfig().assembly === 'GRCh38'" (click)="setAssembly('GRCh38')">HG38</button>
                             <button class="pill-btn" [class.active]="hgvsConfig().assembly === 'GRCh37'" (click)="setAssembly('GRCh37')">HG19</button>
@@ -124,14 +124,14 @@
                     </h3>
                     <div class="grid-2">
                         <div class="form-group">
-                            <label class="form-label">NCBI Code or Gene Name</label>
+                            <label class="form-label">{{ 'dashboard.ncbiCodeOrGene' | translate }}</label>
                             <div class="input-with-action">
                                 <input type="text" [ngModel]="ncbiId()" (ngModelChange)="onNcbiIdChange($event)"
                                     placeholder="e.g., NM_000546.6" (keyup.enter)="fetchRefSeq()">
-                                <button class="btn-inline-action" (click)="fetchRefSeq()">Search</button>
+                                <button class="btn-inline-action" (click)="fetchRefSeq()">{{ 'common.search' | translate }}</button>
                             </div>
                             @if (isSearching()) {
-                            <p class="form-hint" style="color: var(--primary); font-size: 12px; margin-top: 4px;">Searching...</p>
+                            <p class="form-hint" style="color: var(--primary); font-size: 12px; margin-top: 4px;">{{ 'common.loading' | translate }}</p>
                             }
                             @if (fetchError()) {
                             <p class="form-error" style="color: #ef4444; font-size: 12px; margin-top: 4px;">{{ fetchError() }}</p>
@@ -139,7 +139,7 @@
                             @if (fetchSuccess()) {
                             <p class="form-success" style="color: #22c55e; font-size: 12px; margin-top: 4px;">{{ fetchSuccess() }}</p>
                             }
-
+ 
                             @if (searchResults().length > 0) {
                             <div class="search-results-dropdown">
                                 <ul class="results-list">
@@ -153,13 +153,13 @@
                             </div>
                             }
                         </div>
-
+ 
                         <div class="form-group">
-                            <label class="form-label">Upload Local FASTA</label>
+                            <label class="form-label">{{ 'dashboard.uploadLocalFasta' | translate }}</label>
                             @if (!useLocalRef()) {
                             <div class="upload-area" (click)="selectRefFasta()">
                                 <span class="material-symbols-outlined upload-icon">upload_file</span>
-                                <p class="upload-title">Upload Reference Genome</p>
+                                <p class="upload-title">{{ 'dashboard.uploadReferenceGenome' | translate }}</p>
                             </div>
                             } @else {
                             <div class="upload-area" (click)="clearLocalRef()">
@@ -169,51 +169,51 @@
                             }
                         </div>
                     </div>
-
+ 
                 </section>
-
+ 
                 <div class="divider"></div>
-
+ 
                 <section class="content-section">
                     <div class="patient-section-header">
-                        <h3 class="section-title">Patient Samples</h3>
+                        <h3 class="section-title">{{ 'dashboard.patientSamples' | translate }}</h3>
                         <button class="btn-text-action" (click)="addPatient()">
                             <span class="material-symbols-outlined">add_circle</span>
-                            Add Another Patient
+                            {{ 'dashboard.addAnotherPatient' | translate }}
                         </button>
                     </div>
-
+ 
                     @for (patient of patients(); track patient.id) {
                     <div class="patient-card">
                         <div class="patient-grid-layout">
                             <div class="form-group">
-                                <label class="form-label">Patient ID / Sample Name</label>
+                                <label class="form-label">{{ 'dashboard.patientIdSampleName' | translate }}</label>
                                 <div class="input-with-action">
                                     <input type="text" [ngModel]="patient.name"
                                         (ngModelChange)="updatePatientName(patient.id, $event)"
-                                        placeholder="Enter ID">
-                                    <button class="btn-inline-action btn-icon-danger" (click)="removePatient(patient.id)" title="Remove">
+                                        [placeholder]="'dashboard.enterId' | translate">
+                                    <button class="btn-inline-action btn-icon-danger" (click)="removePatient(patient.id)" [attr.title]="'common.delete' | translate">
                                         <span class="material-symbols-outlined">delete</span>
                                     </button>
                                 </div>
                             </div>
-
+ 
                             <div class="form-group">
-                                <label class="form-label">Sequencing Reads</label>
+                                <label class="form-label">{{ 'dashboard.sequencingReads' | translate }}</label>
                                 <div class="reads-upload-container">
                                     <div class="reads-icon-wrapper"><span class="material-symbols-outlined">biotech</span></div>
                                     <div class="reads-info">
-                                        <p class="title">Upload .ab1 or .scf files</p>
+                                        <p class="title">{{ 'dashboard.uploadAb1OrScf' | translate }}</p>
                                     </div>
-                                    <button class="btn-small-action" (click)="addRead(patient)">Browse</button>
+                                    <button class="btn-small-action" (click)="addRead(patient)">{{ 'common.browse' | translate }}</button>
                                 </div>
-
+ 
                                 <div class="file-tags">
                                     @for (read of patient.reads; track $index) {
                                     <div class="file-tag" [class.tag-error]="read.fullLength !== undefined && (read.trimLeft ?? 0) + (read.trimRight ?? 0) >= read.fullLength">
                                         <span>{{ read.file.split('/').pop() }}</span>
                                         @if (read.fullLength !== undefined && (read.trimLeft ?? 0) + (read.trimRight ?? 0) >= read.fullLength) {
-                                            <span class="material-symbols-outlined warning-icon" title="Sequence is empty after trimming!">warning</span>
+                                            <span class="material-symbols-outlined warning-icon" [attr.title]="'dashboard.sequenceEmptyWarning' | translate">warning</span>
                                         }
                                         <button class="btn-tag-action" (click)="openReadSettings(patient.id, read)">
                                             <span class="material-symbols-outlined">settings</span>
@@ -231,41 +231,41 @@
                     <div class="empty-placeholder" (click)="addPatient()">
                         <div class="placeholder-content">
                             <span class="material-symbols-outlined">add</span>
-                            <span>Add New Patient</span>
+                            <span>{{ 'dashboard.addNewPatient' | translate }}</span>
                         </div>
                     </div>
                     }
                 </section>
             </div>
-
+ 
             <div class="modal-footer">
                 <div class="footer-warnings-left">
                     @if (sequenceWarnings().length > 0) {
-                    <div class="footer-warning-span" [title]="sequenceWarnings().join('\n')">
+                    <div class="footer-warning-span" [attr.title]="sequenceWarnings().join('\n')">
                         <span class="material-symbols-outlined">warning</span>
-                        <span>{{ sequenceWarnings().length }} sequence issues found. Hover for details.</span>
+                        <span>{{ 'dashboard.sequenceIssuesFound' | translate: { count: sequenceWarnings().length } }}</span>
                     </div>
                     }
                 </div>
-
+ 
                 <div class="footer-actions-right">
-                    <button class="btn-outline-icon" (click)="openSettings()" title="Run Configuration">
+                    <button class="btn-outline-icon" (click)="openSettings()" [attr.title]="'dashboard.runConfiguration' | translate">
                         <span class="material-symbols-outlined">tune</span>
                     </button>
                     
                     @if (currentJobId()) {
                     <button class="btn-outline" (click)="showCurrentResults()">
                         <span class="material-symbols-outlined">visibility</span>
-                        See Results
+                        {{ 'dashboard.seeResults' | translate }}
                     </button>
                     }
                     <button class="btn-solid" (click)="runAnalysis()" [disabled]="!canRunAnalysis()">
                         @if (currentJobId()) {
                         <span class="material-symbols-outlined">save</span>
-                        Update & Run
+                        {{ 'dashboard.updateAndRun' | translate }}
                         } @else {
                         <span class="material-symbols-outlined">play_arrow</span>
-                        Run Analysis
+                        {{ 'dashboard.runAnalysis' | translate }}
                         }
                     </button>
                 </div>
@@ -273,7 +273,7 @@
         </main>
     </div>
     }
-
+ 
     <!-- Hotspots View -->
     @if (currentTab() === 'hotspots') {
     <div class="hotspots-view-container">
@@ -281,26 +281,26 @@
     </div>
     }
 </div>
-
+ 
     <!-- Settings Modal -->
     @if (showSettings()) {
     <app-settings-modal [(isVisible)]="showSettings" [tracyConfig]="tracyConfig()" [hgvsConfig]="hgvsConfig()"
         [ncbiId]="ncbiId()" [useLocalRef]="useLocalRef()" (reset)="resetTracyConfig()">
     </app-settings-modal>
     }
-
+ 
     <!-- App Config Modal -->
     @if (showAppConfig()) {
     <app-config-modal [(isVisible)]="showAppConfig" [(activeTab)]="configModalTab"></app-config-modal>
     }
-
+ 
     <!-- Read Settings Modal -->
     @if (editingRead(); as current) {
     <app-read-settings [filePath]="current.read.file" [initialTrimLeft]="current.read.trimLeft ?? 50"
         [initialTrimRight]="current.read.trimRight ?? 50" (save)="saveReadSettings($event)"
         (close)="closeReadSettings()"></app-read-settings>
     }
-
+ 
     <!-- Hidden inputs for web-mode file selection -->
     <input type="file" id="web-ref-input" style="display: none;" accept=".fasta,.fa,.fna"
         (change)="onWebFileChange($event, 'ref')">

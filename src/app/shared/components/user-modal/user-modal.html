@@ -5,36 +5,36 @@
         <span class="material-symbols-outlined">person_add</span>
       </div>
       <div class="header-text">
-        <h2 class="modal-title">User Identity</h2>
-        <p class="modal-subtitle">Enter your name to personalize your comments and actions.</p>
+        <h2 class="modal-title">{{ 'userModal.title' | translate }}</h2>
+        <p class="modal-subtitle">{{ 'userModal.subtitle' | translate }}</p>
       </div>
-      <button class="close-btn" (click)="cancel()" aria-label="Close modal">
+      <button class="close-btn" (click)="cancel()" [attr.aria-label]="'common.close' | translate">
         <span class="material-symbols-outlined">close</span>
       </button>
     </header>
 
     <div class="modal-body">
       <div class="input-group">
-        <label for="username">Your Name</label>
+        <label for="username">{{ 'userModal.yourName' | translate }}</label>
         <div class="input-wrapper">
           <span class="material-symbols-outlined input-icon">account_circle</span>
           <input 
             type="text" 
             id="username" 
             [(ngModel)]="tempName" 
-            placeholder="e.g. Dr. Smith" 
+            [placeholder]="'appConfig.yourName' | translate" 
             (keyup.enter)="save()"
-            autofocus
+           
           >
         </div>
-        <small>This name will be attached to your comments and stored locally in this browser.</small>
+        <small>{{ 'userModal.nameDescription' | translate }}</small>
       </div>
     </div>
 
     <footer class="modal-footer">
-      <button class="btn-ghost" (click)="cancel()">Cancel</button>
+      <button class="btn-ghost" (click)="cancel()">{{ 'common.cancel' | translate }}</button>
       <button class="btn-primary" [disabled]="!tempName().trim()" (click)="save()">
-        <span>Confirm Name</span>
+        <span>{{ 'userModal.confirmName' | translate }}</span>
         <span class="material-symbols-outlined">check_circle</span>
       </button>
     </footer>

@@ -2,10 +2,13 @@ import {
   ApplicationConfig,
   provideBrowserGlobalErrorListeners,
   provideZonelessChangeDetection,
-  provideAppInitializer
+  provideAppInitializer,
+  importProvidersFrom
 } from "@angular/core";
 import { provideRouter } from "@angular/router";
 import { provideHttpClient } from '@angular/common/http';
+import { provideTranslateService } from '@ngx-translate/core';
+import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import { invoke } from '@tauri-apps/api/core';
 import { API_CONFIG } from './core/config/api.config';
 
@@ -49,6 +52,14 @@ export const appConfig: ApplicationConfig = {
     provideZonelessChangeDetection(),
     provideRouter(routes),
     provideHttpClient(),
-    provideAppInitializer(initializeApp)
+    provideAppInitializer(initializeApp),
+    provideTranslateService({
+      loader: provideTranslateHttpLoader({
+        prefix: './assets/i18n/',
+        suffix: '.json'
+      }),
+      lang: 'en',
+      fallbackLang: 'en'
+    })
   ],
 };

@@ -1,5 +1,4 @@
 import { Component, input, ChangeDetectionStrategy } from '@angular/core';
-
 @Component({
     selector: 'app-sanger-loader',
     standalone: true,

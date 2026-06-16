@@ -668,7 +668,7 @@ export class SangerChartComponent {
      * @param genotype VCF/genotype string e.g. 'hom. ALT'
      * @param insIdx Index of the base within an insertion (0 for primary base)
      */
-    highlightRefPos(refPos: number, genotype?: string, insIdx: number = 0) {
+    highlightRefPos(refPos: number, genotype?: string, insIdx = 0) {
         const item = this.consensusAlign()[refPos.toString()];
         if (!item) {
             this.highlightConfigs.set([]);

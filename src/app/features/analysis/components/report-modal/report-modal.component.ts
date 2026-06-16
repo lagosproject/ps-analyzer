@@ -1,13 +1,14 @@
 import { Component, input, output, signal, computed, ChangeDetectionStrategy, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe } from '@ngx-translate/core';
 import { Variant } from '../../../../core/models/analysis.model';
 import { ReportService, ReportConfig, ReportConfigItem } from '../../../../core/services/report.service';
 
 @Component({
     selector: 'app-report-modal',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, TranslatePipe],
     templateUrl: './report-modal.component.html',
     styleUrl: './report-modal.component.css',
     changeDetection: ChangeDetectionStrategy.OnPush

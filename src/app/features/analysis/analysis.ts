@@ -2,6 +2,7 @@ import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy, v
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { AnalysisService } from '../../core/services/analysis.service';
 import { TimelineService } from '../../core/services/timeline.service';
 import { AppStateService } from '../../core/services/app-state.service';
@@ -23,7 +24,7 @@ import { UserService } from '../../core/services/user.service';
 @Component({
   selector: 'app-analysis',
   standalone: true,
-  imports: [CommonModule, GroupNucleotideRows, SangerChartComponent, VariantListComponent, FormsModule, SettingsModalComponent, AnalysisMinimapComponent, NucleotideRowControlsComponent, ReportModalComponent, VariantDetailsModalComponent],
+  imports: [CommonModule, GroupNucleotideRows, SangerChartComponent, VariantListComponent, FormsModule, SettingsModalComponent, AnalysisMinimapComponent, NucleotideRowControlsComponent, ReportModalComponent, VariantDetailsModalComponent, TranslatePipe],
   templateUrl: './analysis.html',
   styleUrl: './analysis.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -37,6 +38,7 @@ export class AnalysisComponent implements OnInit {
   private readonly reportService = inject(ReportService);
   private readonly toastService = inject(ToastService);
   protected readonly userService = inject(UserService);
+  private readonly translate = inject(TranslateService);
 
 
   /** ID of the current analysis job */
@@ -136,13 +138,13 @@ export class AnalysisComponent implements OnInit {
     if (!range) return;
 
     const currentReadId = this.lastSelectedReadId() || 'Reference';
-    let currentGlobalIndex = range.start; // This is actually refPos - 1
+    const currentGlobalIndex = range.start; // This is actually refPos - 1
     const max = this.timelineService.maxPosition();
     
     // We also need to know the current subIndex if we are in an insertion.
     // However, since timelineService only tracks globalIndex (refPos - 1), 
     // let's just use the current refPos and scan forward/backward.
-    let refPos = currentGlobalIndex + 1;
+    const refPos = currentGlobalIndex + 1;
     let nextRefPos = refPos;
     let found = false;
     
@@ -385,7 +387,7 @@ export class AnalysisComponent implements OnInit {
         this.isEditingName.set(false);
       } catch (e) {
         console.error("Failed to rename job", e);
-        alert("Failed to rename job");
+        alert(this.translate.instant('analysis.failedRename'));
       }
     } else {
       // Revert or same name
@@ -646,7 +648,7 @@ export class AnalysisComponent implements OnInit {
       for (const res of results) {
         if (res.error) {
           console.error(`Error in result for patient ${res.patientId}: `, res.error);
-          this.toastService.show(`Error for patient ${res.patientId}: ${res.error}`, 'error');
+          this.toastService.show(this.translate.instant('analysis.errorForPatient', { patientId: res.patientId, error: res.error }), 'error');
           continue;
         }
 
@@ -710,7 +712,7 @@ export class AnalysisComponent implements OnInit {
 
     } catch (err: any) {
       console.error("Clinical Engine Failure:", err);
-      this.toastService.show(`Analysis loading failed: ${err.message || err}`, 'error');
+      this.toastService.show(this.translate.instant('analysis.analysisFailed', { message: err.message || err }), 'error');
     }
   }
 
@@ -732,7 +734,7 @@ export class AnalysisComponent implements OnInit {
       }
     } catch (e) {
       console.error("Failed to add comment", e);
-      alert("Failed to add comment");
+      alert(this.translate.instant('analysis.failedAddComment'));
     }
   }
 
@@ -752,7 +754,7 @@ export class AnalysisComponent implements OnInit {
       }
     } catch (e) {
       console.error("Failed to delete comment", e);
-      alert("Failed to delete comment");
+      alert(this.translate.instant('analysis.failedDeleteComment'));
     }
   }
 
@@ -768,11 +770,14 @@ export class AnalysisComponent implements OnInit {
       if (updatedJob && updatedJob.variant_statuses) {
         this.variantStatuses.set(updatedJob.variant_statuses);
       }
-      this.toastService.show(`Status updated to ${event.status}`, 'success');
+      const statusText = event.status !== 'none'
+        ? this.translate.instant('variantList.' + event.status.toLowerCase())
+        : event.status;
+      this.toastService.show(this.translate.instant('analysis.statusUpdated', { status: statusText }), 'success');
 
     } catch (e) {
       console.error("Failed to update status", e);
-      this.toastService.show("Failed to update status", "error");
+      this.toastService.show(this.translate.instant('analysis.failedUpdateStatus'), "error");
     }
   }
 

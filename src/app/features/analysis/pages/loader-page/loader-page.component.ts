@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, inject, signal, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { AnalysisError, AnalysisService } from '../../../../core/services/analysis.service';
 import { AppStateService } from '../../../../core/services/app-state.service';
 import { SangerLoaderComponent } from '../../../../shared/components/loader/loader.component';
@@ -12,7 +13,7 @@ import { SangerLoaderComponent } from '../../../../shared/components/loader/load
 @Component({
     selector: 'app-analysis-loader-page',
     standalone: true,
-    imports: [CommonModule, SangerLoaderComponent],
+    imports: [CommonModule, SangerLoaderComponent, TranslatePipe],
     templateUrl: './loader-page.component.html',
     styleUrl: './loader-page.component.css',
     changeDetection: ChangeDetectionStrategy.OnPush
@@ -22,9 +23,10 @@ export class AnalysisLoaderPageComponent implements OnInit, OnDestroy {
     private readonly appState = inject(AppStateService);
     private readonly router = inject(Router);
     private readonly route = inject(ActivatedRoute);
+    private readonly translate = inject(TranslateService);
 
     /** The current status message to display in the UI */
-    readonly statusMessage = signal<string>('Initializing...');
+    readonly statusMessage = signal<string>('');
     /** Job progress percentage (0-100) */
     readonly progress = signal<number>(0);
     /** Error details if the job fails */
@@ -33,6 +35,7 @@ export class AnalysisLoaderPageComponent implements OnInit, OnDestroy {
     private destroyed = false;
 
     ngOnInit() {
+        this.statusMessage.set(this.translate.instant('loaderPage.initializing'));
         this.route.paramMap.subscribe(params => {
             const jobId = params.get('id');
             if (jobId) {
@@ -76,7 +79,7 @@ export class AnalysisLoaderPageComponent implements OnInit, OnDestroy {
                 if (job.status_message) {
                     this.statusMessage.set(job.status_message);
                 } else {
-                    this.statusMessage.set(`Job is ${job.status}...`);
+                    this.statusMessage.set(this.translate.instant('loaderPage.jobIs', { status: job.status }));
                 }
 
                 await new Promise(resolve => setTimeout(resolve, 2000));
@@ -87,12 +90,12 @@ export class AnalysisLoaderPageComponent implements OnInit, OnDestroy {
 
             if (job.status === 'failed') {
                 console.error("Job failed:", job.error);
-                this.statusMessage.set("Job failed.");
+                this.statusMessage.set(this.translate.instant('loaderPage.jobFailed'));
                 this.analysisError.set({ type: 'JobFailed', message: job.error || 'Unknown error', traceback: '' });
                 return;
             }
 
-            this.statusMessage.set("Processing results...");
+            this.statusMessage.set(this.translate.instant('loaderPage.processingResults'));
             // Navigate to analysis view passing the job object in state to avoid re-fetching
             this.router.navigate(['/analysis', jobId], { state: { job } });
 

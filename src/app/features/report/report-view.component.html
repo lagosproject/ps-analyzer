@@ -2,38 +2,38 @@
     <header class="report-header no-print">
         <button class="btn-outline" (click)="back()">
             <span class="material-symbols-outlined">arrow_back</span>
-            Back to Analysis
+            {{ 'report.backToAnalysis' | translate }}
         </button>
         <div class="action-buttons">
             <button class="btn-outline" (click)="exportFhir()">
                 <span class="material-symbols-outlined">description</span>
-                Export to FHIR
+                {{ 'report.exportFhir' | translate }}
             </button>
             <button class="btn-outline" (click)="exportHtml()">
                 <span class="material-symbols-outlined">html</span>
-                Export to HTML
+                {{ 'report.exportHtml' | translate }}
             </button>
             <button class="btn-solid" (click)="print()">
                 <span class="material-symbols-outlined">print</span>
-                Print / Save PDF
+                {{ 'report.printSavePdf' | translate }}
             </button>
         </div>
     </header>
 
     <div class="report-content">
         <div class="report-title-section">
-            <h1>Analysis Report</h1>
+            <h1>{{ 'report.analysisReport' | translate }}</h1>
             <div class="meta-grid">
                 <div class="meta-item">
-                    <span class="label">Job Name:</span>
+                    <span class="label">{{ 'report.jobName' | translate }}</span>
                     <span class="value">{{ config()?.jobName }}</span>
                 </div>
                 <div class="meta-item">
-                    <span class="label">Job ID:</span>
+                    <span class="label">{{ 'report.jobId' | translate }}</span>
                     <span class="value">{{ config()?.jobId }}</span>
                 </div>
                 <div class="meta-item">
-                    <span class="label">Date:</span>
+                    <span class="label">{{ 'report.date' | translate }}</span>
                     <span class="value">{{ currentDate | date:'medium' }}</span>
                 </div>
             </div>

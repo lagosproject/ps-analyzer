@@ -2,6 +2,7 @@ import { Component, inject, signal, computed, OnInit, ChangeDetectionStrategy } 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { open, ask } from '@tauri-apps/plugin-dialog';
 import { getVersion } from '@tauri-apps/api/app';
 import { AppStateService } from '../../core/services/app-state.service';
@@ -13,16 +14,16 @@ import { ReadSettingsComponent } from '../../shared/components/read-settings/rea
 import { SettingsModalComponent } from '../../shared/components/settings-modal/settings-modal';
 import { AppConfigModalComponent } from '../../shared/components/app-config-modal/app-config-modal';
 import { HotspotsComponent } from '../hotspots/hotspots';
-
+ 
 /**
  * DashboardComponent handles the main orchestration of analysis projects.
  * It allows users to manage projects, patients, reads, and configuration settings.
  */
-
+ 
 @Component({
     selector: 'app-dashboard',
     standalone: true,
-    imports: [CommonModule, FormsModule, ReadSettingsComponent, SettingsModalComponent, AppConfigModalComponent, HotspotsComponent],
+    imports: [CommonModule, FormsModule, ReadSettingsComponent, SettingsModalComponent, AppConfigModalComponent, HotspotsComponent, TranslatePipe],
     templateUrl: './dashboard.html',
     styleUrl: './dashboard.css',
     changeDetection: ChangeDetectionStrategy.OnPush
@@ -36,6 +37,8 @@ export class DashboardComponent implements OnInit {
     private readonly toastService = inject(ToastService);
     /** Angular Router for navigation */
     private readonly router = inject(Router);
+    /** TranslateService for dynamic translations */
+    private readonly translate = inject(TranslateService);
     
     /** Current active dashboard tab: 'sanger' or 'hotspots' */
     readonly currentTab = signal<'sanger' | 'hotspots'>('sanger');
@@ -170,7 +173,7 @@ export class DashboardComponent implements OnInit {
                 }
             } catch (e) {
                 console.error("Upload failed", e);
-                this.toastService.show(`Failed to upload ${file.name}`, "error");
+                this.toastService.show(this.translate.instant('dashboard.failedUpload', { name: file.name }), "error");
             }
         }
         
@@ -196,7 +199,7 @@ export class DashboardComponent implements OnInit {
         if (isConnected) {
             this.loadJobs();
         } else {
-            this.toastService.show("Could not connect to analysis server.", "error");
+            this.toastService.show(this.translate.instant('dashboard.serverConnectionError'), "error");
         }
     }
 
@@ -218,7 +221,7 @@ export class DashboardComponent implements OnInit {
             }
         } catch (e) {
             console.error("Failed to load jobs", e);
-            this.toastService.show("Failed to load project list.", "error");
+            this.toastService.show(this.translate.instant('dashboard.loadJobsError'), "error");
         }
     }
 
@@ -258,18 +261,18 @@ export class DashboardComponent implements OnInit {
                     this.ncbiId.set(id);
                     // Update HGVS transcript
                     this.hgvsConfig.update(cfg => ({ ...cfg, transcript: id }));
-                    this.fetchSuccess.set(`Validated reference: ${id} (${results[0].title})`);
+                    this.fetchSuccess.set(this.translate.instant('dashboard.validatedRef', { id, title: results[0].title }));
                 } else {
                     // Multiple results, show them to the user
                     this.searchResults.set(results);
-                    this.fetchSuccess.set(`Found ${results.length} possible references. Please select one.`);
+                    this.fetchSuccess.set(this.translate.instant('dashboard.foundRefs', { count: results.length }));
                 }
             } else {
-                this.fetchError.set(`No references found for "${query}".`);
+                this.fetchError.set(this.translate.instant('dashboard.noRefsFound', { query }));
             }
         } catch (error: any) {
             this.isSearching.set(false);
-            this.fetchError.set("Error checking reference. Please try again.");
+            this.fetchError.set(this.translate.instant('dashboard.refCheckError'));
         }
     }
 
@@ -281,7 +284,7 @@ export class DashboardComponent implements OnInit {
         this.ncbiId.set(result.accession);
         this.hgvsConfig.update(cfg => ({ ...cfg, transcript: result.accession }));
         this.searchResults.set([]);
-        this.fetchSuccess.set(`Selected reference: ${result.accession} (${result.title})`);
+        this.fetchSuccess.set(this.translate.instant('dashboard.selectedRef', { id: result.accession, title: result.title }));
     }
 
     /**
@@ -368,9 +371,9 @@ export class DashboardComponent implements OnInit {
      */
     async removePatient(id: string) {
         const confirmed = this.isTauri 
-            ? await ask("Are you sure you want to remove this patient?", { title: 'Confirm Deletion', kind: 'warning' })
-            : confirm("Are you sure you want to remove this patient?");
-
+            ? await ask(this.translate.instant('dashboard.confirmRemovePatient'), { title: this.translate.instant('dashboard.confirmDeletion'), kind: 'warning' })
+            : confirm(this.translate.instant('dashboard.confirmRemovePatient'));
+ 
         if (confirmed) {
             this.appState.removePatient(id);
         }
@@ -470,9 +473,9 @@ export class DashboardComponent implements OnInit {
     async onDeleteJob(event: Event, job: AnalysisJob) {
         event.stopPropagation();
         const confirmed = this.isTauri
-            ? await ask(`Delete job "${job.name}"?`, { title: 'Confirm Deletion', kind: 'warning' })
-            : confirm(`Delete job "${job.name}"?`);
-
+            ? await ask(this.translate.instant('dashboard.confirmDeleteJob', { name: job.name }), { title: this.translate.instant('dashboard.confirmDeletion'), kind: 'warning' })
+            : confirm(this.translate.instant('dashboard.confirmDeleteJob', { name: job.name }));
+ 
         if (confirmed) {
             try {
                 await this.analysisService.deleteJob(job.id);
@@ -480,10 +483,10 @@ export class DashboardComponent implements OnInit {
                 if (this.currentJobId() === job.id) {
                     this.currentJobId.set(null);
                 }
-                this.toastService.show("Project deleted.", "success");
+                this.toastService.show(this.translate.instant('dashboard.projectDeleted'), "success");
             } catch (e) {
                 console.error("Failed to delete job", e);
-                this.toastService.show("Failed to delete project.", "error");
+                this.toastService.show(this.translate.instant('dashboard.deleteProjectError'), "error");
             }
         }
     }
@@ -503,15 +506,15 @@ export class DashboardComponent implements OnInit {
      */
     async onRenameJob(event: Event, job: AnalysisJob) {
         event.stopPropagation();
-        const newName = prompt("New job name:", job.name);
+        const newName = prompt(this.translate.instant('dashboard.newJobNamePrompt'), job.name);
         if (newName && newName !== job.name) {
             try {
                 await this.analysisService.renameJob(job.id, newName);
                 this.loadJobs();
-                this.toastService.show("Project renamed.", "success");
+                this.toastService.show(this.translate.instant('dashboard.projectRenamed'), "success");
             } catch (e) {
                 console.error("Failed to rename job", e);
-                this.toastService.show("Failed to rename project.", "error");
+                this.toastService.show(this.translate.instant('dashboard.renameProjectError'), "error");
             }
         }
     }
@@ -532,22 +535,22 @@ export class DashboardComponent implements OnInit {
 
                 if (!targetFolder) return;
 
-                const confirmed = await ask(`Export "${job.name}" to this folder?\n\nChoose Export Level:`, {
-                    title: 'Share Job',
+                const confirmed = await ask(this.translate.instant('dashboard.exportQuestion', { name: job.name }), {
+                    title: this.translate.instant('dashboard.shareJob'),
                     kind: 'info',
-                    okLabel: 'Full (Data + Results)',
-                    cancelLabel: 'Results Only'
+                    okLabel: this.translate.instant('dashboard.exportLevelFull'),
+                    cancelLabel: this.translate.instant('dashboard.exportLevelResults')
                 });
-
+ 
                 const level = confirmed ? 'full' : 'results_only';
                 await this.analysisService.shareJob(job.id, level, targetFolder as string);
-                this.toastService.show(`Job exported successfully to ${targetFolder}`, 'success');
+                this.toastService.show(this.translate.instant('dashboard.exportSuccess', { folder: targetFolder }), 'success');
             } else {
-                this.toastService.show("Export to local folder is only available in the desktop version.", "warning");
+                this.toastService.show(this.translate.instant('dashboard.exportDesktopOnly'), "warning");
             }
         } catch (e) {
             console.error("Failed to share job", e);
-            this.toastService.show("Failed to export job", 'error');
+            this.toastService.show(this.translate.instant('dashboard.exportError'), 'error');
         }
     }
 
@@ -566,14 +569,14 @@ export class DashboardComponent implements OnInit {
                 if (!sourceFolder) return;
 
                 await this.analysisService.importJob(sourceFolder as string);
-                this.toastService.show("Job imported successfully", 'success');
+                this.toastService.show(this.translate.instant('dashboard.importSuccess'), 'success');
                 this.loadJobs();
             } catch (e) {
                 console.error("Failed to import job", e);
-                this.toastService.show("Failed to import job. Ensure it is a valid shared job folder.", 'error');
+                this.toastService.show(this.translate.instant('dashboard.importError'), 'error');
             }
         } else {
-            this.toastService.show("Importing from local folder is only available in the desktop version.", "warning");
+            this.toastService.show(this.translate.instant('dashboard.importDesktopOnly'), "warning");
         }
     }
 
@@ -601,10 +604,10 @@ export class DashboardComponent implements OnInit {
                 await this.analysisService.renameJob(jobId, newName);
                 await this.loadJobs();
                 this.isEditingName.set(false);
-                this.toastService.show("Project renamed.", "success");
+                this.toastService.show(this.translate.instant('dashboard.projectRenamed'), "success");
             } catch (e) {
                 console.error("Failed to rename job", e);
-                this.toastService.show("Failed to rename project.", "error");
+                this.toastService.show(this.translate.instant('dashboard.renameProjectError'), "error");
             }
         } else {
             this.isEditingName.set(false);
@@ -716,7 +719,7 @@ export class DashboardComponent implements OnInit {
                 }));
 
             if (validPatients.length === 0) {
-                this.toastService.show("No patients with reads found.", "warning");
+                this.toastService.show(this.translate.instant('dashboard.noPatientsWithReads'), "warning");
                 return;
             }
 
@@ -744,10 +747,10 @@ export class DashboardComponent implements OnInit {
                 this.router.navigate(['/analysis/loading', job.id]);
             } catch (e) {
                 console.error("Job execution failed", e);
-                this.toastService.show("Failed to execute analysis job.", "error");
+                this.toastService.show(this.translate.instant('dashboard.executeJobError'), "error");
             }
         } else {
-            this.toastService.show("Please add at least one patient and a reference sequence.", "warning");
+            this.toastService.show(this.translate.instant('dashboard.validationError'), "warning");
         }
     }
 

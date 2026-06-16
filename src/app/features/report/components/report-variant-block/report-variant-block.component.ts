@@ -1,5 +1,6 @@
 import { Component, OnInit, inject, computed, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslatePipe } from '@ngx-translate/core';
 import { TimelineService } from '../../../../core/services/timeline.service';
 import { SangerChartComponent } from '../../../analysis/components/sanger-chart/sanger-chart';
 import { AnalysisService } from '../../../../core/services/analysis.service';
@@ -14,7 +15,7 @@ import { ProcessedReportItem } from '../../models/report.models';
 @Component({
     selector: 'app-report-variant-block',
     standalone: true,
-    imports: [CommonModule, SangerChartComponent, GroupNucleotideRows],
+    imports: [CommonModule, SangerChartComponent, GroupNucleotideRows, TranslatePipe],
     providers: [TimelineService],
     templateUrl: './report-variant-block.component.html',
     styleUrl: './report-variant-block.component.css'

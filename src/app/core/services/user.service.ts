@@ -10,7 +10,6 @@ export class UserService {
 
   private modalResolver: ((name: string | null) => void) | null = null;
 
-  constructor() {}
 
   private getStoredName(): string | null {
     return localStorage.getItem(this.STORAGE_KEY);

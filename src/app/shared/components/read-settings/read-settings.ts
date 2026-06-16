@@ -1,19 +1,21 @@
 import { Component, inject, signal, input, output, ChangeDetectionStrategy, effect, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { SangerChartComponent } from '../../../features/analysis/components/sanger-chart/sanger-chart';
 import { AnalysisService, AnalysisResult } from '../../../core/services/analysis.service';
 
 @Component({
     selector: 'app-read-settings',
     standalone: true,
-    imports: [CommonModule, FormsModule, SangerChartComponent],
+    imports: [CommonModule, FormsModule, SangerChartComponent, TranslatePipe],
     templateUrl: './read-settings.html',
     styleUrl: './read-settings.css',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ReadSettingsComponent {
     protected readonly analysisService = inject(AnalysisService);
+    private readonly translate = inject(TranslateService);
 
     // Inputs
     /** Path of the read file. */
@@ -75,7 +77,7 @@ export class ReadSettingsComponent {
                 this.previewSequenceLength.set(data.peakLocations.length);
             }
         } catch (e: unknown) {
-            this.error.set(e instanceof Error ? e.message : "Failed to load preview.");
+            this.error.set(e instanceof Error ? e.message : this.translate.instant('readSettings.failedLoad'));
         } finally {
             this.loading.set(false);
         }

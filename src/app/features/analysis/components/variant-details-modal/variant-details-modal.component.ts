@@ -1,6 +1,7 @@
 import { Component, input, output, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { Variant } from '../../../../core/models/analysis.model';
 import { ToastService } from '../../../../core/services/toast.service';
 import { openUrl } from '@tauri-apps/plugin-opener';
@@ -13,7 +14,7 @@ interface OCGroup {
 @Component({
   selector: 'app-variant-details-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './variant-details-modal.component.html',
   styleUrl: './variant-details-modal.component.css'
 })
@@ -29,6 +30,7 @@ export class VariantDetailsModalComponent {
   isVepExpanded = signal<boolean>(false);
 
   private toastService = inject(ToastService);
+  private translate = inject(TranslateService);
 
   /**
    * Formats a consequence abbreviation into a descriptive name.
@@ -277,10 +279,10 @@ export class VariantDetailsModalComponent {
   async copyText(text: string) {
     try {
       await navigator.clipboard.writeText(text);
-      this.toastService.show('Copied to clipboard!', 'success');
+      this.toastService.show(this.translate.instant('common.copied'), 'success');
     } catch (err) {
       console.error(err);
-      this.toastService.show('Failed to copy', 'error');
+      this.toastService.show(this.translate.instant('common.failedCopy'), 'error');
     }
   }
 
@@ -339,7 +341,7 @@ export class VariantDetailsModalComponent {
 
     if (!url) return;
 
-    this.toastService.show(`Opening external site...`, 'info');
+    this.toastService.show(this.translate.instant('common.openingExternal'), 'info');
     try {
       await openUrl(url);
     } catch (err) {
@@ -371,7 +373,7 @@ export class VariantDetailsModalComponent {
   async openPubmed(pmid: string) {
     const numeric = pmid.replace('PMID:', '').trim();
     const url = `https://pubmed.ncbi.nlm.nih.gov/${numeric}/`;
-    this.toastService.show(`Opening PubMed article...`, 'info');
+    this.toastService.show(this.translate.instant('common.openingPubmed'), 'info');
     try {
       await openUrl(url);
     } catch (err) {
@@ -381,7 +383,7 @@ export class VariantDetailsModalComponent {
 
   async openDbsnp(rsid: string) {
     const url = `https://www.ncbi.nlm.nih.gov/snp/${rsid.trim()}`;
-    this.toastService.show(`Opening dbSNP...`, 'info');
+    this.toastService.show(this.translate.instant('common.openingDbsnp'), 'info');
     try {
       await openUrl(url);
     } catch (err) {
@@ -400,7 +402,7 @@ export class VariantDetailsModalComponent {
 
   async openClinvar(id: any) {
     const url = `https://www.ncbi.nlm.nih.gov/clinvar/variation/${id}/`;
-    this.toastService.show(`Opening NCBI ClinVar...`, 'info');
+    this.toastService.show(this.translate.instant('common.openingClinvar'), 'info');
     try {
       await openUrl(url);
     } catch (err) {
@@ -410,7 +412,7 @@ export class VariantDetailsModalComponent {
 
   async openDbsnpId(id: any) {
     const url = `https://www.ncbi.nlm.nih.gov/snp/rs${id}`;
-    this.toastService.show(`Opening dbSNP...`, 'info');
+    this.toastService.show(this.translate.instant('common.openingDbsnp'), 'info');
     try {
       await openUrl(url);
     } catch (err) {
@@ -439,7 +441,7 @@ export class VariantDetailsModalComponent {
   }
 
   async openExternalUrl(url: string) {
-    this.toastService.show(`Opening external link...`, 'info');
+    this.toastService.show(this.translate.instant('common.openingExternalLink'), 'info');
     try {
       await openUrl(url);
     } catch (err) {

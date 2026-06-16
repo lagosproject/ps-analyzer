@@ -1,4 +1,5 @@
 import { Component, ChangeDetectionStrategy, input, output, viewChild, ElementRef, signal, effect } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 
 /**
  * Data structure for the signal popup displaying nucleotide details.
@@ -19,7 +20,7 @@ export interface SignalPopupData {
 @Component({
     selector: 'app-signal-popup',
     standalone: true,
-    imports: [],
+    imports: [TranslatePipe],
     templateUrl: './signal-popup.html',
     styleUrl: './signal-popup.css',
     changeDetection: ChangeDetectionStrategy.OnPush

@@ -6,14 +6,14 @@
     <!-- Top Header -->
     <header class="top-bar">
       <div class="header-left">
-        <div class="brand" (click)="goBack()" title="Return to Dashboard" aria-label="Return to Dashboard" role="button"
+        <div class="brand" (click)="goBack()" [title]="'analysis.returnToDashboard' | translate" [attr.aria-label]="'analysis.returnToDashboard' | translate" role="button"
           tabindex="0">
           <img src="assets/logo.svg" class="brand-logo" alt="PS Analyzer Logo" aria-hidden="true">
           <div class="brand-text">
             <h1 class="brand-title">PS Analyzer</h1>
             <div class="brand-subtitle" aria-hidden="true">
               <span class="material-symbols-outlined" style="font-size: 16px;" aria-hidden="true">arrow_back</span>
-              <span>Back to Dashboard</span>
+              <span>{{ 'analysis.backToDashboard' | translate }}</span>
             </div>
           </div>
         </div>
@@ -26,33 +26,33 @@
                 (keyup.escape)="cancelEditingName()" class="header-edit-input" aria-label="Edit job name">
             </div>
             } @else {
-            <h2 class="page-title editable-title" (dblclick)="startEditingName()" title="Double click to rename"
+            <h2 class="page-title editable-title" (dblclick)="startEditingName()" [title]="'dashboard.doubleClickRename' | translate"
               aria-label="Job Name">
-              {{ currentJobName() || 'Sequence Analysis' }}
+              {{ currentJobName() || ('analysis.sequenceAnalysis' | translate) }}
               <span class="material-symbols-outlined edit-icon" aria-hidden="true">edit</span>
             </h2>
             }
           </div>
           <div class="job-meta-badge">
             <span class="material-symbols-outlined" aria-hidden="true">group</span>
-            <span>{{ patients().length }} Patients</span>
+            <span>{{ 'analysis.patientsCount' | translate: { count: patients().length } }}</span>
             <span class="meta-dot"></span>
             <span class="material-symbols-outlined" aria-hidden="true">analytics</span>
-            <span>{{ totalReads() }} Reads</span>
+            <span>{{ 'analysis.readsCount' | translate: { count: totalReads() } }}</span>
           </div>
         </div>
       </div>
       <div class="action-buttons">
         <button class="btn-outline" (click)="openSettings()" [disabled]="!tracyConfig()"
-          aria-label="View Analysis Settings">
+          [attr.aria-label]="'analysis.viewSettings' | translate">
           <span class="material-symbols-outlined" aria-hidden="true">tune</span>
-          <span>View Settings</span>
+          <span>{{ 'analysis.viewSettings' | translate }}</span>
         </button>
 
         <button class="btn-solid" [disabled]="!hasMarkedVariants()" (click)="openReportModal()"
-          aria-label="Export Report">
+          [attr.aria-label]="'analysis.exportReport' | translate">
           <span class="material-symbols-outlined" aria-hidden="true">download</span>
-          <span>Export Report</span>
+          <span>{{ 'analysis.exportReport' | translate }}</span>
         </button>
       </div>
 
@@ -100,7 +100,7 @@
 
         <!-- Resizer Handle -->
         <div class="resizer-handle" (mousedown)="startResizing($event)" role="separator" aria-orientation="horizontal"
-          title="Drag to resize panels">
+          [title]="'analysis.dragToResize' | translate">
           <div class="resizer-indicator"></div>
         </div>
         }
@@ -109,12 +109,12 @@
         <div class="chromatogram-section">
           <div class="chromatogram-header">
             <div class="header-left-group">
-              <h4 class="section-title">Chromatogram Traces</h4>
+              <h4 class="section-title">{{ 'analysis.chromatogramTraces' | translate }}</h4>
             </div>
             <div class="header-actions">
               <button class="icon-btn-toggle" (click)="toggleSequenceVisibility()"
-                [title]="isSequenceVisible() ? 'Fullscreen Sanger' : 'Show Sequence'"
-                [attr.aria-label]="isSequenceVisible() ? 'Fullscreen Sanger' : 'Show Sequence'">
+                [title]="isSequenceVisible() ? ('analysis.fullscreenSanger' | translate) : ('analysis.showSequence' | translate)"
+                [attr.aria-label]="isSequenceVisible() ? ('analysis.fullscreenSanger' | translate) : ('analysis.showSequence' | translate)">
                 <span class="material-symbols-outlined">
                   {{ isSequenceVisible() ? 'fullscreen' : 'fullscreen_exit' }}
                 </span>

@@ -6,20 +6,20 @@
       <div class="header-title-group">
         <span class="material-symbols-outlined header-icon">database</span>
         <div class="header-text-layout">
-          <h2>Variant Annotation Details</h2>
+          <h2>{{ 'variantDetails.title' | translate }}</h2>
           <div class="header-consequence-row">
             @if (variant()!['consequence']) {
-            <span class="header-conseq-badge" title="Consequence">{{ getConsequenceDisplayName(variant()!['consequence']) }}</span>
+            <span class="header-conseq-badge" [title]="'variantList.consequence' | translate">{{ getConsequenceDisplayName(variant()!['consequence']) }}</span>
             }
             @if (variant()!['impact']) {
-            <span class="impact-badge header-impact" [attr.data-impact]="variant()!['impact']" title="Impact Severity">
+            <span class="impact-badge header-impact" [attr.data-impact]="variant()!['impact']" [title]="'variantList.impact' | translate">
               {{ variant()!['impact'] }}
             </span>
             }
           </div>
         </div>
       </div>
-      <button class="btn-icon-small" (click)="close()" aria-label="Close modal">
+      <button class="btn-icon-small" (click)="close()" [attr.aria-label]="'common.close' | translate">
         <span class="material-symbols-outlined">close</span>
       </button>
     </div>
@@ -30,7 +30,7 @@
         <div class="card-header-row">
           <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; position: relative;">
             <div class="variant-name-container" [class.has-hgvs-interaction]="getAlternateNames().length > 0">
-              <div class="variant-hgvs-badge" (click)="copyText(getVariantName())" title="Click to copy principal HGVS" style="margin: 0;">
+              <div class="variant-hgvs-badge" (click)="copyText(getVariantName())" [title]="'variantDetails.hgvsCodingNomenclature' | translate" style="margin: 0;">
                 <span class="hgvs-text">{{ getVariantName() }}</span>
                 <span class="material-symbols-outlined copy-icon">content_copy</span>
               </div>
@@ -39,16 +39,16 @@
               <span class="alt-badge">+{{ getAlternateNames().length }}</span>
               <div class="hgvs-tooltip">
                 <div class="hgvs-tooltip-header">
-                  <span>Equivalent Transcripts</span>
-                  <button class="copy-all-btn" (click)="copyText(getAlternateNames().concat(getVariantName()).join('\n'))" title="Copy all" aria-label="Copy all HGVS variants">
+                  <span>{{ 'variantDetails.equivalentTranscripts' | translate }}</span>
+                  <button class="copy-all-btn" (click)="copyText(getAlternateNames().concat(getVariantName()).join('\n'))" [title]="'variantList.copyAll' | translate" [attr.aria-label]="'variantList.copyAllHgvs' | translate">
                     <span class="material-symbols-outlined" aria-hidden="true">content_copy</span>
                   </button>
                 </div>
                 <div class="hgvs-list">
                   @for (altName of getAlternateNames(); track altName) {
                   <div class="hgvs-item" (click)="copyText(altName)">
-                    <span>{{ altName }}</span>
-                    <span class="material-symbols-outlined mini-copy">content_copy</span>
+                     <span>{{ altName }}</span>
+                     <span class="material-symbols-outlined mini-copy">content_copy</span>
                   </div>
                   }
                 </div>
@@ -56,7 +56,7 @@
               }
             </div>
             @if (variant()!['gene_symbol']) {
-            <span class="header-gene" title="Gene Symbol" style="font-size: 0.85rem; padding: 4px 10px; border-radius: 6px; margin: 0;">{{ variant()!['gene_symbol'] }}</span>
+            <span class="header-gene" [title]="'variantList.gene' | translate" style="font-size: 0.85rem; padding: 4px 10px; border-radius: 6px; margin: 0;">{{ variant()!['gene_symbol'] }}</span>
             }
           </div>
           <div class="genomic-coords">
@@ -67,11 +67,11 @@
 
         <div class="metadata-grid">
           <div class="meta-item">
-            <span class="meta-label">Variant Type</span>
+            <span class="meta-label">{{ 'variantList.type' | translate }}</span>
             <span class="meta-value type-pill" [attr.data-type]="variant()!.type">{{ variant()!.type }}</span>
           </div>
           <div class="meta-item">
-            <span class="meta-label">Involved Patients</span>
+            <span class="meta-label">{{ 'variantList.patient' | translate }}</span>
             <div class="patient-pills">
               @for (patient of getInvolvedPatients(); track patient) {
               <span class="patient-pill">{{ patient }}</span>
@@ -79,7 +79,7 @@
             </div>
           </div>
           <div class="meta-item">
-            <span class="meta-label">Quality Status</span>
+            <span class="meta-label">{{ 'variantList.quality' | translate }}</span>
             <span class="meta-value quality-pill" [class.pass]="variant()!.filter === 'PASS'">
               {{ variant()!.filter || 'N/A' }} (Qual: {{ variant()!.qual }})
             </span>
@@ -89,13 +89,13 @@
 
       <!-- Section 2: External Database Portals -->
       <div class="portal-links-section">
-        <span class="portal-label">External Database Portals:</span>
+        <span class="portal-label">{{ 'variantDetails.clinicalEvidence' | translate }}:</span>
         <div class="portal-btn-row">
-          <button class="portal-btn" (click)="openLink('ensembl')" title="Query this HGVS in Ensembl browser">
+          <button class="portal-btn" (click)="openLink('ensembl')" [title]="'variantList.viewOnEnsembl' | translate">
             <span class="portal-icon material-symbols-outlined">launch</span>
             <span>Ensembl</span>
           </button>
-          <button class="portal-btn" (click)="openLink('clinvar')" title="View variation detail in NCBI ClinVar">
+          <button class="portal-btn" (click)="openLink('clinvar')" [title]="'variantDetails.clinicalEvidence' | translate">
             <span class="portal-icon material-symbols-outlined">medical_information</span>
             <span>ClinVar</span>
           </button>
@@ -119,10 +119,10 @@
       @if (cravatGroups().length > 0) {
       <div class="cravat-section">
         <div class="cravat-filter-header">
-          <span class="cravat-filter-label">Annotations</span>
+          <span class="cravat-filter-label">{{ 'variantList.vepAnnotations' | translate }}</span>
           <div class="cravat-chips-container">
             <button class="cravat-filter-chip" [class.active]="activeCravatTab() === 'All'" (click)="setActiveCravatTab('All')">
-              All ({{ cravatGroups().length }})
+              {{ 'variantList.all' | translate }} ({{ cravatGroups().length }})
             </button>
             @for (grp of cravatGroups(); track grp.module) {
             <button class="cravat-filter-chip" [class.active]="activeCravatTab() === grp.module" (click)="setActiveCravatTab(grp.module)">
@@ -139,7 +139,7 @@
                 <div class="cravat-card-title clinvar-custom-title" (click)="toggleClinvar()" style="cursor: pointer;" title="Click to collapse/expand details">
                   <div style="display: flex; align-items: center; gap: 8px;">
                     <span class="material-symbols-outlined clinvar-title-icon">medical_information</span>
-                    <span>ClinVar Clinical Annotation</span>
+                    <span>{{ 'variantDetails.clinicalEvidence' | translate }}</span>
                   </div>
                   <span class="material-symbols-outlined toggle-chevron">
                     {{ (activeCravatTab() === 'ClinVar' || isClinvarExpanded()) ? 'expand_less' : 'expand_more' }}
@@ -147,13 +147,13 @@
                 </div>
                 
                 <div class="clinvar-custom-body">
-                  <!-- Top Section: Significance, Stars, and IDs (Always visible) -->
+                  <!-- Bottom Section: Significance, Stars, and IDs (Always visible) -->
                   <div class="clinvar-header-section">
                     <!-- Column 1: Significance & Stars -->
                     <div class="clinvar-header-main">
                       @if (getClinvarField(grp.fields, 'Sig'); as sig) {
                         <div class="clinvar-sig-display">
-                          <span class="clin-sig-label">Clinical Significance</span>
+                          <span class="clin-sig-label">{{ 'variantDetails.clinicalSignificance' | translate }}</span>
                           <div class="clin-sig-pills">
                             @for (s of splitPipeString(sig); track s) {
                               <span class="clin-sig-badge large-badge" [attr.data-sig]="s.toLowerCase()">{{ s }}</span>
@@ -164,7 +164,7 @@
                       
                       @if (getClinvarField(grp.fields, 'Rev Stat'); as revStat) {
                         <div class="clinvar-stars-display">
-                          <span class="clin-stars-label">Review Status</span>
+                          <span class="clin-stars-label">{{ 'variantDetails.reviewStatus' | translate }}</span>
                           <div class="stars-row-container">
                             <div class="stars-stars">
                               @for (star of [1, 2, 3, 4]; track star) {
@@ -183,7 +183,7 @@
                     <div class="clinvar-header-ids">
                       @if (getClinvarField(grp.fields, 'Id'); as cvId) {
                         <div class="clinvar-id-row">
-                          <span class="clinvar-id-label">Variation ID</span>
+                          <span class="clinvar-id-label">{{ 'variantDetails.variationId' | translate }}</span>
                           <span class="pheno-pill pmid" (click)="$event.stopPropagation(); openClinvar(cvId)" title="Click to view variation in NCBI ClinVar">
                             {{ cvId }}
                             <span class="material-symbols-outlined tiny-icon">launch</span>
@@ -192,7 +192,7 @@
                       }
                       @if (getClinvarField(grp.fields, 'Dbsnp Id'); as dbsnpId) {
                         <div class="clinvar-id-row">
-                          <span class="clinvar-id-label">dbSNP rsID</span>
+                          <span class="clinvar-id-label">{{ 'variantDetails.dbSnpRsId' | translate }}</span>
                           <span class="pheno-pill pmid" (click)="$event.stopPropagation(); openDbsnpId(dbsnpId)" title="Click to view SNP details">
                             rs{{ dbsnpId }}
                             <span class="material-symbols-outlined tiny-icon">launch</span>
@@ -211,7 +211,7 @@
                         <div class="clinvar-diseases-section">
                           <div class="section-subtitle-row">
                             <span class="material-symbols-outlined section-subtitle-icon">healing</span>
-                            <h3>Disease Associations & References</h3>
+                            <h3>{{ 'variantDetails.diseaseAssociations' | translate }}</h3>
                           </div>
                           <div class="clinvar-diseases-grid">
                             @for (item of diseases; track item.name) {
@@ -232,7 +232,7 @@
                                     <span class="pheno-pill ref-pill more-refs-pill">
                                       +{{ item.refs.length - 1 }} refs
                                       <span class="refs-tooltip">
-                                        <span class="refs-tooltip-title">Additional References</span>
+                                        <span class="refs-tooltip-title">{{ 'variantDetails.literatureReferences' | translate }}</span>
                                         <span class="refs-tooltip-list">
                                           @for (r of item.refs.slice(1); track r.label) {
                                             @if (r.url) {
@@ -260,18 +260,18 @@
                       <div class="clinvar-tech-section">
                         <div class="section-subtitle-row">
                           <span class="material-symbols-outlined section-subtitle-icon">settings</span>
-                          <h3>Technical & Nomenclature Details</h3>
+                          <h3>{{ 'variantDetails.technicalDetails' | translate }}</h3>
                         </div>
                         <div class="clinvar-tech-grid">
                           @if (getClinvarField(grp.fields, 'Hgvs'); as hgvs) {
                             <div class="clinvar-tech-item">
-                              <span class="tech-label">HGVS Nomenclature</span>
+                              <span class="tech-label">{{ 'variantDetails.hgvsNomenclature' | translate }}</span>
                               <span class="tech-value mono-val">{{ hgvs }}</span>
                             </div>
                           }
                           @if (getClinvarField(grp.fields, 'Variant Clinical Sources'); as sources) {
                             <div class="clinvar-tech-item full-width-item">
-                              <span class="tech-label">Clinical Evidence Sources</span>
+                              <span class="tech-label">{{ 'variantDetails.clinicalEvidence' | translate }}</span>
                               <div class="phenotype-pills">
                                 @for (source of splitPipeString(sources); track source) {
                                   @if (getClinicalSourceUrl(source); as url) {
@@ -305,7 +305,7 @@
                 <div class="cravat-card-title vep-custom-title" (click)="toggleVep()" style="cursor: pointer;" title="Click to collapse/expand details">
                   <div style="display: flex; align-items: center; gap: 8px;">
                     <span class="material-symbols-outlined vep-title-icon">analytics</span>
-                    <span>VEP Functional Annotation</span>
+                    <span>{{ 'variantDetails.vepFunctionalAnnotation' | translate }}</span>
                   </div>
                   <span class="material-symbols-outlined toggle-chevron">
                     {{ (activeCravatTab() === 'VEP' || isVepExpanded()) ? 'expand_less' : 'expand_more' }}
@@ -320,13 +320,13 @@
                       <div class="vep-consequence-row">
                         @if (getVepField(grp.fields, 'Consequence'); as consequence) {
                           <div class="vep-item-display">
-                            <span class="vep-label">Consequence</span>
+                            <span class="vep-label">{{ 'variantList.consequence' | translate }}</span>
                             <span class="consequence-pill large-pill">{{ formatConsequence(consequence) }}</span>
                           </div>
                         }
                         @if (getVepField(grp.fields, 'Gene Symbol'); as gene) {
                           <div class="vep-item-display">
-                            <span class="vep-label">Gene Symbol</span>
+                            <span class="vep-label">{{ 'variantList.gene' | translate }}</span>
                             <span class="header-gene large-pill" style="font-size: 0.85rem; padding: 5px 12px; margin: 0; display: inline-block;">{{ gene }}</span>
                           </div>
                         }
@@ -336,7 +336,7 @@
                       <div class="vep-impact-row">
                         @if (getVepField(grp.fields, 'Impact'); as impact) {
                           <div class="vep-item-display">
-                            <span class="vep-label">Impact Severity</span>
+                            <span class="vep-label">{{ 'variantList.impact' | translate }}</span>
                             <span class="impact-badge large-pill" [attr.data-impact]="impact" style="display: inline-block; font-size: 0.8rem; padding: 5px 12px; font-weight: 700;">
                               {{ impact }}
                             </span>
@@ -345,7 +345,7 @@
                         
                         @if (getVepField(grp.fields, 'Clinical Significance'); as clinSig) {
                           <div class="vep-item-display">
-                            <span class="vep-label">Clinical Significance</span>
+                            <span class="vep-label">{{ 'variantDetails.clinicalSignificance' | translate }}</span>
                             <div class="clin-sig-pills">
                               @for (sig of splitCommaString(clinSig); track sig) {
                                 <span class="clin-sig-badge large-badge" [attr.data-sig]="sig.toLowerCase()">{{ sig }}</span>
@@ -367,7 +367,7 @@
                         <div class="vep-predictors-section">
                           <div class="section-subtitle-row">
                             <span class="material-symbols-outlined section-subtitle-icon">psychology</span>
-                            <h3>Computational Functional Predictors</h3>
+                            <h3>{{ 'variantDetails.computationalPredictors' | translate }}</h3>
                           </div>
                           <div class="vep-predictors-grid">
                             @if (getVepField(grp.fields, 'SIFT'); as sift) {
@@ -400,12 +400,12 @@
                             <div class="vep-phenotype-section">
                               <div class="section-subtitle-row">
                                 <span class="material-symbols-outlined section-subtitle-icon">healing</span>
-                                <h3>Associated Phenotypes & References</h3>
+                                <h3>{{ 'variantDetails.associatedPhenotypes' | translate }}</h3>
                               </div>
                               
                               @if (data.disorders.length > 0) {
                                 <div class="vep-disorders-container" style="margin-bottom: 12px;">
-                                  <span class="vep-label" style="display: block; margin-bottom: 6px;">Reported Conditions</span>
+                                  <span class="vep-label" style="display: block; margin-bottom: 6px;">{{ 'variantDetails.reportedConditions' | translate }}</span>
                                   <div class="phenotype-pills">
                                     @for (dis of data.disorders; track dis) {
                                       <span class="pheno-pill" style="font-weight: 600; white-space: normal; line-height: 1.3;">{{ dis }}</span>
@@ -416,7 +416,7 @@
 
                               @if (data.refs.length > 0) {
                                 <div class="vep-refs-container">
-                                  <span class="vep-label" style="display: block; margin-bottom: 6px;">Literature & Database References</span>
+                                  <span class="vep-label" style="display: block; margin-bottom: 6px;">{{ 'variantDetails.literatureReferences' | translate }}</span>
                                   <div class="disease-refs-container">
                                     @for (r of data.refs.slice(0, 1); track r.label) {
                                       @if (r.url) {
@@ -432,7 +432,7 @@
                                       <span class="pheno-pill ref-pill more-refs-pill">
                                         +{{ data.refs.length - 1 }} refs
                                         <span class="refs-tooltip">
-                                          <span class="refs-tooltip-title">Additional References</span>
+                                          <span class="refs-tooltip-title">{{ 'variantDetails.literatureReferences' | translate }}</span>
                                           <span class="refs-tooltip-list">
                                             @for (r of data.refs.slice(1); track r.label) {
                                               @if (r.url) {
@@ -461,18 +461,18 @@
                       <div class="vep-tech-section">
                         <div class="section-subtitle-row">
                           <span class="material-symbols-outlined section-subtitle-icon">settings</span>
-                          <h3>Technical & Nomenclature Details</h3>
+                          <h3>{{ 'variantDetails.technicalDetails' | translate }}</h3>
                         </div>
                         <div class="vep-tech-grid">
                           @if (getVepField(grp.fields, 'HGVS coding'); as hgvsC) {
                             <div class="vep-tech-item">
-                              <span class="tech-label">HGVS Coding Nomenclature</span>
+                              <span class="tech-label">{{ 'variantDetails.hgvsCodingNomenclature' | translate }}</span>
                               <span class="tech-value mono-val">{{ hgvsC }}</span>
                             </div>
                           }
                           @if (getVepField(grp.fields, 'HGVS protein'); as hgvsP) {
                             <div class="vep-tech-item">
-                              <span class="tech-label">HGVS Protein Nomenclature</span>
+                              <span class="tech-label">{{ 'variantDetails.hgvsProteinNomenclature' | translate }}</span>
                               <span class="tech-value mono-val">{{ hgvsP }}</span>
                             </div>
                           }
@@ -553,7 +553,7 @@
     </div>
 
     <div class="modal-footer">
-      <button class="btn-solid" (click)="close()">Close Details</button>
+      <button class="btn-solid" (click)="close()">{{ 'variantDetails.closeDetails' | translate }}</button>
     </div>
 
   </div>

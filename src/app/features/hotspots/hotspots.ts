@@ -1,13 +1,14 @@
 import { Component, OnInit, inject, signal, OnDestroy, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { AnalysisService } from '../../core/services/analysis.service';
 import { ToastService } from '../../core/services/toast.service';
 
 @Component({
   selector: 'app-hotspots',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   templateUrl: './hotspots.html',
   styleUrls: ['./hotspots.css']
 })
@@ -15,6 +16,7 @@ export class HotspotsComponent implements OnInit {
   private readonly analysisService = inject(AnalysisService);
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
+  private readonly translate = inject(TranslateService);
 
   readonly isLoading = signal<boolean>(true);
   readonly hasData = signal<boolean>(false);
@@ -60,7 +62,7 @@ export class HotspotsComponent implements OnInit {
   // Computed signal to group and position markers on each chromosome
   readonly chromosomeMarkers = computed(() => {
     const variants = this.approvedVariants();
-    const markersMap: Record<string, Array<{ position: number; count: number; gene: string }>> = {};
+    const markersMap: Record<string, { position: number; count: number; gene: string }[]> = {};
 
     // Initialize arrays for all chromosomes
     this.chromosomes.forEach(c => {
@@ -156,7 +158,7 @@ export class HotspotsComponent implements OnInit {
 
       this.isLoading.set(false);
     } catch (error: any) {
-      this.toastService.show(`Failed to load hotspot data: ${error.message}`, 'error');
+      this.toastService.show(this.translate.instant('hotspots.failedLoad', { error: error.message }), 'error');
       this.isLoading.set(false);
     }
   }

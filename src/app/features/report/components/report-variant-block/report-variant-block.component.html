@@ -3,7 +3,7 @@
         @if (item().hgvs) {
         <h2>{{ item().hgvs }}</h2>
         } @else {
-        <h2>Variant at Position {{ item().config.variantPosition }}</h2>
+        <h2>{{ 'report.variantAtPosition' | translate: { pos: item().config.variantPosition } }}</h2>
         }
         <div class="variant-tags">
             <span class="tag">{{ item().variant.ref }} <span class="arrow">→</span> {{ item().variant.alt }}</span>
@@ -15,7 +15,7 @@
 
     @if (item().config.comments || item().jobComments.length > 0) {
     <div class="variant-comments">
-        <strong>Comments:</strong>
+        <strong>{{ 'report.commentsLabel' | translate }}</strong>
         @for (comment of item().jobComments; track comment.id) {
         <p class="job-comment"><span class="comment-author">{{ comment.author }}:</span> {{ comment.text }}</p>
         }

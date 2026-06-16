@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, model, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { SettingsService, ProxyConfig } from '../../../core/services/settings.service';
 import { UserService } from '../../../core/services/user.service';
 import { AnalysisService } from '../../../core/services/analysis.service';
@@ -26,7 +27,7 @@ const DEFAULT_MODULES = new Set([
 @Component({
     selector: 'app-config-modal',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, TranslatePipe],
     templateUrl: './app-config-modal.html',
     styleUrl: './app-config-modal.css',
     changeDetection: ChangeDetectionStrategy.OnPush
@@ -35,6 +36,7 @@ export class AppConfigModalComponent implements OnInit {
     private settingsService = inject(SettingsService);
     private analysisService = inject(AnalysisService);
     protected userService = inject(UserService);
+    protected translate = inject(TranslateService);
 
     proxyConfig: ProxyConfig = {};
     userName = signal<string>('');
@@ -154,12 +156,12 @@ export class AppConfigModalComponent implements OnInit {
      * Flushes the global annotation cache.
      */
     async flushCache() {
-        if (confirm('Are you sure you want to clear the global annotation cache? This will delete all cached VEP and HGVS results for all users.')) {
+        if (confirm(this.translate.instant('appConfig.confirmFlushCache'))) {
             try {
                 await this.analysisService.flushCache();
-                alert('Cache cleared successfully.');
+                alert(this.translate.instant('appConfig.cacheCleared'));
             } catch (error: unknown) {
-                alert('Failed to clear cache: ' + (error as any).message);
+                alert(this.translate.instant('appConfig.failedClearCache', { error: (error as any).message }));
             }
         }
     }
@@ -220,15 +222,15 @@ export class AppConfigModalComponent implements OnInit {
                 }
             });
         } catch (e: any) {
-            alert(`Failed to start installation for ${moduleName}: ` + e.message);
+            alert(this.translate.instant('appConfig.failedStartInstall', { name: moduleName, error: e.message }));
         }
     }
-
+ 
     /**
      * Uninstalls an OpenCRAVAT module.
      */
     async uninstallModule(moduleName: string) {
-        if (!confirm(`Are you sure you want to uninstall module "${moduleName}"?`)) {
+        if (!confirm(this.translate.instant('appConfig.confirmUninstallModule', { name: moduleName }))) {
             return;
         }
         this.isLoading.set(true);
@@ -240,10 +242,10 @@ export class AppConfigModalComponent implements OnInit {
                     await this.loadStore();
                 }
             } else {
-                alert(`Failed to uninstall module: ${res.error}`);
+                alert(this.translate.instant('appConfig.failedUninstallModule', { error: res.error }));
             }
         } catch (e: any) {
-            alert(`Failed to uninstall module: ` + e.message);
+            alert(this.translate.instant('appConfig.failedUninstallModule', { error: e.message }));
         } finally {
             this.isLoading.set(false);
         }

@@ -2,23 +2,21 @@
 <div class="modal-backdrop" (click)="close()">
     <div class="settings-modal" (click)="$event.stopPropagation()">
         <div class="modal-header">
-            <h2>Configure Report</h2>
+            <h2>{{ 'report.configureReport' | translate }}</h2>
             <button class="btn-icon-small" (click)="close()">
                 <span class="material-symbols-outlined">close</span>
             </button>
         </div>
 
         <div class="modal-content">
-            <p class="modal-description">
-                Configure which variants and reads to include in the report for <strong>{{ jobName() }}</strong>.
-            </p>
+            <p class="modal-description" [innerHTML]="'report.configureDescription' | translate: { name: jobName() }"></p>
 
             <div class="variants-config-list">
                 @if (markedVariants().length === 0) {
                 <div class="empty-state">
                     <span class="material-symbols-outlined large-icon">bookmark_border</span>
-                    <p>No variants marked for report.</p>
-                    <p class="sub-text">Go back and click the bookmark icon on variants to include them.</p>
+                    <p>{{ 'report.noVariantsMarked' | translate }}</p>
+                    <p class="sub-text">{{ 'report.goBackMarkVariants' | translate }}</p>
                 </div>
                 }
 
@@ -34,7 +32,7 @@
                             <label class="checkbox-label">
                                 <input type="checkbox" [checked]="configItems()[i]?.includeReference"
                                     (change)="updateItem(i, { includeReference: !configItems()[i]?.includeReference })">
-                                <span>Include Reference</span>
+                                <span>{{ 'report.includeReference' | translate }}</span>
                             </label>
                         </div>
                     </div>
@@ -42,15 +40,15 @@
                     <div class="variant-body">
                         <!-- Comments -->
                         <div class="form-group">
-                            <label class="form-label">Variant Analysis Comments</label>
+                            <label class="form-label">{{ 'report.comments' | translate }}</label>
                             <textarea rows="2" class="form-input" [ngModel]="configItems()[i]?.comments"
                                 (ngModelChange)="updateItem(i, { comments: $event })"
-                                placeholder="Add specific notes for this variant..."></textarea>
+                                [placeholder]="'report.addSpecificNotes' | translate"></textarea>
                         </div>
 
                         <!-- Read Selection -->
                         <div class="reads-selection">
-                            <label class="form-label">Select Reads to Include</label>
+                            <label class="form-label">{{ 'report.selectReads' | translate }}</label>
                             <div class="reads-grid">
                                 @for (read of getAvailableReads(variant.position); track read.id) {
                                 <div class="read-card" [class.selected]="isReadSelected(i, read.id)"
@@ -75,10 +73,10 @@
         </div>
 
         <div class="modal-footer">
-            <button class="btn-outline" (click)="close()">Cancel</button>
+            <button class="btn-outline" (click)="close()">{{ 'common.cancel' | translate }}</button>
             <button class="btn-solid" (click)="confirm()" [disabled]="markedVariants().length === 0">
                 <span class="material-symbols-outlined">picture_as_pdf</span>
-                Generate Report
+                {{ 'report.generateReport' | translate }}
             </button>
         </div>
     </div>
