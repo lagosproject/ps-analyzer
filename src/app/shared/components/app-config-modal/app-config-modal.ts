@@ -40,6 +40,7 @@ export class AppConfigModalComponent implements OnInit {
     userName = signal<string>('');
     ocPath = signal<string>('');
     activeTab = model<string>('General');
+    showAdvanced = signal<boolean>(false);
 
     // OpenCRAVAT State
     ocStatus = signal<OCStatus | null>(null);

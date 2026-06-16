@@ -12,6 +12,10 @@
                         <span class="material-symbols-outlined">settings</span>
                         <span>General</span>
                     </button>
+                    <button class="menu-item" [class.active]="activeTab() === 'Proxy'" (click)="setActiveTab('Proxy')" role="tab" [attr.aria-selected]="activeTab() === 'Proxy'">
+                        <span class="material-symbols-outlined">language</span>
+                        <span>Proxy</span>
+                    </button>
                     <button class="menu-item" [class.active]="activeTab() === 'Local Annotator'" (click)="setActiveTab('Local Annotator')" role="tab" [attr.aria-selected]="activeTab() === 'Local Annotator'">
                         <span class="material-symbols-outlined">analytics</span>
                         <span>Local Annotator</span>
@@ -60,26 +64,6 @@
                         <div class="divider-small"></div>
 
                         <div class="settings-section">
-                            <div class="info-box">
-                                <span class="material-symbols-outlined">info</span>
-                                <div>
-                                    <strong>Proxy Configuration</strong>
-                                    <p>Set a custom proxy. Leave empty to use system defaults. To disable an existing proxy, leave it blank and close.</p>
-                                </div>
-                            </div>
-                            <div class="form-group-small">
-                                <label for="httpProxyInput">HTTP Proxy</label>
-                                <input id="httpProxyInput" type="text" [(ngModel)]="proxyConfig.http_proxy" placeholder="http://127.0.0.1:8080">
-                            </div>
-                            <div class="form-group-small">
-                                <label for="httpsProxyInput">HTTPS Proxy</label>
-                                <input id="httpsProxyInput" type="text" [(ngModel)]="proxyConfig.https_proxy" placeholder="http://127.0.0.1:8080">
-                            </div>
-                        </div>
-
-                        <div class="divider-small"></div>
-
-                        <div class="settings-section">
                             <div class="info-box danger">
                                 <span class="material-symbols-outlined">settings_suggest</span>
                                 <div>
@@ -99,29 +83,29 @@
                         </div>
                     }
 
-                    <!-- LOCAL ANNOTATOR TAB -->
-                    @if (activeTab() === 'Local Annotator') {
+                    <!-- PROXY TAB -->
+                    @if (activeTab() === 'Proxy') {
                         <div class="settings-section">
                             <div class="info-box">
-                                <span class="material-symbols-outlined">terminal</span>
+                                <span class="material-symbols-outlined">info</span>
                                 <div>
-                                    <strong>Local Annotator Executable Path</strong>
-                                    <p>Specify the name or absolute path of the OpenCRAVAT executable. Leave as "oc" if it is in the system PATH.</p>
+                                    <strong>Proxy Configuration</strong>
+                                    <p>Set a custom proxy. Leave empty to use system defaults. To disable an existing proxy, leave it blank and close.</p>
                                 </div>
                             </div>
                             <div class="form-group-small">
-                                <label for="ocPathInput">Executable Path</label>
-                                <div style="display: flex; gap: 8px;">
-                                    <input id="ocPathInput" type="text" style="flex: 1;" [ngModel]="ocPath()" (ngModelChange)="ocPath.set($event)" placeholder="e.g. oc, or /usr/local/bin/oc">
-                                    <button class="btn-outline small" (click)="loadOCInfo()" style="display: inline-flex; align-items: center; gap: 4px; padding: 0 12px; height: 36px; white-space: nowrap;">
-                                        <span class="material-symbols-outlined" style="font-size: 18px;">refresh</span> Apply & Test
-                                    </button>
-                                </div>
+                                <label for="httpProxyInput">HTTP Proxy</label>
+                                <input id="httpProxyInput" type="text" [(ngModel)]="proxyConfig.http_proxy" placeholder="http://127.0.0.1:8080">
+                            </div>
+                            <div class="form-group-small">
+                                <label for="httpsProxyInput">HTTPS Proxy</label>
+                                <input id="httpsProxyInput" type="text" [(ngModel)]="proxyConfig.https_proxy" placeholder="http://127.0.0.1:8080">
                             </div>
                         </div>
+                    }
 
-                        <div class="divider-small"></div>
-
+                    <!-- LOCAL ANNOTATOR TAB -->
+                    @if (activeTab() === 'Local Annotator') {
                         @if (isLoading() && !ocStatus()) {
                             <div class="oc-loading-container">
                                 <svg class="spinner" viewBox="0 0 24 24">
@@ -306,6 +290,38 @@ oc module install-base</code></pre>
                                     </button>
                                 </div>
                             }
+
+                            <!-- Advanced Settings Section -->
+                            <div class="divider-small"></div>
+                            <div class="advanced-settings-container">
+                                <div class="advanced-settings-header" role="button" tabindex="0" (click)="showAdvanced.set(!showAdvanced())" (keydown.enter)="showAdvanced.set(!showAdvanced())" [class.expanded]="showAdvanced()">
+                                    <span class="material-symbols-outlined toggle-icon">expand_more</span>
+                                    <span>Advanced Settings</span>
+                                </div>
+                                
+                                @if (showAdvanced()) {
+                                    <div class="advanced-settings-content mt-3">
+                                        <div class="settings-section">
+                                            <div class="info-box">
+                                                <span class="material-symbols-outlined">terminal</span>
+                                                <div>
+                                                    <strong>Local Annotator Executable Path</strong>
+                                                    <p>Specify the name or absolute path of the OpenCRAVAT executable. Leave as "oc" if it is in the system PATH.</p>
+                                                </div>
+                                            </div>
+                                            <div class="form-group-small">
+                                                <label for="ocPathInput">Executable Path</label>
+                                                <div style="display: flex; gap: 8px;">
+                                                    <input id="ocPathInput" type="text" style="flex: 1;" [ngModel]="ocPath()" (ngModelChange)="ocPath.set($event)" placeholder="e.g. oc, or /usr/local/bin/oc">
+                                                    <button class="btn-outline small" (click)="loadOCInfo()" style="display: inline-flex; align-items: center; gap: 4px; padding: 0 12px; height: 36px; white-space: nowrap;">
+                                                        <span class="material-symbols-outlined" style="font-size: 18px;">refresh</span> Apply & Test
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
                         }
                     }
                 </div>
