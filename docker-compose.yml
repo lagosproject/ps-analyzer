@@ -3,6 +3,13 @@ services:
     build:
       context: ../bio-engine
       dockerfile: Dockerfile.server
+      args:
+        - HTTP_PROXY=${HTTP_PROXY}
+        - HTTPS_PROXY=${HTTPS_PROXY}
+        - NO_PROXY=${NO_PROXY}
+        - http_proxy=${http_proxy}
+        - https_proxy=${https_proxy}
+        - no_proxy=${no_proxy}
     environment:
       - BIO_HOST=0.0.0.0
       - BIO_PORT=8000
@@ -24,6 +31,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.server
+      args:
+        - HTTP_PROXY=${HTTP_PROXY}
+        - HTTPS_PROXY=${HTTPS_PROXY}
+        - NO_PROXY=${NO_PROXY}
+        - http_proxy=${http_proxy}
+        - https_proxy=${https_proxy}
+        - no_proxy=${no_proxy}
     ports:
       - "8080:80"
     depends_on:

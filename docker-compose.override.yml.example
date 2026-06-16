@@ -1,0 +1,7 @@
+# local docker-compose overrides (copy to docker-compose.override.yml to enable)
+services:
+  backend:
+    volumes:
+      # Example: bind-mount pre-downloaded OpenCRAVAT modules to avoid downloading them at runtime
+      # - /path/to/cravat_modules:/app/storage/open-cravat
+      - ./storage:/app/storage

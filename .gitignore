@@ -54,3 +54,6 @@ src-tauri/binaries/
 # Local symlinks
 engine
 storage/
+
+# Docker Compose overrides
+docker-compose.override.yml

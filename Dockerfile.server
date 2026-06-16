@@ -1,8 +1,23 @@
 # Production Dockerfile for MS-Analyzer Web Deployment
 # Stage 1: Build the Angular application
-FROM node:20-bullseye AS build-stage
+FROM mirror.gcr.io/library/node:20-bullseye AS build-stage
+
+# Build-time proxy ARGs
+ARG HTTP_PROXY
+ARG HTTPS_PROXY
+ARG NO_PROXY
+ARG http_proxy=$HTTP_PROXY
+ARG https_proxy=$HTTPS_PROXY
+ARG no_proxy=$NO_PROXY
 
 WORKDIR /app
+
+# Copy custom CA certificates if any are provided (e.g. for HTTPS inspection proxy)
+COPY certs/ /usr/local/share/ca-certificates/
+RUN apt-get update && apt-get install -y ca-certificates && update-ca-certificates
+
+# Tell npm to use the system CA certificate bundle
+RUN npm config set cafile /etc/ssl/certs/ca-certificates.crt
 
 # Copy package files and install dependencies
 COPY package.json package-lock.json* ./
@@ -13,7 +28,7 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Serve with Nginx
-FROM nginx:alpine
+FROM mirror.gcr.io/library/nginx:alpine
 
 # Copy the build output to Nginx's serve directory
 # Note: The path depends on the 'frontendDist' in tauri.conf.json or angular.json
