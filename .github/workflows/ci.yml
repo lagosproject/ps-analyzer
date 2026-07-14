@@ -20,10 +20,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
-          cache: npm
 
       - name: Install Frontend Dependencies
-        run: npm ci
+        run: npm install
 
       - name: Run Frontend Lint
         run: npm run lint
@@ -38,7 +37,7 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev jq
 
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
@@ -47,6 +46,17 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: 'src-tauri -> target'
+
+      - name: Stub sidecar binaries
+        working-directory: src-tauri
+        run: |
+          # tauri-build's build script validates that every externalBin resource
+          # path exists on disk, even for `cargo check`. It doesn't need working
+          # binaries here, just files with the right target-triple suffix.
+          jq '.bundle.externalBin |= map(select(contains("bgzip") == false and contains("samtools") == false))' tauri.conf.json > tauri.conf.json.tmp && mv tauri.conf.json.tmp tauri.conf.json
+          mkdir -p binaries
+          touch binaries/ps-analyzer-bio-engine-x86_64-unknown-linux-gnu
+          touch binaries/ps-analyzer-tracy-x86_64-unknown-linux-gnu
 
       - name: Run cargo check
         working-directory: src-tauri
